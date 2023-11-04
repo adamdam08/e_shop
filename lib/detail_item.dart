@@ -13,10 +13,7 @@ import 'theme/theme.dart';
 
 class DetailItem extends StatefulWidget {
   final String imageUrl;
-  const DetailItem({
-    super.key,
-    required this.imageUrl
-  });
+  const DetailItem({super.key, required this.imageUrl});
 
   @override
   State<DetailItem> createState() => _DetailItemState();
@@ -47,13 +44,15 @@ class _DetailItemState extends State<DetailItem> {
                         fit: BoxFit.cover,
                       ),
                       Container(
-                        padding: const EdgeInsets.only(top: 30,left: 30, right: 30),
-                        margin: EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.8),
+                        padding:
+                            const EdgeInsets.only(top: 30, left: 30, right: 30),
+                        margin: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.width * 0.8),
                         width: double.infinity,
                         decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(30))
-                        ),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(30))),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,8 +75,7 @@ class _DetailItemState extends State<DetailItem> {
                                         overflow: TextOverflow.ellipsis,
                                         fontSize: 14,
                                         color: Colors.grey,
-                                        decoration: TextDecoration.lineThrough
-                                    ),
+                                        decoration: TextDecoration.lineThrough),
                                   ),
                                 ),
                                 Text(
@@ -85,8 +83,7 @@ class _DetailItemState extends State<DetailItem> {
                                   style: poppins.copyWith(
                                       fontSize: 12,
                                       color: Colors.red,
-                                      fontWeight: bold
-                                  ),
+                                      fontWeight: bold),
                                 ),
                               ],
                             ),
@@ -139,14 +136,14 @@ class _DetailItemState extends State<DetailItem> {
                               textAlign: TextAlign.justify,
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(top: 20, bottom: 10),
+                              padding:
+                                  const EdgeInsets.only(top: 20, bottom: 10),
                               child: Text(
-                                "Detail product",
+                                "Detail produk",
                                 style: poppins.copyWith(
-                                  fontWeight: semiBold,
-                                  color: backgroundColor1,
-                                  fontSize: 18
-                                ),
+                                    fontWeight: semiBold,
+                                    color: backgroundColor1,
+                                    fontSize: 18),
                               ),
                             ),
                             Row(
@@ -154,33 +151,7 @@ class _DetailItemState extends State<DetailItem> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Condition",
-                                  style: poppins.copyWith(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  "Data",
-                                  style: poppins.copyWith(
-                                      color: backgroundColor1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Min. Purchase",
+                                  "Kondisi",
                                   style: poppins.copyWith(
                                     color: Colors.black,
                                   ),
@@ -206,7 +177,7 @@ class _DetailItemState extends State<DetailItem> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Category",
+                                  "Minimal pembelian",
                                   style: poppins.copyWith(
                                     color: Colors.black,
                                   ),
@@ -219,7 +190,35 @@ class _DetailItemState extends State<DetailItem> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10,),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Kategori",
+                                  style: poppins.copyWith(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Text(
+                                  "Data",
+                                  style: poppins.copyWith(
+                                    color: backgroundColor1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
                             const Padding(
                               padding: EdgeInsets.only(bottom: 10),
                               child: Divider(
@@ -240,7 +239,7 @@ class _DetailItemState extends State<DetailItem> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 setState(() {
                                   Navigator.pop(context);
                                 });
@@ -267,7 +266,7 @@ class _DetailItemState extends State<DetailItem> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Center(
                 child: SizedBox(
                   height: 50,
@@ -275,28 +274,28 @@ class _DetailItemState extends State<DetailItem> {
                   child: ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        Map<dynamic, dynamic> myProducts =  cartProduct.myProducts.firstWhere(
+                        Map<dynamic, dynamic> myProducts =
+                            cartProduct.myProducts.firstWhere(
                                 (element) => element["id"] == widget.imageUrl,
-                            orElse: () => {}
-                        );
+                                orElse: () => {});
 
-                        if(myProducts.isEmpty){
+                        if (myProducts.isEmpty) {
                           cartProduct.myProducts.add({
                             "id": widget.imageUrl,
                             "name": widget.imageUrl,
                             "price": 100000,
                             "amount": 1
                           });
-                        }else{
-                          myProducts["amount"]  = myProducts["amount"]+=1;
+                        } else {
+                          myProducts["amount"] = myProducts["amount"] += 1;
                         }
-
                       });
                       final snackBar = SnackBar(
-                        content: const Text('Add To Cart Success!'),
+                        content: const Text(
+                            'Berhasil menambahkan item ke keranjang!'),
                         duration: const Duration(seconds: 1),
                         action: SnackBarAction(
-                          label: 'Go To Cart',
+                          label: 'Menuju Keranjang',
                           onPressed: () {
                             // Some code to undo the change.
                             setState(() {
@@ -304,9 +303,10 @@ class _DetailItemState extends State<DetailItem> {
                             });
                             Navigator.pushAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(builder: (context) => const BottomNavigationBarExample()),
-                                (route) => false
-                            );
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const BottomNavigationBarExample()),
+                                (route) => false);
                           },
                         ),
                       );
@@ -317,13 +317,9 @@ class _DetailItemState extends State<DetailItem> {
                     },
                     style: ElevatedButton.styleFrom(
                         shape: StadiumBorder(
-                            side: BorderSide(
-                                width: 1,
-                                color: backgroundColor3
-                            )
-                        ),
-                        backgroundColor: backgroundColor1
-                    ),
+                            side:
+                                BorderSide(width: 1, color: backgroundColor3)),
+                        backgroundColor: backgroundColor1),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -333,11 +329,9 @@ class _DetailItemState extends State<DetailItem> {
                           color: Colors.white,
                         ),
                         Text(
-                          ' Add to Cart',
+                          ' Tambahkan ke keranjang',
                           style: poppins.copyWith(
-                              fontWeight: semiBold,
-                              color: Colors.white
-                          ),
+                              fontWeight: semiBold, color: Colors.white),
                         ),
                       ],
                     ),

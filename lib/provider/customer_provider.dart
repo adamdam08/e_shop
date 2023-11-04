@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-class CustomerProvider with ChangeNotifier{
+class CustomerProvider with ChangeNotifier {
   // final List<Map> myProducts = List.generate(0, (index) => {
   //   "id": index,
   //   "name": "Product $index",
@@ -11,7 +11,7 @@ class CustomerProvider with ChangeNotifier{
   List<Map> _myCustomer = [];
   List<Map> get myCustomer => _myCustomer;
 
-  set myCustomer(List<Map> customer){
+  set myCustomer(List<Map> customer) {
     myCustomer = customer;
     notifyListeners();
   }

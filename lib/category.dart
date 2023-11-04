@@ -13,7 +13,9 @@ class Category extends StatefulWidget {
 }
 
 class _CategoryState extends State<Category> {
-  final List<Map> myProducts = List.generate(99, (index) => {"id": index, "name": "Product $index"}).toList();
+  final List<Map> myProducts =
+      List.generate(99, (index) => {"id": index, "name": "Product $index"})
+          .toList();
 
   List<String> myCategoryFiltered = [];
   List<String> myCategory = ["Tepung", "Kecap", "Sambal", "Beras", "Mie"];
@@ -28,7 +30,7 @@ class _CategoryState extends State<Category> {
     searchBarFocusNode.addListener(_onFocusChange);
   }
 
-  void _onFocusChange(){
+  void _onFocusChange() {
     setState(() {
       print("Searchbar Clicked");
     });
@@ -42,27 +44,39 @@ class _CategoryState extends State<Category> {
       child: Column(
         children: [
           searchbar(),
-          if(searchBarFocusNode.hasFocus)...[
+          if (searchBarFocusNode.hasFocus) ...[
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SuggestionListView(myCategory: myCategoryFiltered, searchTextController: searchTextController),
+                child: SuggestionListView(
+                    myCategory: myCategoryFiltered,
+                    searchTextController: searchTextController),
               ),
             ),
-          ]else...[
+          ] else ...[
             Expanded(
               child: ListView(
                 children: [
-                  ExpansionTileBuilder(title: "Collapsible 1", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 2", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 3", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 4", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 5", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 1", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 2", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 3", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 4", myProducts: myProducts),
-                  ExpansionTileBuilder(title: "Collapsible 5", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 1", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 2", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 3", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 4", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 5", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 1", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 2", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 3", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 4", myProducts: myProducts),
+                  ExpansionTileBuilder(
+                      title: "Collapsible 5", myProducts: myProducts),
                 ],
               ),
             ),
@@ -72,7 +86,7 @@ class _CategoryState extends State<Category> {
     );
   }
 
-  Widget searchbar(){
+  Widget searchbar() {
     return Container(
       height: 50,
       margin: const EdgeInsets.only(bottom: 10, left: 20, right: 20),
@@ -91,102 +105,95 @@ class _CategoryState extends State<Category> {
           prefixIconColor: Colors.grey,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(5)),
-            borderSide: BorderSide(
-                color: Colors.red,
-                width: 1
-            ),
+            borderSide: BorderSide(color: Colors.red, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(5)),
-            borderSide: BorderSide(
-                color: Colors.green,
-                width: 1
-            ),
+            borderSide: BorderSide(color: Colors.green, width: 1),
           ),
-          hintText: "Search Here...",
-          hintStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.normal
-          ),
+          hintText: "Cari disini...",
+          hintStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
           alignLabelWithHint: true,
         ),
-        onSubmitted:(value){
-          if(value != ""){
+        onSubmitted: (value) {
+          if (value != "") {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SearchList(text: value)),
             );
           }
         },
-        onChanged: (query){
+        onChanged: (query) {
           setState(() {
             myCategoryFiltered.clear();
-            myCategoryFiltered = myCategory.where((element) => element.toLowerCase().contains(query.toLowerCase())).toList();
+            myCategoryFiltered = myCategory
+                .where((element) =>
+                    element.toLowerCase().contains(query.toLowerCase()))
+                .toList();
           });
         },
       ),
     );
   }
 
-  Widget suggestionListview(List<String> myCategory){
+  Widget suggestionListview(List<String> myCategory) {
     return ListView(
-      children:
-        myCategory.map((data) =>
-            searchTextController.text == "" ? SizedBox() :
-            GestureDetector(
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SearchList(text: data)),
-                  );
-                },
-                child: Container(
-                    color: Colors.white,
-                    width: double.infinity,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.search,
-                                color: Colors.grey,
-                                size: 18,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  data,
-                                  style: poppins.copyWith(
-                                    fontWeight: light,
-                                    color: Colors.black,
+        children: myCategory
+            .map((data) => searchTextController.text == ""
+                ? const SizedBox()
+                : GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SearchList(text: data)),
+                      );
+                    },
+                    child: Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.search,
+                                    color: Colors.grey,
+                                    size: 18,
                                   ),
-                                ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Text(
+                                      data,
+                                      style: poppins.copyWith(
+                                        fontWeight: light,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  const Icon(
+                                    Icons.call_made,
+                                    color: Colors.grey,
+                                    size: 18,
+                                  )
+                                ],
                               ),
-                              const Spacer(),
-                              const Icon(
-                                Icons.call_made,
-                                color: Colors.grey,
-                                size: 18,
-                              )
-                            ],
-                          ),
-                        ),
-                        const Divider(
-                          color: Colors.grey,
-                          thickness: 1,
-                        )
-                      ],
-                    )
-                )
-            )
-        ).toList()
-    );
+                            ),
+                            const Divider(
+                              color: Colors.grey,
+                              thickness: 1,
+                            )
+                          ],
+                        ))))
+            .toList());
   }
 }
 
@@ -203,66 +210,64 @@ class SuggestionListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-        children:
-        myCategory.map((data) =>
-        searchTextController.text == "" ? const SizedBox() :
-        GestureDetector(
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SearchList(text: data)),
-              );
-            },
-            child: Container(
-                color: Colors.white,
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.search,
-                            color: Colors.grey,
-                            size: 18,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(
-                              data,
-                              style: poppins.copyWith(
-                                fontWeight: light,
-                                color: Colors.black,
+        children: myCategory
+            .map((data) => searchTextController.text == ""
+                ? const SizedBox()
+                : GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SearchList(text: data)),
+                      );
+                    },
+                    child: Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.search,
+                                    color: Colors.grey,
+                                    size: 18,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Text(
+                                      data,
+                                      style: poppins.copyWith(
+                                        fontWeight: light,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  const Icon(
+                                    Icons.call_made,
+                                    color: Colors.grey,
+                                    size: 18,
+                                  )
+                                ],
                               ),
                             ),
-                          ),
-                          const Spacer(),
-                          const Icon(
-                            Icons.call_made,
-                            color: Colors.grey,
-                            size: 18,
-                          )
-                        ],
-                      ),
-                    ),
-                    const Divider(
-                      color: Colors.grey,
-                      thickness: 1,
-                    )
-                  ],
-                )
-            )
-        )
-        ).toList()
-    );
+                            const Divider(
+                              color: Colors.grey,
+                              thickness: 1,
+                            )
+                          ],
+                        ))))
+            .toList());
   }
 }
-
 
 class ExpansionTileBuilder extends StatelessWidget {
   final String title;
@@ -278,12 +283,10 @@ class ExpansionTileBuilder extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: ExpansionTile(
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w500
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w500),
         ),
-      ),
         children: [
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.start,
@@ -298,7 +301,6 @@ class ExpansionTileBuilder extends StatelessWidget {
                     const ExpansionCarditem(itemTitle: "Test 1"),
                 ],
               )
-
             ],
           )
         ],
@@ -317,28 +319,20 @@ class ExpansionCarditem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 10),
       width: 75,
       height: 75,
-      child:  Card(
+      child: Card(
           elevation: 2,
           shadowColor: Colors.grey,
           color: Colors.white,
-          child:Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              const Icon(
-                  Icons.message,
-                  size: 24,
-                  color: Colors.black
-              ),
+              const Icon(Icons.message, size: 24, color: Colors.black),
               Text(
                 itemTitle,
-                style: const TextStyle(
-                    color: Colors.black
-                ),
+                style: const TextStyle(color: Colors.black),
               ),
             ],
-          )
-      ),
+          )),
     );
   }
 }
-

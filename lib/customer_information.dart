@@ -4,17 +4,15 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class CustomerInformation extends StatefulWidget {
   final Map<dynamic, dynamic> data;
   final bool isEditable;
-  const CustomerInformation({
-    super.key,
-    required this.data,
-    this.isEditable = false
-  });
+  const CustomerInformation(
+      {super.key, required this.data, this.isEditable = false});
 
   @override
   State<CustomerInformation> createState() => _CustomerInformationState();
@@ -34,14 +32,17 @@ class _CustomerInformationState extends State<CustomerInformation> {
     'Jl.Bendungan Sutami GG.6 No 11, Lowokwaru, Kota Malang, Jawa Timur.',
   ];
 
-  final TextEditingController nameTextEditingController = TextEditingController();
-  final TextEditingController phoneTextEditingController = TextEditingController();
-  final TextEditingController addressTextEditingController = TextEditingController();
+  final TextEditingController nameTextEditingController =
+      TextEditingController();
+  final TextEditingController phoneTextEditingController =
+      TextEditingController();
+  final TextEditingController addressTextEditingController =
+      TextEditingController();
 
   @override
-  initState(){
+  initState() {
     super.initState();
-    if(widget.isEditable == false){
+    if (widget.isEditable == false) {
       nameTextEditingController.text = widget.data["name"];
       phoneTextEditingController.text = widget.data["phone"];
       addressTextEditingController.text = widget.data["address"];
@@ -61,46 +62,26 @@ class _CustomerInformationState extends State<CustomerInformation> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
-                      onTap: (){
+                      onTap: () {
                         Navigator.pop(context);
                       },
-                      child:  const SizedBox(
+                      child: const SizedBox(
                         width: 20, //MediaQuery.of(context).size.width * 0.1,
-                        child: Icon(
-                            Icons.arrow_back
-                        ),
+                        child: Icon(Icons.arrow_back),
                       ),
                     ),
-                    Text(
-                        "Customer Profile",
-                      style: poppins.copyWith(
-                        fontWeight: semiBold,
-                        fontSize: 18
-                      ),
-                    ),
-                    InkWell(
-                      onTap: (){
-                          customerProvider.myCustomer.add({
-                            "id": customerProvider.myCustomer.length + 1,
-                            "name": nameTextEditingController.text,
-                            "phone" : phoneTextEditingController.text,
-                            "address" : addressTextEditingController.text
-                        });
-                          Navigator.pop(context);
-                      },
-                      child: SizedBox(
-                        width: 20, //MediaQuery.of(context).size.width * 0.1,
-                        child: Icon(
-                            Icons.save,
-                            color: widget.isEditable ? Colors.black : Colors.white
-                          ,
-                        ),
+                    Center(
+                      child: Text(
+                        "Profil Customer",
+                        style: poppins.copyWith(
+                            fontWeight: semiBold, fontSize: 18),
                       ),
                     ),
                   ],
@@ -109,30 +90,117 @@ class _CustomerInformationState extends State<CustomerInformation> {
               Expanded(
                 child: ListView(
                   children: [
-                    Center(
-                      child: ClipOval(
-                        clipBehavior: Clip.antiAlias,
-                        // borderRadius: BorderRadius.circular(8),
-                        child: FadeInImage.memoryNetwork(
-                          placeholder: kTransparentImage,
-                          image: "https://picsum.photos/300?image=${(int.tryParse("1")! * Random().nextInt(10))}",
-                          fit: BoxFit.cover,
-                          height: 150,
-                          width: 150,
-                        ),
-                      ),
-                    ),
-                    textFormBuilder(searchBoxController: nameTextEditingController, headerText: "Nama", icon: Icons.person, isEditable: widget.isEditable, keyboardType: TextInputType.name),
-                    textFormBuilder(searchBoxController: phoneTextEditingController, headerText: "Nomor Telefon", icon: Icons.phone, isEditable: widget.isEditable , keyboardType: TextInputType.number),
-                    if(widget.isEditable)...[
-                      textFormBuilder(searchBoxController: addressTextEditingController, headerText: "Alamat", icon: Icons.phone, isEditable: widget.isEditable, keyboardType: TextInputType.emailAddress),
-                    ]else...[
-                      for (var i =0;  i < 1; i++)
-                        textFormBuilder(searchBoxController: addressTextEditingController, headerText: "Alamat ${i+1}", icon: Icons.phone, isEditable: widget.isEditable, keyboardType: TextInputType.text),
+                    textFormBuilder(
+                        searchBoxController: nameTextEditingController,
+                        headerText: "Nama",
+                        icon: Icons.person,
+                        isEditable: widget.isEditable,
+                        keyboardType: TextInputType.name),
+                    textFormBuilder(
+                        searchBoxController: phoneTextEditingController,
+                        headerText: "Nomor Telefon",
+                        icon: Icons.phone,
+                        isEditable: widget.isEditable,
+                        keyboardType: TextInputType.number),
+                    if (widget.isEditable) ...[
+                      textFormBuilder(
+                          searchBoxController: addressTextEditingController,
+                          headerText: "Alamat",
+                          icon: Icons.phone,
+                          isEditable: widget.isEditable,
+                          keyboardType: TextInputType.emailAddress),
+                    ] else ...[
+                      for (var i = 0; i < 1; i++)
+                        textFormBuilder(
+                            searchBoxController: addressTextEditingController,
+                            headerText: "Alamat ${i + 1}",
+                            icon: Icons.phone,
+                            isEditable: widget.isEditable,
+                            keyboardType: TextInputType.text),
                     ]
                   ],
                 ),
-              )
+              ),
+              if (widget.isEditable) ...[
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  child: Center(
+                    child: SizedBox(
+                      height: 50,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          String name = nameTextEditingController.text;
+                          String phone = phoneTextEditingController.text;
+                          String address = addressTextEditingController.text;
+
+                          if (name.isNotEmpty &&
+                              phone.isNotEmpty &&
+                              address.isNotEmpty) {
+                            customerProvider.myCustomer.add({
+                              "id": customerProvider.myCustomer.length + 1,
+                              "name": nameTextEditingController.text,
+                              "phone": phoneTextEditingController.text,
+                              "address": addressTextEditingController.text
+                            });
+                            Navigator.pop(context);
+                          } else {
+                            if (name.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: "Nama wajib diisi",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            }
+                            if (phone.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: "Nomor telefon wajib diisi",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            }
+                            if (address.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: "Alamat wajib diisi",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            shape: StadiumBorder(
+                                side: BorderSide(
+                                    width: 1, color: backgroundColor3)),
+                            backgroundColor: backgroundColor1),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.person_add,
+                              color: Colors.white,
+                            ),
+                            Text(
+                              ' Simpan Customer',
+                              style: poppins.copyWith(
+                                  fontWeight: semiBold, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ] else
+                ...[],
             ],
           ),
         ),
@@ -140,19 +208,19 @@ class _CustomerInformationState extends State<CustomerInformation> {
     );
   }
 
-  Widget listFormBuilder({required List<String> items,required String headerText, required IconData icon}){
+  Widget listFormBuilder(
+      {required List<String> items,
+      required String headerText,
+      required IconData icon}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             headerText,
-            style: poppins.copyWith(
-                fontWeight: semiBold,
-                fontSize: 14
-            ),
+            style: poppins.copyWith(fontWeight: semiBold, fontSize: 14),
           ),
           const SizedBox(
             height: 10,
@@ -182,18 +250,20 @@ class _CustomerInformationState extends State<CustomerInformation> {
                   ),
                 ],
               ),
-              items: items.map((String item) => DropdownMenuItem<String>(
-                value: item,
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    fontWeight: regular,
-                    color: Colors.grey,
-                  ),
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              )).toList(),
+              items: items
+                  .map((String item) => DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(
+                          item,
+                          style: TextStyle(
+                            fontWeight: regular,
+                            color: Colors.grey,
+                          ),
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ))
+                  .toList(),
               value: selectedValue,
               buttonStyleData: ButtonStyleData(
                 width: double.infinity,
@@ -241,18 +311,20 @@ class _CustomerInformationState extends State<CustomerInformation> {
     );
   }
 
-  Widget textFormBuilder({required TextEditingController searchBoxController, required String headerText, required IconData icon, required bool isEditable, required TextInputType keyboardType}){
+  Widget textFormBuilder(
+      {required TextEditingController searchBoxController,
+      required String headerText,
+      required IconData icon,
+      required bool isEditable,
+      required TextInputType keyboardType}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             headerText,
-            style: poppins.copyWith(
-                fontWeight: semiBold,
-                fontSize: 14
-            ),
+            style: poppins.copyWith(fontWeight: semiBold, fontSize: 14),
           ),
           const SizedBox(
             height: 10,
@@ -274,23 +346,15 @@ class _CustomerInformationState extends State<CustomerInformation> {
                 prefixIconColor: Colors.grey,
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
-                  borderSide: BorderSide(
-                      color: Colors.red,
-                      width: 1
-                  ),
+                  borderSide: BorderSide(color: Colors.red, width: 1),
                 ),
                 focusedBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
-                  borderSide: BorderSide(
-                      color: Colors.green,
-                      width: 1
-                  ),
+                  borderSide: BorderSide(color: Colors.green, width: 1),
                 ),
-                hintText: isEditable ? "Input $headerText here..." : headerText,
+                hintText: isEditable ? "Input $headerText" : headerText,
                 hintStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal
-                ),
+                    fontSize: 14, fontWeight: FontWeight.normal),
                 alignLabelWithHint: true,
               ),
             ),
@@ -300,5 +364,3 @@ class _CustomerInformationState extends State<CustomerInformation> {
     );
   }
 }
-
-

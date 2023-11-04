@@ -1,4 +1,3 @@
-
 import 'package:e_shop/home.dart';
 import 'package:e_shop/search_list.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ class Promo extends StatefulWidget {
 }
 
 class _PromoState extends State<Promo> {
-
   List<String> myCategoryFiltered = [];
   List<String> myCategory = ["Tepung", "Kecap", "Sambal", "Beras", "Mie"];
 
@@ -27,7 +25,7 @@ class _PromoState extends State<Promo> {
     searchBarFocusNode.addListener(_onFocusChange);
   }
 
-  void _onFocusChange(){
+  void _onFocusChange() {
     setState(() {
       print("Searchbar Clicked");
     });
@@ -40,17 +38,20 @@ class _PromoState extends State<Promo> {
       child: Column(
         children: [
           searchbar(),
-          if(searchBarFocusNode.hasFocus)...[
+          if (searchBarFocusNode.hasFocus) ...[
             Expanded(
-            child: Padding(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SuggestionListView(myCategory: myCategoryFiltered, searchTextController: searchTextController),
+                child: SuggestionListView(
+                    myCategory: myCategoryFiltered,
+                    searchTextController: searchTextController),
               ),
             )
-          ]else...[
+          ] else ...[
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 children: [
                   for (int i = 0; i <= 20; i++)
                     const DynamicCardVertical(text: "1")
@@ -58,13 +59,12 @@ class _PromoState extends State<Promo> {
               ),
             ),
           ]
-
         ],
       ),
     );
   }
 
-  Widget searchbar(){
+  Widget searchbar() {
     return Container(
       height: 50,
       margin: const EdgeInsets.only(bottom: 10, left: 20, right: 20),
@@ -83,37 +83,31 @@ class _PromoState extends State<Promo> {
           prefixIconColor: Colors.grey,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(5)),
-            borderSide: BorderSide(
-                color: Colors.red,
-                width: 1
-            ),
+            borderSide: BorderSide(color: Colors.red, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(5)),
-            borderSide: BorderSide(
-                color: Colors.green,
-                width: 1
-            ),
+            borderSide: BorderSide(color: Colors.green, width: 1),
           ),
-          hintText: "Search Here...",
-          hintStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.normal
-          ),
+          hintText: "Cari disini...",
+          hintStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
           alignLabelWithHint: true,
         ),
-        onSubmitted:(value){
-          if(value != ""){
+        onSubmitted: (value) {
+          if (value != "") {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SearchList(text: value)),
             );
           }
         },
-        onChanged: (query){
+        onChanged: (query) {
           setState(() {
             myCategoryFiltered.clear();
-            myCategoryFiltered = myCategory.where((element) => element.toLowerCase().contains(query.toLowerCase())).toList();
+            myCategoryFiltered = myCategory
+                .where((element) =>
+                    element.toLowerCase().contains(query.toLowerCase()))
+                .toList();
           });
         },
       ),
