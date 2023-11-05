@@ -17,7 +17,6 @@ INJECTED from D:\GitHub\e_shop\android\app\src\main\AndroidManifest.xml:1:1-33:1
 INJECTED from D:\GitHub\e_shop\android\app\src\main\AndroidManifest.xml:1:1-33:12
 INJECTED from D:\GitHub\e_shop\android\app\src\main\AndroidManifest.xml:1:1-33:12
 MERGED from D:\GitHub\e_shop\android\app\src\main\AndroidManifest.xml:1:1-33:12
-MERGED from [:sqflite] D:\GitHub\e_shop\build\sqflite\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
 MERGED from [:fluttertoast] D:\GitHub\e_shop\build\fluttertoast\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
 MERGED from [:path_provider_android] D:\GitHub\e_shop\build\path_provider_android\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-9:12
 MERGED from [androidx.window:window-java:1.0.0-beta04] C:\Users\GL522VXK\.gradle\caches\transforms-3\ae81e06d24c799147c26814497a2a305\transformed\jetified-window-java-1.0.0-beta04\AndroidManifest.xml:17:1-23:12
@@ -58,8 +57,6 @@ uses-sdk
 INJECTED from D:\GitHub\e_shop\android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\GitHub\e_shop\android\app\src\main\AndroidManifest.xml
 INJECTED from D:\GitHub\e_shop\android\app\src\main\AndroidManifest.xml
-MERGED from [:sqflite] D:\GitHub\e_shop\build\sqflite\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
-MERGED from [:sqflite] D:\GitHub\e_shop\build\sqflite\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:fluttertoast] D:\GitHub\e_shop\build\fluttertoast\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:fluttertoast] D:\GitHub\e_shop\build\fluttertoast\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41
 MERGED from [:path_provider_android] D:\GitHub\e_shop\build\path_provider_android\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-7:41

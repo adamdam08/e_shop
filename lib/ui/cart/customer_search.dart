@@ -58,10 +58,8 @@ class _CustomerSearchState extends State<CustomerSearch> {
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
         onTap: () {
-          setState(() {
-            print((myCustomer["id"] is int));
-            customerProvider.selectCustomer = myCustomer["id"];
-          });
+          print((myCustomer["id"] is int));
+          // customerProvider.selectCustomer = 1; // myCustomer["id"];
           Navigator.pop(context);
         },
         child: Container(
