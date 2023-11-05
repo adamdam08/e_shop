@@ -79,26 +79,31 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        CarouselSlider(
-            items: [
-              for (var sliderItem in imgList)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: FadeInImage.memoryNetwork(
-                    placeholder: kTransparentImage,
-                    image: sliderItem,
-                    fit: BoxFit.cover,
+        Container(
+          width: double.infinity,
+          height: 300,
+          margin: const EdgeInsets.symmetric(horizontal: 30),
+          child: CarouselSlider(
+              items: [
+                for (var sliderItem in imgList)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: FadeInImage.memoryNetwork(
+                      placeholder: kTransparentImage,
+                      image: sliderItem,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-            ],
-            options: CarouselOptions(
-                viewportFraction: 1,
-                autoPlay: true,
-                autoPlayCurve: Curves.linear,
-                reverse: false,
-                autoPlayInterval: const Duration(seconds: 5),
-                initialPage: 0,
-                scrollDirection: Axis.horizontal)),
+              ],
+              options: CarouselOptions(
+                  viewportFraction: 1,
+                  autoPlay: true,
+                  autoPlayCurve: Curves.linear,
+                  reverse: false,
+                  autoPlayInterval: const Duration(seconds: 5),
+                  initialPage: 0,
+                  scrollDirection: Axis.horizontal)),
+        ),
         CardSectionHorizontal(text: text, headerText: "Promo "),
         CardSectionHorizontal(text: text, headerText: "Diskon"),
         CardSectionVertical(text: text, headerText: "Produk terlaku"),

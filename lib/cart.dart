@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:e_shop/provider/cart_provider.dart';
+import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/theme/theme.dart';
+import 'package:e_shop/ui/cart/customer_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,20 +14,14 @@ import 'package:transparent_image/transparent_image.dart';
 import 'detail_item.dart';
 
 class Cart extends StatefulWidget {
-  const Cart({super.key});
+  final int index;
+  const Cart({super.key, this.index = 0});
 
   @override
   State<Cart> createState() => _CartState();
 }
 
 class _CartState extends State<Cart> {
-  // final List<Map> myProducts = List.generate(10, (index) => {
-  //   "id": index,
-  //   "name": "Lorem Ipsum Sit Dolor Amet",
-  //   "price": 100000,
-  //   "amount": 1
-  // }).toList();
-
   final List<String> items = [
     'Toko Adamdam',
     'Toko Adamdam2',
@@ -49,6 +45,7 @@ class _CartState extends State<Cart> {
   @override
   Widget build(BuildContext context) {
     CartProvider cartProduct = Provider.of<CartProvider>(context);
+    CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
 
     int countItem = 0;
     int subTotal = 0;
@@ -187,6 +184,15 @@ class _CartState extends State<Cart> {
     }
 
     Widget bottomSheetDialog() {
+      String selectedCustomer = "Select customer";
+
+      if (customerProvider.myCustomer.isEmpty) {
+        selectedCustomer = "Select customer";
+      } else {
+        selectedCustomer = customerProvider
+            .myCustomer[customerProvider.selectCustomer]["name"];
+      }
+
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
@@ -196,116 +202,145 @@ class _CartState extends State<Cart> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Ringkasan Pembelian",
+              "Pilih Customer",
               style: poppins.copyWith(
                   fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
             ),
-            listFormBuilder(
-                items: items,
-                headerText: "Pilih pelanggan",
-                icon: Icons.person),
+            GestureDetector(
+              onTap: () {},
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: Colors.grey, width: 1, style: BorderStyle.solid),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.person,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CustomerSearch()),
+                        ).then((value) => setState(() {}));
+                      },
+                      child: SizedBox(
+                        width: 250,
+                        child: Text(
+                          selectedCustomer,
+                          // "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque laoreet a tellus eget dapibus.",
+                          style: poppins.copyWith(
+                              fontWeight: regular,
+                              fontSize: 14,
+                              overflow: TextOverflow.ellipsis),
+                          maxLines: 2,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(
               height: 10,
             ),
             Text(
-              "Data pembelian",
-              style: poppins.copyWith(fontWeight: semiBold, fontSize: 14),
+              "Ringkasan Pembelian",
+              style: poppins.copyWith(
+                  fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
             ),
-            Expanded(
-              child: ListView(
-                children: [
-                  const SizedBox(
-                    height: 10,
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Total item",
+                  style: poppins.copyWith(
+                    color: Colors.black,
                   ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.white,
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Total item",
-                                style: poppins.copyWith(
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Text(
-                                countItem.toString(),
-                                style: poppins.copyWith(
-                                  color: backgroundColor1,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Biaya Pengiriman",
-                                style: poppins.copyWith(
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Text(
-                                "Rp.0",
-                                style: poppins.copyWith(
-                                  color: backgroundColor1,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Promo",
-                                style: poppins.copyWith(
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Text(
-                                "Rp.0",
-                                style: poppins.copyWith(
-                                  color: backgroundColor1,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                ),
+                Text(
+                  countItem.toString(),
+                  style: poppins.copyWith(
+                    color: backgroundColor1,
                   ),
-                ],
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Divider(
+                height: 1,
+                thickness: 1,
+                color: Colors.grey,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Biaya Pengiriman",
+                  style: poppins.copyWith(
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  "Rp.0",
+                  style: poppins.copyWith(
+                    color: backgroundColor1,
+                  ),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Divider(
+                height: 1,
+                thickness: 1,
+                color: Colors.grey,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Promo",
+                  style: poppins.copyWith(
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  "Rp.0",
+                  style: poppins.copyWith(
+                    color: backgroundColor1,
+                  ),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Divider(
+                height: 1,
+                thickness: 1,
+                color: Colors.grey,
               ),
             ),
             Row(
@@ -335,7 +370,12 @@ class _CartState extends State<Cart> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  cartProduct.myProducts.clear();
+                });
+                Navigator.pop(context);
+              },
               style: ElevatedButton.styleFrom(
                   shape: StadiumBorder(
                       side: BorderSide(width: 1, color: backgroundColor3)),
@@ -349,7 +389,7 @@ class _CartState extends State<Cart> {
                     color: Colors.white,
                   ),
                   Text(
-                    ' Make Order',
+                    ' Buat Pesanan',
                     style: poppins.copyWith(
                         fontWeight: semiBold, color: Colors.white),
                   ),
@@ -594,7 +634,7 @@ class _CartState extends State<Cart> {
                   size: 48,
                 ),
                 Text(
-                  "Cart Empty",
+                  "Keranjang Kosong",
                   style: poppins.copyWith(fontWeight: regular, fontSize: 20),
                 ),
               ],

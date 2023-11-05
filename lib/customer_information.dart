@@ -79,7 +79,7 @@ class _CustomerInformationState extends State<CustomerInformation> {
                     ),
                     Center(
                       child: Text(
-                        "Profil Customer",
+                        "Profil Pelanggan",
                         style: poppins.copyWith(
                             fontWeight: semiBold, fontSize: 18),
                       ),
@@ -189,7 +189,7 @@ class _CustomerInformationState extends State<CustomerInformation> {
                               color: Colors.white,
                             ),
                             Text(
-                              ' Simpan Customer',
+                              ' Simpan Pelanggan',
                               style: poppins.copyWith(
                                   fontWeight: semiBold, color: Colors.white),
                             ),

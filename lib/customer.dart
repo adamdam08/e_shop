@@ -50,11 +50,11 @@ class _CustomerState extends State<Customer> {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
 
     // customerProvider.myCustomer.addAll(dummyCustomer);
-    // customerList =  customerProvider.myCustomer;
-    // customerListFiltered = customerProvider.myCustomer;
+    customerList = customerProvider.myCustomer;
+    customerListFiltered = customerProvider.myCustomer;
 
-    customerList = dummyCustomer;
-    customerListFiltered = dummyCustomer;
+    // customerList = dummyCustomer;
+    // customerListFiltered = dummyCustomer;
 
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
@@ -149,7 +149,7 @@ class _CustomerState extends State<Customer> {
               width: MediaQuery.of(context).size.width * 0.78,
               height: 50,
               decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
               ),
               child: TextField(
                 textInputAction: TextInputAction.search,
@@ -162,7 +162,7 @@ class _CustomerState extends State<Customer> {
                   prefixIconColor: Colors.grey,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(color: Colors.red, width: 1),
+                    borderSide: BorderSide(color: Colors.white, width: 1),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -173,11 +173,6 @@ class _CustomerState extends State<Customer> {
                       TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
                   alignLabelWithHint: true,
                 ),
-                // onTap: () {
-                //   setState(() {
-                //     customerListFiltered.clear();
-                //   });
-                // },
                 onChanged: (query) {
                   setState(() {
                     customerListFiltered.clear();
@@ -249,7 +244,7 @@ class _CustomerState extends State<Customer> {
                   size: 48,
                 ),
                 Text(
-                  "Customer Not Found",
+                  "Pelanggan tidak ditemukan",
                   style: poppins.copyWith(fontWeight: regular, fontSize: 20),
                 ),
               ],

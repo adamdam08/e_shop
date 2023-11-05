@@ -15,4 +15,12 @@ class CustomerProvider with ChangeNotifier {
     myCustomer = customer;
     notifyListeners();
   }
+
+  final int _selectCustomer = 0;
+  int get selectCustomer => _selectCustomer;
+
+  set selectCustomer(int customer) {
+    selectCustomer = customer;
+    notifyListeners();
+  }
 }
