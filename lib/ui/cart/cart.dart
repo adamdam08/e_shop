@@ -1,6 +1,3 @@
-import 'dart:ffi';
-import 'dart:math';
-
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
@@ -11,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import 'detail_item.dart';
+import '../../detail_item.dart';
 
 class Cart extends StatefulWidget {
   final int index;

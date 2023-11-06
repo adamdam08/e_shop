@@ -34,132 +34,135 @@ class _SearchListState extends State<SearchList> {
 
   @override
   Widget build(BuildContext context) {
+    Widget searchBar(){
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            if (searchBarFocusNode.hasFocus == false) ...[
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: SizedBox(
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: backgroundColor1,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
+            Expanded(
+              child: Container(
+                height: 50,
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  child: TextField(
+                      textInputAction: TextInputAction.search,
+                      controller: searchTextController,
+                      focusNode: searchBarFocusNode,
+                      obscureText: false,
+                      cursorColor: Colors.grey,
+                      maxLines: 1,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        prefixIconColor: Colors.grey,
+                        border: OutlineInputBorder(
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(5)),
+                          borderSide:
+                          BorderSide(color: Colors.red, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(5)),
+                          borderSide:
+                          BorderSide(color: Colors.green, width: 1),
+                        ),
+                        hintText: "Cari disini...",
+                        hintStyle: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal),
+                        alignLabelWithHint: true,
+                      ),
+                      onSubmitted: (value) {
+                        if (value != "") {
+                          FocusScope.of(context).unfocus();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    SearchList(text: value)),
+                          );
+                        }
+                      },
+                      onChanged: (query) {
+                        setState(() {
+                          myCategoryFiltered.clear();
+                          myCategoryFiltered = myCategory
+                              .where((element) => element
+                              .toLowerCase()
+                              .contains(query.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                    ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+
     return Scaffold(
       body: SafeArea(
           top: true,
           left: true,
           right: true,
           bottom: true,
-          child: Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              color: Colors.white,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            color: Colors.white,
+            child: Column(
+              children: [
+                searchBar(),
+                if (searchBarFocusNode.hasFocus == false) ...[
+                  if (myProducts.isEmpty) ...[
+                    Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (searchBarFocusNode.hasFocus == false) ...[
-                          InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.1,
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: backgroundColor1,
-                              ),
-                            ),
-                          ),
-                        ],
-                        Expanded(
-                          child: Container(
-                            // width: searchBarFocusNode.hasFocus == false ? MediaQuery.of(context).size * 0.8 : MediaQuery.of(context).size.width * 0.9 ,
-                            height: 50,
-                            decoration: const BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                            ),
-                            child: TextField(
-                              textInputAction: TextInputAction.search,
-                              controller: searchTextController,
-                              focusNode: searchBarFocusNode,
-                              obscureText: false,
-                              cursorColor: Colors.grey,
-                              maxLines: 1,
-                              decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.search),
-                                prefixIconColor: Colors.grey,
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  borderSide:
-                                      BorderSide(color: Colors.red, width: 1),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                  borderSide:
-                                      BorderSide(color: Colors.green, width: 1),
-                                ),
-                                hintText: "Cari disini...",
-                                hintStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal),
-                                alignLabelWithHint: true,
-                              ),
-                              onSubmitted: (value) {
-                                if (value != "") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            SearchList(text: value)),
-                                  );
-                                }
-                              },
-                              onChanged: (query) {
-                                setState(() {
-                                  myCategoryFiltered.clear();
-                                  myCategoryFiltered = myCategory
-                                      .where((element) => element
-                                          .toLowerCase()
-                                          .contains(query.toLowerCase()))
-                                      .toList();
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+                    const Icon(
+                      Icons.report_problem,
+                      size: 48,
                     ),
-                  ),
-                  if (searchBarFocusNode.hasFocus == false) ...[
-                    if (myProducts.isEmpty) ...[
-                      Expanded(
-                          child: Center(
-                              child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.report_problem,
-                            size: 48,
-                          ),
-                          Text(
-                            "Products Not Found",
-                            style: poppins.copyWith(
-                                fontWeight: regular, fontSize: 20),
-                          ),
-                        ],
-                      )))
-                    ] else ...[
-                      Expanded(child: GridBuilder(myProducts: myProducts))
-                    ]
+                    Text(
+                      "Products Not Found",
+                      style: poppins.copyWith(
+                          fontWeight: regular, fontSize: 20),
+                    ),
+                      ],
+                    ))
                   ] else ...[
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: SuggestionListView(
-                            myCategory: myCategoryFiltered,
-                            searchTextController: searchTextController),
-                      ),
-                    )
-                  ],
+                    Expanded(child: GridBuilder(myProducts: myProducts))
+                  ]
+                ] else ...[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SuggestionListView(
+                          myCategory: myCategoryFiltered,
+                          searchTextController: searchTextController),
+                    ),
+                  )
                 ],
-              ),
+              ],
             ),
           )),
     );

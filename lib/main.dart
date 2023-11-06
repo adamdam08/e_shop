@@ -1,4 +1,4 @@
-import 'package:e_shop/cart.dart';
+import 'package:e_shop/ui/cart/cart.dart';
 import 'package:e_shop/category.dart';
 import 'package:e_shop/home.dart';
 import 'package:e_shop/promo.dart';
