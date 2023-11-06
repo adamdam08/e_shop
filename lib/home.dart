@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:e_shop/detail_item.dart';
 import 'package:e_shop/provider/page_provider.dart';
 import 'package:e_shop/theme/theme.dart';
@@ -18,13 +19,17 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<int> text = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   final List<String> imgList = [
-    'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
-    'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
-    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-    'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
-    'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-    'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
+    "https://picsum.photos/id/100/1920/1080",
+    "https://picsum.photos/id/101/1920/1080",
+    "https://picsum.photos/id/102/1920/1080",
+    "https://picsum.photos/id/103/1920/1080",
+    "https://picsum.photos/id/104/1920/1080",
+    "https://picsum.photos/id/109/1920/1080",
+    "https://picsum.photos/id/106/1920/1080",
+    "https://picsum.photos/id/107/1920/1080",
+    "https://picsum.photos/id/108/1920/1080"
   ];
+  int carouselIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -80,29 +85,51 @@ class _HomeState extends State<Home> {
           ),
         ),
         Container(
-          width: double.infinity,
-          height: 300,
           margin: const EdgeInsets.symmetric(horizontal: 30),
-          child: CarouselSlider(
-              items: [
-                for (var sliderItem in imgList)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: FadeInImage.memoryNetwork(
-                      placeholder: kTransparentImage,
-                      image: sliderItem,
-                      fit: BoxFit.cover,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Stack(
+              children: [
+                CarouselSlider(
+                  items: [
+                    for (var sliderItem in imgList)
+                      FadeInImage.memoryNetwork(
+                        placeholder: kTransparentImage,
+                        image: sliderItem,
+                        fit: BoxFit.cover,
+                      ),
+                  ],
+                  options: CarouselOptions(
+                    viewportFraction: 1,
+                    autoPlay: true,
+                    autoPlayCurve: Curves.linear,
+                    reverse: false,
+                    autoPlayInterval: const Duration(seconds: 5),
+                    initialPage: carouselIndex,
+                    scrollDirection: Axis.horizontal,
+                    onPageChanged: (index, reason){
+                      setState(() {
+                        carouselIndex = index;
+                      });
+                    },
+                  ),
+                ),
+                Positioned(
+                  bottom: 5,
+                  left: 0,
+                  right: 0,
+                  child: DotsIndicator(
+                    dotsCount: imgList.length,
+                    position: carouselIndex,
+                    decorator: DotsDecorator(
+                      color: Colors.black38, // Inactive color
+                      activeColor: backgroundColor2,
                     ),
                   ),
+                ),
               ],
-              options: CarouselOptions(
-                  viewportFraction: 1,
-                  autoPlay: true,
-                  autoPlayCurve: Curves.linear,
-                  reverse: false,
-                  autoPlayInterval: const Duration(seconds: 5),
-                  initialPage: 0,
-                  scrollDirection: Axis.horizontal)),
+            ),
+          ),
         ),
         CardSectionHorizontal(text: text, headerText: "Promo "),
         CardSectionHorizontal(text: text, headerText: "Diskon"),

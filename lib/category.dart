@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:e_shop/promo.dart';
 import 'package:e_shop/search_list.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';

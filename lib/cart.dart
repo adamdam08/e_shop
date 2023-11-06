@@ -197,206 +197,218 @@ class _CartState extends State<Cart> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Pilih Customer",
-              style: poppins.copyWith(
-                  fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                      color: Colors.grey, width: 1, style: BorderStyle.solid),
-                  borderRadius: BorderRadius.circular(10),
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter stateSetter) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Pilih Customer",
+                  style: poppins.copyWith(
+                      fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
                 ),
-                width: double.infinity,
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.person,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CustomerSearch()),
+                    ).then((value) => stateSetter(() {
+                      Navigator.pop(context);
+                      showModalBottomSheet(
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20))),
+                          backgroundColor: Colors.white,
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          builder: (BuildContext context) {
+                            return bottomSheetDialog();
+                          });
+                    }));
+                  },
+                  child: Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Colors.grey, width: 1, style: BorderStyle.solid),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CustomerSearch()),
-                        ).then((value) => setState(() {}));
-                      },
-                      child: SizedBox(
-                        width: 250,
-                        child: Text(
-                          selectedCustomer,
-                          // "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque laoreet a tellus eget dapibus.",
-                          style: poppins.copyWith(
-                              fontWeight: regular,
-                              fontSize: 14,
-                              overflow: TextOverflow.ellipsis),
-                          maxLines: 2,
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.person,
                         ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        SizedBox(
+                          child: Text(
+                            selectedCustomer,
+                            // "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque laoreet a tellus eget dapibus.",
+                            style: poppins.copyWith(
+                                fontWeight: regular,
+                                fontSize: 14,
+                                overflow: TextOverflow.ellipsis),
+                            maxLines: 2,
+                          ),
+                        ),
+                        const Spacer(),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Ringkasan Pembelian",
+                  style: poppins.copyWith(
+                      fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Total item",
+                      style: poppins.copyWith(
+                        color: Colors.black,
                       ),
                     ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.arrow_forward_ios,
+                    Text(
+                      countItem.toString(),
+                      style: poppins.copyWith(
+                        color: backgroundColor1,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              "Ringkasan Pembelian",
-              style: poppins.copyWith(
-                  fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Total item",
-                  style: poppins.copyWith(
-                    color: Colors.black,
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey,
                   ),
                 ),
-                Text(
-                  countItem.toString(),
-                  style: poppins.copyWith(
-                    color: backgroundColor1,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Biaya Pengiriman",
+                      style: poppins.copyWith(
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      "Rp.0",
+                      style: poppins.copyWith(
+                        color: backgroundColor1,
+                      ),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Promo",
+                      style: poppins.copyWith(
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      "Rp.0",
+                      style: poppins.copyWith(
+                        color: backgroundColor1,
+                      ),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Jumlah Total",
+                      style: poppins.copyWith(
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      "${CurrencyFormat.convertToIdr(subTotal, 2)}",
+                      style: poppins.copyWith(
+                        color: backgroundColor1,
+                      ),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      cartProduct.myProducts.clear();
+                    });
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                      shape: StadiumBorder(
+                          side: BorderSide(width: 1, color: backgroundColor3)),
+                      backgroundColor: backgroundColor1),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.shopping_cart,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        ' Buat Pesanan',
+                        style: poppins.copyWith(
+                            fontWeight: semiBold, color: Colors.white),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Biaya Pengiriman",
-                  style: poppins.copyWith(
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  "Rp.0",
-                  style: poppins.copyWith(
-                    color: backgroundColor1,
-                  ),
-                ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Promo",
-                  style: poppins.copyWith(
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  "Rp.0",
-                  style: poppins.copyWith(
-                    color: backgroundColor1,
-                  ),
-                ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Jumlah Total",
-                  style: poppins.copyWith(
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  "${CurrencyFormat.convertToIdr(subTotal, 2)}",
-                  style: poppins.copyWith(
-                    color: backgroundColor1,
-                  ),
-                ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  cartProduct.myProducts.clear();
-                });
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                  shape: StadiumBorder(
-                      side: BorderSide(width: 1, color: backgroundColor3)),
-                  backgroundColor: backgroundColor1),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.shopping_cart,
-                    color: Colors.white,
-                  ),
-                  Text(
-                    ' Buat Pesanan',
-                    style: poppins.copyWith(
-                        fontWeight: semiBold, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            );
+          },
         ),
       );
     }

@@ -13,48 +13,18 @@ class Customer extends StatefulWidget {
 }
 
 class _CustomerState extends State<Customer> {
-  //dummy data
-  List<Map> dummyCustomer = [
-    {
-      "id": 1,
-      "name": "User 1",
-      "phone": "0888888888",
-      "address": "Testing alamat"
-    },
-    {
-      "id": 2,
-      "name": "User dua",
-      "phone": "0888888878",
-      "address": "Testing alamat 2"
-    }
-  ];
 
-  FocusNode searchBarFocusNode = FocusNode();
   List<Map<dynamic, dynamic>> customerListFiltered = [];
-  List<Map<dynamic, dynamic>> customerList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    searchBarFocusNode.addListener(_onFocusChange);
-  }
-
-  void _onFocusChange() {
-    setState(() {
-      print("Searchbar Clicked");
-    });
-  }
+  TextEditingController searchTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
-
-    // customerProvider.myCustomer.addAll(dummyCustomer);
-    customerList = customerProvider.myCustomer;
     customerListFiltered = customerProvider.myCustomer;
-
-    // customerList = dummyCustomer;
-    // customerListFiltered = dummyCustomer;
+    customerListFiltered = customerListFiltered.where(
+            (element) => element["name"].toString().toLowerCase()
+                .contains(searchTextController.text.toLowerCase()
+            )).toList();
 
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
@@ -149,14 +119,14 @@ class _CustomerState extends State<Customer> {
               width: MediaQuery.of(context).size.width * 0.78,
               height: 50,
               decoration: const BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(5)),
+                borderRadius:  BorderRadius.all(Radius.circular(5)),
               ),
               child: TextField(
+                controller: searchTextController,
                 textInputAction: TextInputAction.search,
                 obscureText: false,
                 cursorColor: Colors.grey,
                 maxLines: 1,
-                // focusNode: searchBarFocusNode,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search),
                   prefixIconColor: Colors.grey,
@@ -174,29 +144,7 @@ class _CustomerState extends State<Customer> {
                   alignLabelWithHint: true,
                 ),
                 onChanged: (query) {
-                  setState(() {
-                    customerListFiltered.clear();
-
-                    // List<Map<dynamic, dynamic>> filterList = customerList
-                    //     .where((element) => element["name"]
-                    //         .toLowerCase()
-                    //         .contains(query.toLowerCase()))
-                    //     .toList();
-
-                    // print("SET DATA " + filterList.toString());
-                    print("SET DATA " + customerList.toString());
-
-                    // print("SET DATA TESTING" +
-                    //     customerList[0]["name"]
-                    //         .toLowerCase()
-                    //         .contains(query.toLowerCase().toString()));
-
-                    // customerListFiltered = customerList
-                    //     .where((element) => element["name"]
-                    //         .toLowerCase()
-                    //         .contains(query.toLowerCase()))
-                    //     .toList();
-                  });
+                  setState(() {});
                 },
               ),
             ),
@@ -224,10 +172,6 @@ class _CustomerState extends State<Customer> {
       );
     }
 
-    print("SET INIT raw" + customerProvider.myCustomer.toString());
-    print("SET INIT Data" + customerList.toString());
-    print("SET INIT Filter" + customerListFiltered.toString());
-
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -252,8 +196,7 @@ class _CustomerState extends State<Customer> {
           ] else ...[
             Expanded(
               child: ListView(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 children: [
                   for (int i = 0; i < customerListFiltered.length; i++)
                     customerDynamicCardVertical(customerListFiltered[i])

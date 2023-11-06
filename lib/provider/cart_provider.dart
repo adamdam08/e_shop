@@ -12,7 +12,7 @@ class CartProvider with ChangeNotifier{
   List<Map> get myProducts => _myProducts;
 
   set myProducts(List<Map> products){
-    myProducts = products;
+    _myProducts = products;
     notifyListeners();
   }
 }
