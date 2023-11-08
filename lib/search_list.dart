@@ -26,6 +26,10 @@ class _SearchListState extends State<SearchList> {
   initState() {
     super.initState();
     searchTextController.text = widget.text;
+    searchBarFocusNode.addListener(() {
+      print("Clicked");
+      print("Clicked : ${searchBarFocusNode.hasFocus}");
+    });
   }
 
   final List<Map> myProducts =
@@ -34,6 +38,7 @@ class _SearchListState extends State<SearchList> {
 
   @override
   Widget build(BuildContext context) {
+
     Widget searchBar(){
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -111,6 +116,9 @@ class _SearchListState extends State<SearchList> {
                               .toList();
                         });
                       },
+                      onTap: (){
+                        print("Focus : ${searchBarFocusNode.hasFocus}");
+                      },
                     ),
               ),
             ),
@@ -118,7 +126,6 @@ class _SearchListState extends State<SearchList> {
         ),
       );
     }
-
 
     return Scaffold(
       body: SafeArea(
@@ -155,7 +162,7 @@ class _SearchListState extends State<SearchList> {
                 ] else ...[
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: SuggestionListView(
                           myCategory: myCategoryFiltered,
                           searchTextController: searchTextController),
