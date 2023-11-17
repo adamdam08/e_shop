@@ -1,4 +1,4 @@
-#Sun Nov 05 16:17:57 WIB 2023
+#Sun Nov 05 16:31:42 WIB 2023
 base.0=D\:\\GitHub\\e_shop\\build\\app\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

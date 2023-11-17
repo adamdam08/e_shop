@@ -8,6 +8,8 @@
         android:minSdkVersion="19"
         android:targetSdkVersion="33" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name="android.app.Application"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
