@@ -46,6 +46,7 @@ dependencies:
   fluttertoast: ^8.1.1
   dots_indicator: ^3.0.0
   expandable: ^5.0.1
+  solar_icons: ^0.0.5
 
 dev_dependencies:
   flutter_test:

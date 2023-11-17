@@ -4,6 +4,7 @@ import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
+import 'package:solar_icons/solar_icons.dart';
 
 class Customer extends StatefulWidget {
   const Customer({super.key});
@@ -13,7 +14,6 @@ class Customer extends StatefulWidget {
 }
 
 class _CustomerState extends State<Customer> {
-
   List<Map<dynamic, dynamic>> customerListFiltered = [];
   TextEditingController searchTextController = TextEditingController();
 
@@ -21,10 +21,12 @@ class _CustomerState extends State<Customer> {
   Widget build(BuildContext context) {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
     customerListFiltered = customerProvider.myCustomer;
-    customerListFiltered = customerListFiltered.where(
-            (element) => element["name"].toString().toLowerCase()
-                .contains(searchTextController.text.toLowerCase()
-            )).toList();
+    customerListFiltered = customerListFiltered
+        .where((element) => element["name"]
+            .toString()
+            .toLowerCase()
+            .contains(searchTextController.text.toLowerCase()))
+        .toList();
 
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
@@ -112,71 +114,83 @@ class _CustomerState extends State<Customer> {
     Widget searchbar() {
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width * 0.78,
-              height: 50,
-              decoration: const BoxDecoration(
-                borderRadius:  BorderRadius.all(Radius.circular(5)),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          height: 50,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            color: Colors.white,
+          ),
+          child: TextField(
+            controller: searchTextController,
+            textInputAction: TextInputAction.search,
+            obscureText: false,
+            cursorColor: Colors.grey,
+            maxLines: 1,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search),
+              prefixIconColor: Colors.grey,
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: Colors.white, width: 1),
               ),
-              child: TextField(
-                controller: searchTextController,
-                textInputAction: TextInputAction.search,
-                obscureText: false,
-                cursorColor: Colors.grey,
-                maxLines: 1,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  prefixIconColor: Colors.grey,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(color: Colors.white, width: 1),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    borderSide: BorderSide(color: Colors.green, width: 1),
-                  ),
-                  hintText: "Cari pelanggan disini...",
-                  hintStyle:
-                      TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-                  alignLabelWithHint: true,
-                ),
-                onChanged: (query) {
-                  setState(() {});
-                },
+              focusedBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: backgroundColor3, width: 1),
               ),
+              hintText: "Cari pelanggan disini...",
+              hintStyle:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+              alignLabelWithHint: true,
             ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CustomerInformation(
-                            data: {},
-                            isEditable: true,
-                          )),
-                ).then((value) => setState(() {}));
-              },
-              child: Container(
-                margin: const EdgeInsets.only(right: 10),
-                width: MediaQuery.of(context).size.width * 0.05,
-                child: const Icon(
-                  Icons.person_add,
-                ),
-              ),
-            ),
-          ],
+            onChanged: (query) {
+              setState(() {});
+            },
+          ),
         ),
       );
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         children: [
-          searchbar(),
+          Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            color: backgroundColor3,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Pelanggan",
+                        style: poppins.copyWith(
+                            fontSize: 20,
+                            fontWeight: semiBold,
+                            color: Colors.white),
+                      ),
+                      InkWell(
+                        onTap: () {},
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.05,
+                          child: const Icon(
+                            SolarIconsOutline.userPlus,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                searchbar()
+              ],
+            ),
+          ),
           if (customerListFiltered.isEmpty) ...[
             Expanded(
                 child: Center(
@@ -196,7 +210,8 @@ class _CustomerState extends State<Customer> {
           ] else ...[
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 children: [
                   for (int i = 0; i < customerListFiltered.length; i++)
                     customerDynamicCardVertical(customerListFiltered[i])

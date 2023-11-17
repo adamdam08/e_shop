@@ -1,6 +1,8 @@
 import 'package:e_shop/home.dart';
 import 'package:e_shop/search_list.dart';
+import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:solar_icons/solar_icons.dart';
 
 import 'category.dart';
 
@@ -27,39 +29,78 @@ class _PromoState extends State<Promo> {
 
   void _onFocusChange() {
     setState(() {
-      print("Searchbar Clicked");
+      print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
     });
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    searchBarFocusNode.removeListener(_onFocusChange);
+    searchBarFocusNode.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        children: [
-          searchbar(),
-          if (searchBarFocusNode.hasFocus) ...[
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SuggestionListView(
-                    myCategory: myCategoryFiltered,
-                    searchTextController: searchTextController),
-              ),
-            )
-          ] else ...[
-            Expanded(
-              child: ListView(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+    return WillPopScope(
+      onWillPop: () async {
+        print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
+        searchBarFocusNode.removeListener(() {});
+        return true;
+      },
+      child: Container(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              color: backgroundColor3,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
                 children: [
-                  for (int i = 0; i <= 20; i++)
-                    const DynamicCardVertical(text: "1")
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Promo",
+                          style: poppins.copyWith(
+                              fontSize: 20,
+                              fontWeight: semiBold,
+                              color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                  searchbar()
                 ],
               ),
             ),
-          ]
-        ],
+            if (searchBarFocusNode.hasFocus) ...[
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SuggestionListView(
+                      myCategory: myCategoryFiltered,
+                      searchTextController: searchTextController),
+                ),
+              )
+            ] else ...[
+              Expanded(
+                child: ListView(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                  children: [
+                    for (int i = 0; i <= 20; i++)
+                      const DynamicCardVertical(text: "1")
+                  ],
+                ),
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }
@@ -69,9 +110,9 @@ class _PromoState extends State<Promo> {
       height: 50,
       margin: const EdgeInsets.only(bottom: 10, left: 20, right: 20),
       decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-      ),
-      child: TextField(
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+          color: Colors.white),
+      child: TextFormField(
         textInputAction: TextInputAction.search,
         obscureText: false,
         cursorColor: Colors.grey,
@@ -93,7 +134,7 @@ class _PromoState extends State<Promo> {
           hintStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
           alignLabelWithHint: true,
         ),
-        onSubmitted: (value) {
+        onFieldSubmitted: (value) {
           if (value != "") {
             Navigator.push(
               context,

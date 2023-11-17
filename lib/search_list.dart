@@ -38,8 +38,7 @@ class _SearchListState extends State<SearchList> {
 
   @override
   Widget build(BuildContext context) {
-
-    Widget searchBar(){
+    Widget searchBar() {
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
@@ -65,61 +64,55 @@ class _SearchListState extends State<SearchList> {
               child: Container(
                 height: 50,
                 decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
+                child: TextField(
+                  textInputAction: TextInputAction.search,
+                  controller: searchTextController,
+                  focusNode: searchBarFocusNode,
+                  obscureText: false,
+                  cursorColor: Colors.grey,
+                  maxLines: 1,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    prefixIconColor: Colors.grey,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      borderSide: BorderSide(color: Colors.red, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      borderSide: BorderSide(color: Colors.green, width: 1),
+                    ),
+                    hintText: "Cari disini...",
+                    hintStyle:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+                    alignLabelWithHint: true,
                   ),
-                  child: TextField(
-                      textInputAction: TextInputAction.search,
-                      controller: searchTextController,
-                      focusNode: searchBarFocusNode,
-                      obscureText: false,
-                      cursorColor: Colors.grey,
-                      maxLines: 1,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        prefixIconColor: Colors.grey,
-                        border: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(5)),
-                          borderSide:
-                          BorderSide(color: Colors.red, width: 1),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(5)),
-                          borderSide:
-                          BorderSide(color: Colors.green, width: 1),
-                        ),
-                        hintText: "Cari disini...",
-                        hintStyle: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal),
-                        alignLabelWithHint: true,
-                      ),
-                      onSubmitted: (value) {
-                        if (value != "") {
-                          FocusScope.of(context).unfocus();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    SearchList(text: value)),
-                          );
-                        }
-                      },
-                      onChanged: (query) {
-                        setState(() {
-                          myCategoryFiltered.clear();
-                          myCategoryFiltered = myCategory
-                              .where((element) => element
+                  onSubmitted: (value) {
+                    if (value != "") {
+                      FocusScope.of(context).unfocus();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SearchList(text: value)),
+                      );
+                    }
+                  },
+                  onChanged: (query) {
+                    setState(() {
+                      myCategoryFiltered.clear();
+                      myCategoryFiltered = myCategory
+                          .where((element) => element
                               .toLowerCase()
                               .contains(query.toLowerCase()))
-                              .toList();
-                        });
-                      },
-                      onTap: (){
-                        print("Focus : ${searchBarFocusNode.hasFocus}");
-                      },
-                    ),
+                          .toList();
+                    });
+                  },
+                  onTap: () {
+                    print("Focus : ${searchBarFocusNode.hasFocus}");
+                  },
+                ),
               ),
             ),
           ],
@@ -137,23 +130,38 @@ class _SearchListState extends State<SearchList> {
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             color: Colors.white,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 searchBar(),
+                RichText(
+                  text: TextSpan(
+                    text: 'Hasil Pencarian : ',
+                    style: poppins.copyWith(color: Colors.black),
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: widget.text,
+                          style: poppins.copyWith(color: backgroundColor1)),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
                 if (searchBarFocusNode.hasFocus == false) ...[
                   if (myProducts.isEmpty) ...[
                     Center(
                         child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                    const Icon(
-                      Icons.report_problem,
-                      size: 48,
-                    ),
-                    Text(
-                      "Products Not Found",
-                      style: poppins.copyWith(
-                          fontWeight: regular, fontSize: 20),
-                    ),
+                        const Icon(
+                          Icons.report_problem,
+                          size: 48,
+                        ),
+                        Text(
+                          "Products Not Found",
+                          style: poppins.copyWith(
+                              fontWeight: regular, fontSize: 20),
+                        ),
                       ],
                     ))
                   ] else ...[

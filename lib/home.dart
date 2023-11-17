@@ -7,6 +7,7 @@ import 'package:e_shop/provider/page_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solar_icons/solar_icons.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class Home extends StatefulWidget {
@@ -70,13 +71,9 @@ class _HomeState extends State<Home> {
                 ],
               ),
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    pageProvider.currentIndex = 3;
-                  });
-                },
+                onTap: () {},
                 child: Icon(
-                  Icons.person,
+                  SolarIconsBold.user,
                   size: 30,
                   color: backgroundColor3,
                 ),
@@ -107,7 +104,7 @@ class _HomeState extends State<Home> {
                     autoPlayInterval: const Duration(seconds: 5),
                     initialPage: carouselIndex,
                     scrollDirection: Axis.horizontal,
-                    onPageChanged: (index, reason){
+                    onPageChanged: (index, reason) {
                       setState(() {
                         carouselIndex = index;
                       });

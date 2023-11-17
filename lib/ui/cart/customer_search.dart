@@ -23,16 +23,18 @@ class _CustomerSearchState extends State<CustomerSearch> {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
 
     customerListFiltered = customerProvider.myCustomer;
-    customerListFiltered = customerListFiltered.where(
-            (element) => element["name"].toString().toLowerCase()
-            .contains(searchTextController.text.toLowerCase()
-        )).toList();
+    customerListFiltered = customerListFiltered
+        .where((element) => element["name"]
+            .toString()
+            .toLowerCase()
+            .contains(searchTextController.text.toLowerCase()))
+        .toList();
 
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
         onTap: () {
           print((myCustomer["id"] is int));
-          customerProvider.selectCustomer = myCustomer["id"]-1;
+          customerProvider.selectCustomer = myCustomer["id"] - 1;
           print("customerId nya adalah: ${customerProvider.selectCustomer}");
           Navigator.pop(context);
         },
@@ -132,7 +134,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
             hintStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
             alignLabelWithHint: true,
           ),
-          onChanged: (query){
+          onChanged: (query) {
             setState(() {});
           },
         ),
@@ -173,18 +175,15 @@ class _CustomerSearchState extends State<CustomerSearch> {
                   child: ListView(
                     padding: const EdgeInsets.symmetric(vertical: 5),
                     children: [
-                      for (int i = 0;
-                          i < customerListFiltered.length;
-                          i++)
-                        customerDynamicCardVertical(
-                            customerListFiltered[i])
+                      for (int i = 0; i < customerListFiltered.length; i++)
+                        customerDynamicCardVertical(customerListFiltered[i])
                     ],
                   ),
                 )
               ],
               Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: Center(
                   child: SizedBox(
                     height: 50,
@@ -195,16 +194,16 @@ class _CustomerSearchState extends State<CustomerSearch> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => const CustomerInformation(
-                                data: {},
-                                isEditable: true,
-                              )),
+                                    data: {},
+                                    isEditable: true,
+                                  )),
                         ).then((value) => setState(() {}));
                       },
                       style: ElevatedButton.styleFrom(
                           shape: StadiumBorder(
                               side: BorderSide(
                                   width: 1, color: backgroundColor3)),
-                          backgroundColor: backgroundColor1),
+                          backgroundColor: backgroundColor3),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,

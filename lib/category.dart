@@ -40,47 +40,46 @@ class _CategoryState extends State<Category> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         children: [
-          searchbar(),
-          if (searchBarFocusNode.hasFocus) ...[
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SuggestionListView(
-                    myCategory: myCategoryFiltered,
-                    searchTextController: searchTextController),
+          Container(
+            color: backgroundColor3,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Center(
+              child: Text(
+                "Kategori",
+                style: poppins.copyWith(
+                    fontSize: 24, fontWeight: semiBold, color: Colors.white),
               ),
             ),
-          ] else ...[
-            Expanded(
-              child: ListView(
-                children: [
-                  ExpansionTileBuilder(
-                      title: "Collapsible 1", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 2", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 3", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 4", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 5", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 1", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 2", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 3", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 4", myProducts: myProducts),
-                  ExpansionTileBuilder(
-                      title: "Collapsible 5", myProducts: myProducts),
-                ],
-              ),
+          ),
+          Expanded(
+            child: ListView(
+              children: [
+                ExpansionTileBuilder(
+                    title: "Collapsible 1", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 2", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 3", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 4", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 5", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 1", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 2", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 3", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 4", myProducts: myProducts),
+                ExpansionTileBuilder(
+                    title: "Collapsible 5", myProducts: myProducts),
+              ],
             ),
-          ]
+          ),
         ],
       ),
     );
@@ -284,23 +283,25 @@ class ExpansionTileBuilder extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: ExpandableNotifier(
           child: ScrollOnExpand(
-            child: ExpandablePanel(
-                header: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Text(title, style: const TextStyle(fontWeight: FontWeight.w500),),
-                ),
-                collapsed: const SizedBox(),
-                expanded: Wrap(
-                spacing: 5,
-                runSpacing: 10,
-                children: [
-                  for (var i = 0; i < 5; i++)
-                    const ExpansionCarditem(itemTitle: "Test 1"),
-                  ],
-                ),
+        child: ExpandablePanel(
+          header: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w500),
             ),
-          )
-      ),
+          ),
+          collapsed: const SizedBox(),
+          expanded: Wrap(
+            spacing: 5,
+            runSpacing: 10,
+            children: [
+              for (var i = 0; i < 5; i++)
+                const ExpansionCarditem(itemTitle: "Test 1"),
+            ],
+          ),
+        ),
+      )),
     );
 
     // return Container(

@@ -8,6 +8,7 @@ import 'package:e_shop/provider/page_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solar_icons/solar_icons.dart';
 
 import 'customer.dart';
 
@@ -29,6 +30,14 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaleFactor: 1.0,
+            ),
+            child: child!,
+          );
+        },
         theme: ThemeData(
           // This is the theme of your application.
           //
@@ -56,15 +65,17 @@ class MyApp extends StatelessWidget {
 }
 
 class BottomNavigationBarExample extends StatefulWidget {
-  const BottomNavigationBarExample({super.key}
-);
+  const BottomNavigationBarExample({super.key});
 
   @override
-  State<BottomNavigationBarExample> createState() => _BottomNavigationBarExampleState();
+  State<BottomNavigationBarExample> createState() =>
+      _BottomNavigationBarExampleState();
 }
 
-class _BottomNavigationBarExampleState extends State<BottomNavigationBarExample> {
-  static const TextStyle optionStyle = TextStyle(fontSize: 50, fontWeight: FontWeight.bold);
+class _BottomNavigationBarExampleState
+    extends State<BottomNavigationBarExample> {
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 50, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     Home(),
     Category(),
@@ -84,84 +95,77 @@ class _BottomNavigationBarExampleState extends State<BottomNavigationBarExample>
         right: true,
         maintainBottomViewPadding: true,
         child: Center(
-            child: _widgetOptions.elementAt(pageProvider.currentIndex),
-          ),
+          child: _widgetOptions.elementAt(pageProvider.currentIndex),
         ),
+      ),
       bottomNavigationBar: bottomNavBar(pageProvider),
     );
   }
 
-  Widget bottomNavBar(PageProvider pageProvider){
+  Widget bottomNavBar(PageProvider pageProvider) {
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(25),),
+      borderRadius: const BorderRadius.vertical(
+        top: Radius.circular(25),
+      ),
       child: Theme(
         data: ThemeData(
           highlightColor: Colors.transparent,
           splashColor: Colors.transparent,
         ),
         child: BottomAppBar(
+          height: 70,
           elevation: 0,
-          color: backgroundColor1,
+          color: backgroundColor3,
           notchMargin: 10,
           shape: const CircularNotchedRectangle(),
           clipBehavior: Clip.antiAlias,
           child: BottomNavigationBar(
             elevation: 0,
             type: BottomNavigationBarType.fixed,
-            items:  [
+            items: [
               BottomNavigationBarItem(
                 icon: Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(
-                      Icons.home
-                  ),
-                ) ,
+                  child: const Icon(Icons.home),
+                ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(
-                      Icons.menu
-                  ),
-                ) ,
+                  child: const Icon(Icons.menu),
+                ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(
-                      Icons.percent
-                  ),
-                ) ,
+                  child: const Icon(Icons.percent),
+                ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(
-                      Icons.person
-                  ),
-                ) ,
+                  child: const Icon(SolarIconsBold.usersGroupRounded),
+                ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(
-                      Icons.shopping_cart
-                  ),
-                ) ,
+                  child: const Icon(Icons.shopping_cart),
+                ),
                 label: '',
               ),
             ],
             currentIndex: pageProvider.currentIndex,
-            selectedItemColor: backgroundColor2,
-            unselectedItemColor: backgroundColor3,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.black,
             showUnselectedLabels: false,
             showSelectedLabels: false,
             backgroundColor: Colors.transparent,
-            onTap: (index){
+            onTap: (index) {
               setState(() {
                 pageProvider.currentIndex = index;
               });
@@ -172,4 +176,3 @@ class _BottomNavigationBarExampleState extends State<BottomNavigationBarExample>
     );
   }
 }
-

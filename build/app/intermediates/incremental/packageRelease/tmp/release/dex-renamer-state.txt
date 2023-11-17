@@ -1,0 +1,4 @@
+#Fri Nov 17 19:40:13 WIB 2023
+base.0=E\:\\Flutter e_shop\\e_shop-main\\e_shop-main\\build\\app\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

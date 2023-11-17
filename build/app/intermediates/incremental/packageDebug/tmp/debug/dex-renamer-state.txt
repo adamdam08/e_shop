@@ -1,4 +1,4 @@
-#Tue Nov 07 11:47:43 WIB 2023
-base.0=/Users/enygmasystem/Documents/Adamdam/e_shop/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+#Fri Nov 17 20:49:46 WIB 2023
+base.0=E\:\\Flutter e_shop\\e_shop-main\\e_shop-main\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

@@ -47,139 +47,6 @@ class _CartState extends State<Cart> {
     int countItem = 0;
     int subTotal = 0;
 
-    Widget listFormBuilder(
-        {required List<String> items,
-        required String headerText,
-        required IconData icon}) {
-      selectedValue = items[0];
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              headerText,
-              style: poppins.copyWith(fontWeight: semiBold, fontSize: 14),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            DropdownButtonHideUnderline(
-              child: DropdownButton2<String>(
-                isExpanded: true,
-                hint: Row(
-                  children: [
-                    Icon(
-                      icon,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: Text(
-                        '$selectedValue',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                          fontWeight: regular,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                items: items
-                    .map((String item) => DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: TextStyle(
-                              fontWeight: regular,
-                              color: Colors.grey,
-                            ),
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ))
-                    .toList(),
-                value: selectedValue,
-                buttonStyleData: ButtonStyleData(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(left: 14, right: 14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: Colors.grey,
-                    ),
-                    color: Colors.white,
-                  ),
-                  elevation: 1,
-                ),
-                iconStyleData: const IconStyleData(
-                  icon: Icon(
-                    Icons.arrow_forward_ios_outlined,
-                  ),
-                  iconSize: 14,
-                  iconEnabledColor: Colors.grey,
-                  iconDisabledColor: Colors.grey,
-                ),
-                dropdownStyleData: DropdownStyleData(
-                  maxHeight: 200,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.white,
-                  ),
-                  offset: const Offset(0, 0),
-                  scrollbarTheme: ScrollbarThemeData(
-                    thickness: MaterialStateProperty.all(6),
-                    thumbVisibility: MaterialStateProperty.all(true),
-                  ),
-                ),
-                dropdownSearchData: DropdownSearchData(
-                  searchController: textEditingController,
-                  searchInnerWidgetHeight: 50,
-                  searchInnerWidget: Container(
-                    height: 50,
-                    padding: const EdgeInsets.only(
-                      top: 8,
-                      bottom: 4,
-                      right: 8,
-                      left: 8,
-                    ),
-                    child: TextFormField(
-                      expands: true,
-                      maxLines: null,
-                      controller: textEditingController,
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 2,
-                          vertical: 8,
-                        ),
-                        hintText: 'Search customer here...',
-                        hintStyle: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ),
-                  searchMatchFn: (item, searchValue) {
-                    return item.value.toString().contains(searchValue);
-                  },
-                ),
-                barrierColor: Colors.grey.withOpacity(0.5),
-                onChanged: (value) {
-                  setState(() {
-                    selectedValue = value!;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     Widget bottomSheetDialog() {
       String selectedCustomer = "Select customer";
 
@@ -203,7 +70,9 @@ class _CartState extends State<Cart> {
                 Text(
                   "Pilih Customer",
                   style: poppins.copyWith(
-                      fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
+                      fontSize: 24,
+                      fontWeight: semiBold,
+                      color: backgroundColor1),
                 ),
                 GestureDetector(
                   onTap: () {
@@ -212,25 +81,27 @@ class _CartState extends State<Cart> {
                       MaterialPageRoute(
                           builder: (context) => const CustomerSearch()),
                     ).then((value) => stateSetter(() {
-                      Navigator.pop(context);
-                      showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(20))),
-                          backgroundColor: Colors.white,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          builder: (BuildContext context) {
-                            return bottomSheetDialog();
-                          });
-                    }));
+                          Navigator.pop(context);
+                          showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20))),
+                              backgroundColor: Colors.white,
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              builder: (BuildContext context) {
+                                return bottomSheetDialog();
+                              });
+                        }));
                   },
                   child: Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: Colors.grey, width: 1, style: BorderStyle.solid),
+                          color: Colors.grey,
+                          width: 1,
+                          style: BorderStyle.solid),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     width: double.infinity,
@@ -267,7 +138,9 @@ class _CartState extends State<Cart> {
                 Text(
                   "Ringkasan Pembelian",
                   style: poppins.copyWith(
-                      fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
+                      fontSize: 24,
+                      fontWeight: semiBold,
+                      color: backgroundColor1),
                 ),
                 const SizedBox(
                   height: 5,
@@ -279,7 +152,7 @@ class _CartState extends State<Cart> {
                     Text(
                       "Total item",
                       style: poppins.copyWith(
-                        color: Colors.black,
+                        color: backgroundColor1,
                       ),
                     ),
                     Text(
@@ -305,7 +178,7 @@ class _CartState extends State<Cart> {
                     Text(
                       "Biaya Pengiriman",
                       style: poppins.copyWith(
-                        color: Colors.black,
+                        color: backgroundColor1,
                       ),
                     ),
                     Text(
@@ -331,7 +204,7 @@ class _CartState extends State<Cart> {
                     Text(
                       "Promo",
                       style: poppins.copyWith(
-                        color: Colors.black,
+                        color: backgroundColor1,
                       ),
                     ),
                     Text(
@@ -357,7 +230,7 @@ class _CartState extends State<Cart> {
                     Text(
                       "Jumlah Total",
                       style: poppins.copyWith(
-                        color: Colors.black,
+                        color: backgroundColor1,
                       ),
                     ),
                     Text(
@@ -385,8 +258,9 @@ class _CartState extends State<Cart> {
                   },
                   style: ElevatedButton.styleFrom(
                       shape: StadiumBorder(
-                          side: BorderSide(width: 1, color: backgroundColor3)),
-                      backgroundColor: backgroundColor1),
+                        side: BorderSide(width: 1, color: backgroundColor3),
+                      ),
+                      backgroundColor: backgroundColor3),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -594,40 +468,49 @@ class _CartState extends State<Cart> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Column(
         children: [
-          Padding(
+          Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            color: backgroundColor3,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: [
-                Text(
-                  "Keranjang anda",
-                  style: poppins.copyWith(fontSize: 20, fontWeight: semiBold),
-                ),
-                InkWell(
-                  onTap: () {
-                    if (cartProduct.myProducts.isNotEmpty) {
-                      showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(20))),
-                          backgroundColor: Colors.white,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          builder: (BuildContext context) {
-                            return bottomSheetDialog();
-                          });
-                    }
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    width: MediaQuery.of(context).size.width * 0.05,
-                    child: const Icon(
-                      Icons.shopping_cart_checkout,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Keranjang anda",
+                      style: poppins.copyWith(
+                          fontSize: 20,
+                          fontWeight: semiBold,
+                          color: Colors.white),
                     ),
-                  ),
+                    InkWell(
+                      onTap: () {
+                        if (cartProduct.myProducts.isNotEmpty) {
+                          showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20))),
+                              backgroundColor: Colors.white,
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              builder: (BuildContext context) {
+                                return bottomSheetDialog();
+                              });
+                        }
+                      },
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.05,
+                        child: const Icon(
+                          Icons.shopping_cart_checkout,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
