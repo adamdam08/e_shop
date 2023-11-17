@@ -144,6 +144,9 @@ class _CustomerInformationState extends State<CustomerInformation> {
                               "phone": phoneTextEditingController.text,
                               "address": addressTextEditingController.text
                             });
+                            for(var data in customerProvider.myCustomer){
+                              print("data customer baru yang ditambahkan adalah: $data");
+                            }
                             Navigator.pop(context);
                           } else {
                             if (name.isEmpty) {

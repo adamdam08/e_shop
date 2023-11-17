@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:e_shop/promo.dart';
 import 'package:e_shop/search_list.dart';
 import 'package:e_shop/theme/theme.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
 class Category extends StatefulWidget {
@@ -280,32 +280,55 @@ class ExpansionTileBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: ExpansionTile(
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w500),
-        ),
-        children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.start,
-            runAlignment: WrapAlignment.start,
-            alignment: WrapAlignment.start,
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              Wrap(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: ExpandableNotifier(
+          child: ScrollOnExpand(
+            child: ExpandablePanel(
+                header: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text(title, style: const TextStyle(fontWeight: FontWeight.w500),),
+                ),
+                collapsed: const SizedBox(),
+                expanded: Wrap(
+                spacing: 5,
+                runSpacing: 10,
                 children: [
-                  for (var i = 0; i < Random().nextInt(20); i++)
+                  for (var i = 0; i < 5; i++)
                     const ExpansionCarditem(itemTitle: "Test 1"),
-                ],
-              )
-            ],
+                  ],
+                ),
+            ),
           )
-        ],
       ),
     );
+
+    // return Container(
+    //   padding: const EdgeInsets.symmetric(vertical: 5),
+    //   child: Theme(
+    //     data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+    //     child: ExpansionTile(
+    //       maintainState: true,
+    //       expandedCrossAxisAlignment: CrossAxisAlignment.start,
+    //       backgroundColor: Colors.white,
+    //       collapsedBackgroundColor: Colors.white60,
+    //       title: Text(
+    //         title,
+    //         style: const TextStyle(fontWeight: FontWeight.w500),
+    //       ),
+    //       children: [
+    //         Wrap(
+    //           spacing: 10,
+    //           runSpacing: 10,
+    //           children: [
+    //             for (var i = 0; i < 3; i++)
+    //               const ExpansionCarditem(itemTitle: "Test 1"),
+    //           ],
+    //         )
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }
 

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 
+import '../../customer_information.dart';
+
 class CustomerSearch extends StatefulWidget {
   const CustomerSearch({Key? key}) : super(key: key);
 
@@ -13,53 +15,25 @@ class CustomerSearch extends StatefulWidget {
 
 class _CustomerSearchState extends State<CustomerSearch> {
   //dummy data
-  List<Map> dummyCustomer = [
-    {
-      "id": 1,
-      "name": "User 1",
-      "phone": "0888888888",
-      "address": "Testing alamat"
-    },
-    {
-      "id": 2,
-      "name": "User dua",
-      "phone": "0888888878",
-      "address": "Testing alamat 2"
-    }
-  ];
-
-  FocusNode searchBarFocusNode = FocusNode();
   List<Map<dynamic, dynamic>> customerListFiltered = [];
-  List<Map<dynamic, dynamic>> customerList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    searchBarFocusNode.addListener(_onFocusChange);
-  }
-
-  void _onFocusChange() {
-    setState(() {
-      print("Searchbar Clicked");
-    });
-  }
+  TextEditingController searchTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
 
-    // customerProvider.myCustomer.addAll(dummyCustomer);
-    // customerList =  customerProvider.myCustomer;
-    // customerListFiltered = customerProvider.myCustomer;
-
-    customerList = dummyCustomer;
-    customerListFiltered = dummyCustomer;
+    customerListFiltered = customerProvider.myCustomer;
+    customerListFiltered = customerListFiltered.where(
+            (element) => element["name"].toString().toLowerCase()
+            .contains(searchTextController.text.toLowerCase()
+        )).toList();
 
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
         onTap: () {
           print((myCustomer["id"] is int));
-          // customerProvider.selectCustomer = 1; // myCustomer["id"];
+          customerProvider.selectCustomer = myCustomer["id"]-1;
+          print("customerId nya adalah: ${customerProvider.selectCustomer}");
           Navigator.pop(context);
         },
         child: Container(
@@ -134,15 +108,16 @@ class _CustomerSearchState extends State<CustomerSearch> {
     }
 
     Widget searchbar() {
-      return const SizedBox(
-        width: 500,
+      return Container(
+        height: 50,
+        margin: const EdgeInsets.only(bottom: 10),
         child: TextField(
+          controller: searchTextController,
           textInputAction: TextInputAction.search,
           obscureText: false,
           cursorColor: Colors.grey,
           maxLines: 1,
-          // focusNode: searchBarFocusNode,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             prefixIcon: Icon(Icons.search),
             prefixIconColor: Colors.grey,
             border: OutlineInputBorder(
@@ -157,6 +132,9 @@ class _CustomerSearchState extends State<CustomerSearch> {
             hintStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
             alignLabelWithHint: true,
           ),
+          onChanged: (query){
+            setState(() {});
+          },
         ),
       );
     }
@@ -173,7 +151,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
           child: Column(
             children: [
               searchbar(),
-              if (customerProvider.myCustomer.isEmpty) ...[
+              if (customerListFiltered.isEmpty) ...[
                 Expanded(
                     child: Center(
                         child: Column(
@@ -184,7 +162,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
                       size: 48,
                     ),
                     Text(
-                      "Customer Not Found",
+                      "Pelanggan tidak ditemukan",
                       style:
                           poppins.copyWith(fontWeight: regular, fontSize: 20),
                     ),
@@ -196,14 +174,56 @@ class _CustomerSearchState extends State<CustomerSearch> {
                     padding: const EdgeInsets.symmetric(vertical: 5),
                     children: [
                       for (int i = 0;
-                          i < customerProvider.myCustomer.length;
+                          i < customerListFiltered.length;
                           i++)
                         customerDynamicCardVertical(
-                            customerProvider.myCustomer[i])
+                            customerListFiltered[i])
                     ],
                   ),
                 )
               ],
+              Padding(
+                padding:
+                const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: Center(
+                  child: SizedBox(
+                    height: 50,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CustomerInformation(
+                                data: {},
+                                isEditable: true,
+                              )),
+                        ).then((value) => setState(() {}));
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: StadiumBorder(
+                              side: BorderSide(
+                                  width: 1, color: backgroundColor3)),
+                          backgroundColor: backgroundColor1),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.person_add,
+                            color: Colors.white,
+                          ),
+                          Text(
+                            ' Tambah Pelanggan Baru',
+                            style: poppins.copyWith(
+                                fontWeight: semiBold, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

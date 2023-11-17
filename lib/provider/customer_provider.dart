@@ -12,15 +12,15 @@ class CustomerProvider with ChangeNotifier {
   List<Map> get myCustomer => _myCustomer;
 
   set myCustomer(List<Map> customer) {
-    myCustomer = customer;
+    _myCustomer = customer;
     notifyListeners();
   }
 
-  final int _selectCustomer = 0;
+  int _selectCustomer = 0;
   int get selectCustomer => _selectCustomer;
 
   set selectCustomer(int customer) {
-    selectCustomer = customer;
+    _selectCustomer = customer;
     notifyListeners();
   }
 }

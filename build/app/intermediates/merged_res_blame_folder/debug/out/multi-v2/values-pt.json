@@ -4,7 +4,7 @@
             "outputFile": "com.shop.e_shop.app-mergeDebugResources-9:/values-pt/values-pt.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\GL522VXK\\.gradle\\caches\\transforms-3\\7e9df2ac2213a6bd3cef0f2f27870d79\\transformed\\core-1.6.0\\res\\values-pt\\values-pt.xml",
+                    "source": "/Users/enygmasystem/.gradle/caches/transforms-3/7e9df2ac2213a6bd3cef0f2f27870d79/transformed/core-1.6.0/res/values-pt/values-pt.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
