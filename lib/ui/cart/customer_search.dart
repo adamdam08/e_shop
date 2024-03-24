@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 
-import '../../customer_information.dart';
+import '../customer/customer_information.dart';
 
 class CustomerSearch extends StatefulWidget {
   const CustomerSearch({Key? key}) : super(key: key);
@@ -61,9 +61,9 @@ class _CustomerSearchState extends State<CustomerSearch> {
                   // borderRadius: BorderRadius.circular(8),
                   child: RoundedImageWithTextAndBG(
                     radius: 20,
-                    uniqueId: myCustomer["name"],
+                    uniqueId: myCustomer["nama_lengkap"],
                     image: '',
-                    text: myCustomer["name"],
+                    text: myCustomer["nama_lengkap"],
                   ),
                 ),
               ),
@@ -75,7 +75,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        myCustomer["name"],
+                        myCustomer["nama_lengkap"],
                         style: poppins.copyWith(
                             overflow: TextOverflow.ellipsis,
                             fontWeight: semiBold,
@@ -84,7 +84,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
                         maxLines: 2,
                       ),
                       Text(
-                        myCustomer["address"],
+                        myCustomer["alamat"],
                         style: poppins.copyWith(
                             fontWeight: regular,
                             color: backgroundColor3,
@@ -92,7 +92,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
                         maxLines: 2,
                       ),
                       Text(
-                        myCustomer["phone"],
+                        myCustomer["tgl_lahir"],
                         style: poppins.copyWith(
                             overflow: TextOverflow.ellipsis,
                             fontWeight: semiBold,
@@ -196,6 +196,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
                               builder: (context) => const CustomerInformation(
                                     data: {},
                                     isEditable: true,
+                                    isUpdate: false,
                                   )),
                         ).then((value) => setState(() {}));
                       },

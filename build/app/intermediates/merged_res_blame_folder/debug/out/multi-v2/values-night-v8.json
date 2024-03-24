@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.shop.e_shop.app-mergeDebugResources-9:/values-night-v8/values-night-v8.xml",
+            "outputFile": "com.shop.e_shop.app-mergeDebugResources-12:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
                     "source": "E:\\Flutter e_shop\\e_shop-main\\e_shop-main\\android\\app\\src\\main\\res\\values-night\\styles.xml",

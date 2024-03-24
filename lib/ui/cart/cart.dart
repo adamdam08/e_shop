@@ -1,14 +1,12 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/cart/customer_search.dart';
+import 'package:e_shop/ui/product/detail_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
-
-import '../../detail_item.dart';
 
 class Cart extends StatefulWidget {
   final int index;
@@ -54,7 +52,7 @@ class _CartState extends State<Cart> {
         selectedCustomer = "Select customer";
       } else {
         selectedCustomer = customerProvider
-            .myCustomer[customerProvider.selectCustomer]["name"];
+            .myCustomer[customerProvider.selectCustomer]["nama_lengkap"];
       }
 
       return Container(
@@ -285,6 +283,8 @@ class _CartState extends State<Cart> {
     }
 
     Widget cartDynamicCard(int index) {
+      print("Data : ${cartProduct.myProducts[index]}");
+
       // subtotal
       subTotal +=
           int.parse(cartProduct.myProducts[index]["amount"].toString()) *
@@ -300,8 +300,8 @@ class _CartState extends State<Cart> {
             context,
             MaterialPageRoute(
                 builder: (context) => DetailItem(
-                      imageUrl: cartProduct.myProducts[index]["id"],
-                    )),
+                    imageUrl: cartProduct.myProducts[index]["img"],
+                    id: cartProduct.myProducts[index]["id"])),
           ).then((value) => setState(() {}));
         },
         child: Container(
@@ -325,7 +325,7 @@ class _CartState extends State<Cart> {
                 // borderRadius: BorderRadius.circular(8),
                 child: FadeInImage.memoryNetwork(
                   placeholder: kTransparentImage,
-                  image: cartProduct.myProducts[index]["id"],
+                  image: cartProduct.myProducts[index]["img"],
                   fit: BoxFit.cover,
                   height: 125,
                   width: 125,
@@ -339,7 +339,7 @@ class _CartState extends State<Cart> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${cartProduct.myProducts[index]["name"]} $index",
+                        "${cartProduct.myProducts[index]["name"]}",
                         style: poppins.copyWith(
                             overflow: TextOverflow.ellipsis,
                             fontWeight: semiBold,
@@ -417,7 +417,6 @@ class _CartState extends State<Cart> {
                                                   ["amount"] <
                                               1) {
                                             print("Index terhapus : $index");
-                                            // myProducts.removeWhere((element) => element["id"] == index);
                                             cartProduct.myProducts
                                                 .removeAt(index);
                                           }
