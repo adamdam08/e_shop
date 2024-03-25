@@ -29,6 +29,8 @@ class _CustomerInformationState extends State<CustomerInformation> {
       TextEditingController();
   final TextEditingController passwordTextEditingController =
       TextEditingController();
+  final TextEditingController confirmPasswordTextEditingController =
+      TextEditingController();
   final TextEditingController emailTextEditingController =
       TextEditingController();
   final TextEditingController birthDateTextEditingController =
@@ -121,6 +123,12 @@ class _CustomerInformationState extends State<CustomerInformation> {
                         isEditable: widget.isEditable,
                         keyboardType: TextInputType.name),
                     textFormBuilder(
+                        searchBoxController: confirmPasswordTextEditingController,
+                        headerText: "Konfirmasi Password",
+                        icon: Icons.password,
+                        isEditable: widget.isEditable,
+                        keyboardType: TextInputType.name),
+                    textFormBuilder(
                         searchBoxController: emailTextEditingController,
                         headerText: "Email",
                         icon: Icons.email,
@@ -182,85 +190,54 @@ class _CustomerInformationState extends State<CustomerInformation> {
                         String username = usernameTextEditingController.text;
                         if (username.isEmpty && isempty == false) {
                           isempty = true;
-                          Fluttertoast.showToast(
-                              msg: "Username wajib diisi",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                          showToast("Username wajib diisi");
                         }
 
                         String password = passwordTextEditingController.text;
+                        String confirmPassword = confirmPasswordTextEditingController.text;
                         if (password.isEmpty && isempty == false) {
                           isempty = true;
-                          Fluttertoast.showToast(
-                              msg: "Password wajib diisi",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                          showToast("Password wajib diisi");
+                        }
+
+                        if(password.isNotEmpty){
+                          if(confirmPassword.isEmpty){
+                            isempty = true;
+                            showToast("Konfirmasi password wajib diisi");
+                          }else if(password != confirmPassword){
+                            isempty = true;
+                            showToast("Password tidak sama");
+                          }
                         }
 
                         String email = emailTextEditingController.text;
                         if (email.isEmpty && isempty == false) {
                           isempty = true;
-                          Fluttertoast.showToast(
-                              msg: "Email wajib diisi",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                          showToast("Email wajib diisi");
                         }
 
                         String name = nameTextEditingController.text;
                         if (name.isEmpty && isempty == false) {
                           isempty = true;
-                          Fluttertoast.showToast(
-                              msg: "Nama Lengkap wajib diisi",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                          showToast("Nama Lengkap wajib diisi");
                         }
 
                         String birthdate = birthDateTextEditingController.text;
                         if (birthdate.isEmpty && isempty == false) {
                           isempty = true;
-                          Fluttertoast.showToast(
-                              msg: "Tanggal lahir wajib diisi",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                          showToast("Tanggal lahir wajib diisi");
                         }
 
                         String address = addressTextEditingController.text;
                         if (address.isEmpty && isempty == false) {
                           isempty = true;
-                          Fluttertoast.showToast(
-                              msg: "Alamat wajib diisi",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                          showToast("Alamat wajib diisi");
                         }
 
                         String phone = phoneTextEditingController.text;
                         if (phone.isEmpty && isempty == false) {
                           isempty = true;
-                          Fluttertoast.showToast(
-                              msg: "Nomor Telefon wajib diisi",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                          showToast("Nomor Telefon wajib diisi");
                         }
 
                         if (!isempty) {
@@ -276,10 +253,6 @@ class _CustomerInformationState extends State<CustomerInformation> {
                             "alamat": address,
                             "telp": phone
                           });
-                          for (var data in customerProvider.myCustomer) {
-                            print(
-                                "data customer baru yang ditambahkan adalah: $data");
-                          }
                           Navigator.pop(context);
                         } else {}
                       },
@@ -318,10 +291,11 @@ class _CustomerInformationState extends State<CustomerInformation> {
     );
   }
 
-  Widget listFormBuilder(
-      {required List<String> items,
-      required String headerText,
-      required IconData icon}) {
+  Widget listFormBuilder({
+    required List<String> items,
+    required String headerText,
+    required IconData icon
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Column(
@@ -595,5 +569,16 @@ class _CustomerInformationState extends State<CustomerInformation> {
         ],
       ),
     );
+  }
+
+  void showToast(String text){
+    Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }

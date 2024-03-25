@@ -24,7 +24,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<int> text = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   final List<String> imgList = [
     "https://picsum.photos/id/100/1920/1080",
     "https://picsum.photos/id/101/1920/1080",
@@ -257,33 +256,37 @@ class _HomeState extends State<Home> {
             ),
           ),
         ),
-        CardSectionHorizontal(
-          text: text,
-          headerText: "Promo",
-          productItem: productProvider.promoProduct,
-        ),
-        CardSectionHorizontal(
-          text: text,
-          headerText: "Diskon",
-          productItem: productProvider.promoProduct,
-        ),
-        CardSectionVertical(
-          text: text,
-          headerText: "Produk terlaku",
-          productItem: productProvider.promoProduct,
-        ),
+
+        if (productProvider.promoProduct != null) ...[
+          CardSectionHorizontal(
+            headerText: "Promo",
+            productItem: productProvider.promoProduct,
+          ),
+        ] else ...[],
+
+        if (productProvider.promoProduct != null)...[
+          CardSectionHorizontal(
+            headerText: "Diskon",
+            productItem: productProvider.promoProduct,
+          ),
+        ] else ...[],
+
+        if (productProvider.promoProduct != null)...[
+          CardSectionVertical(
+            headerText: "Produk terlaku",
+            productItem: productProvider.promoProduct,
+          ),
+        ] else ...[],
       ],
     );
   }
 }
 
 class CardSectionHorizontal extends StatelessWidget {
-  final List<int> text;
   final String headerText;
   final ProductModel.PromoProductModel? productItem;
   const CardSectionHorizontal({
     super.key,
-    required this.text,
     required this.headerText,
     required this.productItem,
   });
@@ -443,7 +446,7 @@ class DynamicCardHorizontal extends StatelessWidget {
                           size: 12,
                         ),
                         Text(
-                          " Cabang ${settingsProvider.storeLocation.data?.first.namaCabang}",
+                          " Cab. ${settingsProvider.storeLocation.data?.first.namaCabang}",
                           style: poppins.copyWith(
                             fontSize: 12,
                             fontWeight: semiBold,
@@ -464,12 +467,10 @@ class DynamicCardHorizontal extends StatelessWidget {
 }
 
 class CardSectionVertical extends StatelessWidget {
-  final List<int> text;
   final String headerText;
   final ProductModel.PromoProductModel? productItem;
   const CardSectionVertical(
       {super.key,
-      required this.text,
       required this.productItem,
       required this.headerText});
 
@@ -617,7 +618,7 @@ class DynamicCardVertical extends StatelessWidget {
                           size: 12,
                         ),
                         Text(
-                          " Cabang ${settingsProvider.storeLocation.data?.first.namaCabang}",
+                          " Cab. ${settingsProvider.storeLocation.data?.first.namaCabang}",
                           style: poppins.copyWith(
                             fontSize: 12,
                             fontWeight: semiBold,
