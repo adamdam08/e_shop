@@ -25,10 +25,13 @@ class _LoginPageState extends State<LoginPage> {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
 
     setState(() {
-      isLoading = true;
+      isLoading = false;
     });
 
     handleSignIn() async {
+      setState(() {
+        isLoading = true;
+      });
       if (await authProvider.salesLogin(
         email: emailController.text,
         password: passwordController.text,
@@ -37,10 +40,16 @@ class _LoginPageState extends State<LoginPage> {
         var getData = prefs.getString("data");
 
         if (context.mounted) {
+          setState(() {
+            isLoading = false;
+          });
           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         }
       } else {
         if (context.mounted) {
+          setState(() {
+            isLoading = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               backgroundColor: Colors.red,
@@ -68,6 +77,7 @@ class _LoginPageState extends State<LoginPage> {
             // Rata Kiri
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Image.asset('assets/logo.png'),
               Text(
                 'Welcome Back, Sales!',
                 style: poppins.copyWith(
@@ -257,7 +267,15 @@ class _LoginPageState extends State<LoginPage> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: Text(
+          child: isLoading == true ?
+           const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ) ,
+          )
+         : Text(
             'Sign In',
             style: poppins.copyWith(
               color: Colors.white,

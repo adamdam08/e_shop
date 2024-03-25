@@ -22,10 +22,18 @@ class DetailItem extends StatefulWidget {
 class _DetailItemState extends State<DetailItem> {
   double headerAlpha = 0.0;
 
+  bool isLoading = false;
+
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    setState(() {
+      isLoading = false;
+    });
 
     print("ImageUrl : ${widget.imageUrl}");
 
@@ -36,31 +44,15 @@ class _DetailItemState extends State<DetailItem> {
         Provider.of<ProductProvider>(context, listen: false);
 
     Future.delayed(Duration.zero, () async {
+      setState(() {
+        isLoading = true;
+      });
+
       // Get data from SharedPref
       var data = await authProvider.getLoginData();
 
       if (data?.token != null) {
-        if (await productProvider.getCategoryProduct(
-            bearerToken: data!.token.toString())) {
-        } else {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-                backgroundColor: Colors.red,
-                content: Text(
-                  'Gagal Mendapatkan Kategori Produk!',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-        }
-      }
-
-      // Check Detail Product
-      if (data?.token != null) {
+        // Check Detail Product
         if (await productProvider.getDetailProduct(
             id: widget.id,
             token: data!.token.toString(),
@@ -81,7 +73,29 @@ class _DetailItemState extends State<DetailItem> {
             );
           }
         }
+
+        if (await productProvider.getCategoryProduct(
+            bearerToken: data.token.toString())) {
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+                backgroundColor: Colors.red,
+                content: Text(
+                  'Gagal Mendapatkan Kategori Produk!',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+        }
       }
+
+      setState(() {
+        isLoading = false;
+      });
     });
   }
 
@@ -98,7 +112,7 @@ class _DetailItemState extends State<DetailItem> {
         left: true,
         right: true,
         bottom: true,
-        child: Column(
+        child: isLoading == false ? Column(
           children: [
             Expanded(
               child: Stack(
@@ -503,6 +517,30 @@ class _DetailItemState extends State<DetailItem> {
               ),
             ),
           ],
+        ) : Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.transparent,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: backgroundColor1,
+              ),
+              Container(
+                height: 30,
+              ),
+              Text(
+                "Loading Data",
+                style: poppins.copyWith(
+                  fontWeight: semiBold,
+                  color: backgroundColor1,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
