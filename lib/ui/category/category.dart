@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/home/search_list.dart';
@@ -305,11 +307,13 @@ class _CategoryState extends State<Category> {
 class SuggestionListView extends StatelessWidget {
   final List<String> myCategory;
   final TextEditingController searchTextController;
+  final bool isPromo;
 
   const SuggestionListView({
     super.key,
     required this.myCategory,
     required this.searchTextController,
+    this.isPromo = false
   });
 
   @override
@@ -324,7 +328,7 @@ class SuggestionListView extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SearchList(text: data)),
+                            builder: (context) => SearchList(text: data, isPromo: isPromo,)),
                       );
                     },
                     child: Container(
@@ -405,7 +409,7 @@ class ExpansionTileBuilder extends StatelessWidget {
             ),
           ),
           collapsed: const SizedBox(),
-          expanded: Wrap(
+          expanded: const Wrap(
             spacing: 5,
             runSpacing: 10,
             children: [

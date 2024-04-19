@@ -18,9 +18,10 @@ class ProductService {
     required String token,
     required int page,
     required int limit,
+    String? query,
   }) async {
     var url = Uri.parse(
-        "${baseURL}produk?cabang=$cabangId&sort=promo&page=$page&limit=$limit");
+        "${baseURL}produk?cabang=$cabangId&sort=promo&page=$page&limit=$limit&q=$query");
     // produk?cabang=1&sort=promo&page=1&limit=15
     var header = {
       'Authorization': 'Bearer $token',
@@ -82,10 +83,11 @@ class ProductService {
       required String token,
       required int page,
       required int limit,
+        required String sort,
       String? cat,
       String query = ""}) async {
     var url = Uri.parse(
-        "${baseURL}produk?cabang=$cabangId&sort=terlaris&page=$page&limit=$limit&cat=$cat&q=$query");
+        "${baseURL}produk?cabang=$cabangId&sort=${sort}&page=$page&limit=$limit&cat=$cat&q=$query");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

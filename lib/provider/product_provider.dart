@@ -22,10 +22,11 @@ class ProductProvider with ChangeNotifier {
       {required String cabangId,
       required String token,
       required int limit,
-      required int page}) async {
+      required int page,
+      String? query}) async {
     try {
       ProductModel promoProduct = await ProductService().getPromoProduct(
-          cabangId: cabangId, token: token, limit: limit, page: page);
+          cabangId: cabangId, token: token, limit: limit, page: page, query:query);
       if (page != 1) {
         _promoProduct!.data!.addAll(promoProduct.data!.toList());
       } else {
@@ -86,6 +87,7 @@ class ProductProvider with ChangeNotifier {
       required String token,
       required int limit,
       required int page,
+        required String sort,
       String? cat,
       String query = ""}) async {
     try {
@@ -94,6 +96,7 @@ class ProductProvider with ChangeNotifier {
           token: token,
           limit: limit,
           page: page,
+          sort: sort,
           cat: cat,
           query: query);
       if (page != 1) {

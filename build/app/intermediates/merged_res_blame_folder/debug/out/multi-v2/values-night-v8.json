@@ -4,7 +4,7 @@
             "outputFile": "com.shop.e_shop.app-mergeDebugResources-12:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "E:\\Flutter e_shop\\e_shop-main\\e_shop-main\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "/Users/enygmasystem/Documents/Adamdam/e_shop/android/app/src/main/res/values-night/styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

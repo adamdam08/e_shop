@@ -20,7 +20,7 @@ class Promo extends StatefulWidget {
 
 class _PromoState extends State<Promo> {
   List<String> myCategoryFiltered = [];
-  List<String> myCategory = ["Tepung", "Kecap", "Sambal", "Beras", "Mie"];
+  List<String> _myCategory = [];
 
   FocusNode searchBarFocusNode = FocusNode();
   TextEditingController searchTextController = TextEditingController();
@@ -44,11 +44,36 @@ class _PromoState extends State<Promo> {
     // Add a listener to the scroll controller to detect when the user reaches the bottom of the list
     _scrollController.addListener(_scrollListener);
 
+    // Get Suggestion
+    _getSuggestionList();
+
     // Get Location
     _getLocation();
 
     // Get Promo
     _getPromo();
+  }
+
+  void _getSuggestionList() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final productProvider =
+    Provider.of<ProductProvider>(context, listen: false);
+
+    // Get data from SharedPref
+    var data = await authProvider.getLoginData();
+    // Get Category By Tree
+    if (await productProvider.getSuggestionData(
+        bearerToken: data!.token.toString())) {
+      if (context.mounted) {
+        setState(() {
+          _myCategory.clear();
+          _myCategory = productProvider.suggestionData!.data!;
+        });
+      }
+      print("Suggestion Data : ${_myCategory}");
+    } else {
+      print("Suggestion Data Failed : ${_myCategory}");
+    }
   }
 
   // Load more data
@@ -93,7 +118,9 @@ class _PromoState extends State<Promo> {
             cabangId: settingsProvider.storeLocation.data!.first.id.toString(),
             token: authProvider.user.token.toString(),
             limit: 5,
-            page: promoIndex + 1)) {
+            page: promoIndex + 1,
+            query: searchTextController.text.isEmpty ? null : searchTextController.text
+        )) {
           if (context.mounted) {
             setState(() {
               promoIndex = promoIndex + 1;
@@ -122,6 +149,9 @@ class _PromoState extends State<Promo> {
     if (context.mounted) {
       setState(() {
         print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
+        if(searchBarFocusNode.hasFocus == false){
+          searchTextController.text = "";
+        }
       });
     }
   }
@@ -147,7 +177,9 @@ class _PromoState extends State<Promo> {
           cabangId: authProvider.user.data.cabangId.toString(),
           token: authProvider.user.token.toString(),
           limit: 5,
-          page: promoIndex)) {
+          page: promoIndex,
+          query: searchTextController.text
+      )) {
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -214,7 +246,9 @@ class _PromoState extends State<Promo> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: SuggestionListView(
                       myCategory: myCategoryFiltered,
-                      searchTextController: searchTextController),
+                      searchTextController: searchTextController,
+                    isPromo: true,
+                  ),
                 ),
               )
             ] else ...[
@@ -287,7 +321,7 @@ class _PromoState extends State<Promo> {
           if (value != "") {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SearchList(text: value)),
+              MaterialPageRoute(builder: (context) => SearchList(text: value, isPromo: true,)),
             );
           }
         },
@@ -295,7 +329,7 @@ class _PromoState extends State<Promo> {
           if (context.mounted) {
             setState(() {
               myCategoryFiltered.clear();
-              myCategoryFiltered = myCategory
+              myCategoryFiltered = _myCategory
                   .where((element) =>
                       element.toLowerCase().contains(query.toLowerCase()))
                   .toList();

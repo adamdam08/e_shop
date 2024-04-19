@@ -37,21 +37,7 @@ class SplashScreenPageState extends State<SplashScreenPage> {
               if (context.mounted) {
                 setState(() {});
               }
-            } else {
-              // if (context.mounted) {
-              //   ScaffoldMessenger.of(context).showSnackBar(
-              //     const SnackBar(
-              //       behavior: SnackBarBehavior.floating,
-              //       margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-              //       backgroundColor: Colors.red,
-              //       content: Text(
-              //         'Gagal Mendapatkan Keranjang!',
-              //         textAlign: TextAlign.center,
-              //       ),
-              //     ),
-              //   );
-              // }
-            }
+            } else {}
 
             if (data?.token != null) {
               if (await customerProvider.getListCustomerData(

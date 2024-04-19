@@ -75,6 +75,9 @@ class _HomeState extends State<Home> {
     if (context.mounted) {
       setState(() {
         print("Focus Node : ${searchBarFocusNode.hasFocus}");
+        if(searchBarFocusNode.hasFocus == false){
+          searchTextController.text = "";
+        }
       });
     }
   }
@@ -224,7 +227,8 @@ class _HomeState extends State<Home> {
         cabangId: authProvider.user.data.cabangId.toString(),
         token: authProvider.user.token.toString(),
         limit: 10,
-        page: 1)) {
+        page: 1,
+        query: "")) {
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -577,7 +581,7 @@ class _HomeState extends State<Home> {
   }
 }
 
-class CardSectionHorizontal extends StatelessWidget {
+class CardSectionHorizontal extends StatefulWidget {
   final String headerText;
   final ProductModel.ProductModel? productItem;
   const CardSectionHorizontal({
@@ -587,7 +591,17 @@ class CardSectionHorizontal extends StatelessWidget {
   });
 
   @override
+  State<CardSectionHorizontal> createState() => _CardSectionHorizontalState();
+}
+
+class _CardSectionHorizontalState extends State<CardSectionHorizontal> {
+
+
+  @override
   Widget build(BuildContext context) {
+    final pageProvider =
+    Provider.of<PageProvider>(context, listen: false);
+
     return SizedBox(
         height: 340,
         width: double.infinity,
@@ -599,7 +613,7 @@ class CardSectionHorizontal extends StatelessWidget {
               margin: const EdgeInsets.only(top: 20, bottom: 10),
               width: double.infinity,
               child: Text(
-                headerText,
+                widget.headerText,
                 style: poppins.copyWith(
                     fontSize: 24,
                     fontWeight: semiBold,
@@ -611,14 +625,50 @@ class CardSectionHorizontal extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 30, right: 30, bottom: 5),
                 scrollDirection: Axis.horizontal,
                 children: [
-                  if (productItem?.data != null)
-                    for (var i in productItem!.data!)
+                  if (widget.productItem?.data != null)...[
+                    for (var i in widget.productItem!.data!)...[
                       DynamicCardHorizontal(
                         data: i,
                         isDiscount: i.diskon != 0 && i.diskon != null,
                       )
-                  else
-                    const SizedBox(),
+                    ],
+                    if(widget.productItem!.data!.length >= 5)...[
+                      GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            pageProvider.currentIndex = 2;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          width: 150,
+                          height: 300,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 0))
+                              ]),
+                          child:  Center(
+                            child: Text(
+                              "Lihat \nSelengkapnya",
+                              style: poppins.copyWith(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontWeight: semiBold,
+                                  color: backgroundColor1,
+                                  fontSize: 15),
+                              maxLines: 2,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                    ]else...[
+                      const SizedBox(),
+                    ],
                 ],
               ),
             ),

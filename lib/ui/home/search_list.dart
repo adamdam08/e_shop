@@ -13,8 +13,9 @@ import '../product/detail_item.dart';
 
 class SearchList extends StatefulWidget {
   final String text;
+  final bool isPromo;
   final String cat;
-  const SearchList({super.key, required this.text, this.cat = ""});
+  const SearchList({super.key, required this.text, this.isPromo = false, this.cat = ""});
 
   @override
   State<SearchList> createState() => _SearchListState();
@@ -22,7 +23,9 @@ class SearchList extends StatefulWidget {
 
 class _SearchListState extends State<SearchList> {
   List<String> myCategoryFiltered = [];
-  List<String> myCategory = ["Tepung", "Kecap", "Sambal", "Beras", "Mie"];
+  List<String> _myCategory = [];
+
+  int searchIndex = 1;
 
   FocusNode searchBarFocusNode = FocusNode();
   TextEditingController searchTextController = TextEditingController();
@@ -30,89 +33,169 @@ class _SearchListState extends State<SearchList> {
   @override
   initState() {
     super.initState();
-    searchTextController.text = widget.text;
-    searchBarFocusNode.addListener(() {
-      print("Clicked");
-      print("Clicked : ${searchBarFocusNode.hasFocus}");
-    });
+    searchTextController.text = "";
+    searchBarFocusNode.addListener(_onFocusChange);
 
-    //
-    int searchIndex = 1;
+    print("Promo : ${widget.isPromo}");
+    
+    if (widget.cat != "") {
+      // Get Promo
+      _getByCategory();
+    } else {
+      if (widget.isPromo){
+        // Get Promo
+        _getPromoList();
+      }else{
+        _getBySearch();
+      }
+    }
 
+    // Get Suggestion
+    _getSuggestionList();
+  }
+
+  void _getBySearch() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final settingsProvider =
-        Provider.of<SettingsProvider>(context, listen: false);
+    Provider.of<SettingsProvider>(context, listen: false);
     final productProvider =
-        Provider.of<ProductProvider>(context, listen: false);
-
-    Future.delayed(Duration.zero, () async {
-      // Get data from SharedPref
-      var data = await authProvider.getLoginData();
-
-      if (widget.cat != "") {
-        // Get Promo
-        print("Cabang ${settingsProvider.storeLocation.data?.first.id}");
-        if (data?.token != null &&
-            settingsProvider.storeLocation.data != null) {
-          if (await productProvider.getSearchProduct(
-              cabangId: authProvider.user.data.cabangId.toString(),
-              token: authProvider.user.token.toString(),
-              limit: 5,
-              page: searchIndex,
-              cat: widget.cat,
-              query: widget.text)) {
-            print("Search Result ${productProvider.searchProduct}");
-            setState(() {});
-          } else {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-                  backgroundColor: Colors.red,
-                  content: Text(
-                    'Data Tidak Ditemukan!',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-            }
-            setState(() {});
-          }
-        }
+    Provider.of<ProductProvider>(context, listen: false);
+    if (await authProvider.getLoginData() != null &&
+        settingsProvider.storeLocation.data != null) {
+      if (await productProvider.getSearchProduct(
+          cabangId: authProvider.user.data.cabangId.toString(),
+          token: authProvider.user.token.toString(),
+          limit: 5,
+          page: searchIndex,
+          sort: "",
+          cat: "",
+          query: widget.text)) {
+        print("Search Result ${productProvider.searchProduct}");
+        setState(() {});
       } else {
-        // Get Promo
-        print("Cabang ${settingsProvider.storeLocation.data?.first.id}");
-        if (data?.token != null &&
-            settingsProvider.storeLocation.data != null) {
-          if (await productProvider.getSearchProduct(
-              cabangId: authProvider.user.data.cabangId.toString(),
-              token: authProvider.user.token.toString(),
-              limit: 5,
-              page: searchIndex,
-              cat: widget.cat,
-              query: widget.text)) {
-            print("Search Result ${productProvider.searchProduct}");
-            setState(() {});
-          } else {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-                  backgroundColor: Colors.red,
-                  content: Text(
-                    'Data Tidak Ditemukan!',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-            }
-            setState(() {});
-          }
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Data Tidak Ditemukan!',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
         }
+        setState(() {});
       }
-    });
+    }
+  }
+
+  void _getByCategory() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settingsProvider =
+    Provider.of<SettingsProvider>(context, listen: false);
+    final productProvider =
+    Provider.of<ProductProvider>(context, listen: false);
+    if (await authProvider.getLoginData() != null &&
+        settingsProvider.storeLocation.data != null) {
+      if (await productProvider.getSearchProduct(
+          cabangId: authProvider.user.data.cabangId.toString(),
+          token: authProvider.user.token.toString(),
+          limit: 5,
+          page: searchIndex,
+          sort: "",
+          cat: widget.cat,
+          query: widget.text)) {
+        print("Search Result ${productProvider.searchProduct}");
+        setState(() {});
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Data Tidak Ditemukan!',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+        setState(() {});
+      }
+    }
+  }
+
+  void _getPromoList() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settingsProvider =
+    Provider.of<SettingsProvider>(context, listen: false);
+    final productProvider =
+    Provider.of<ProductProvider>(context, listen: false);
+    if (await authProvider.getLoginData() != null &&
+        settingsProvider.storeLocation.data != null) {
+      if (await productProvider.getSearchProduct(
+          cabangId: authProvider.user.data.cabangId.toString(),
+          token: authProvider.user.token.toString(),
+          limit: 5,
+          page: searchIndex,
+          sort: "promo",
+          cat: widget.cat,
+          query: widget.text)) {
+        print("Search Result ${productProvider.searchProduct}");
+        setState(() {});
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Data Tidak Ditemukan!',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+        setState(() {});
+      }
+    }
+  }
+
+  void _getSuggestionList() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final productProvider =
+    Provider.of<ProductProvider>(context, listen: false);
+
+    // Get data from SharedPref
+    var data = await authProvider.getLoginData();
+    // Get Category By Tree
+    if (await productProvider.getSuggestionData(
+        bearerToken: data!.token.toString())) {
+      if (context.mounted) {
+        setState(() {
+          _myCategory.clear();
+          _myCategory = productProvider.suggestionData!.data!;
+        });
+      }
+      print("Suggestion Data : ${_myCategory}");
+    } else {
+      print("Suggestion Data Failed : ${_myCategory}");
+    }
+  }
+
+  void _onFocusChange() {
+    if (context.mounted) {
+      setState(() {
+        print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
+        if(searchBarFocusNode.hasFocus == false){
+          searchTextController.text = "";
+        }
+      });
+    }
   }
 
   @override
@@ -173,7 +256,7 @@ class _SearchListState extends State<SearchList> {
                   onSubmitted: (value) {
                     if (value != "") {
                       FocusScope.of(context).unfocus();
-                      searchTextController.text = widget.text;
+                      searchTextController.text = "";
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -185,14 +268,14 @@ class _SearchListState extends State<SearchList> {
                     }
                   },
                   onChanged: (query) {
-                    // setState(() {
-                    //   myCategoryFiltered.clear();
-                    //   myCategoryFiltered = myCategory
-                    //       .where((element) => element
-                    //           .toLowerCase()
-                    //           .contains(query.toLowerCase()))
-                    //       .toList();
-                    // });
+                    setState(() {
+                      myCategoryFiltered.clear();
+                      myCategoryFiltered = _myCategory
+                          .where((element) => element
+                              .toLowerCase()
+                              .contains(query.toLowerCase()))
+                          .toList();
+                    });
                   },
                   onTap: () {
                     print("Focus : ${searchBarFocusNode.hasFocus}");
@@ -218,56 +301,78 @@ class _SearchListState extends State<SearchList> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 searchBar(),
-                RichText(
-                  text: TextSpan(
-                    text: 'Hasil Pencarian : \n',
-                    style: poppins.copyWith(color: Colors.black),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: widget.cat != ""
-                              ? widget.cat.replaceAll('_', ' ')
-                              : "",
-                          style: poppins.copyWith(color: backgroundColor1)),
-                    ],
+              if (searchBarFocusNode.hasFocus) ...[
+                Expanded(
+                  child: SuggestionListView(
+                      myCategory: myCategoryFiltered,
+                      searchTextController: searchTextController),
+                )
+              ] else ...[
+                if(widget.isPromo)...[
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: backgroundColor3
+                    ),
+                    child: Text("Promo", style: poppins.copyWith(
+                      color: Colors.white
+                    )),
+                  )
+                ],
+                if(widget.cat != "")...[
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: backgroundColor3
+                    ),
+                    child: Text(widget.cat.replaceAll('_', ' '), style: poppins.copyWith(
+                        color: Colors.white
+                    )),
+                  )
+                ],
+                SizedBox(height: 10,),
+                if(widget.text.isNotEmpty)...[
+                  RichText(
+                    text: TextSpan(
+                      text: 'Hasil Pencarian : \n',
+                      style: poppins.copyWith(color: Colors.black),
+                      children: <TextSpan>[
+                        TextSpan(
+                            text: widget.text,
+                            style: poppins.copyWith(color: backgroundColor1)),
+                      ],
+                    ),
                   ),
-                ),
+                ],
                 const SizedBox(
                   height: 10,
                 ),
-                if (searchBarFocusNode.hasFocus == false) ...[
-                  if (productProvider.searchProduct?.data == null) ...[
-                    Expanded(
-                      child: Center(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.report_problem,
-                            size: 48,
-                          ),
-                          Text(
-                            "Produk Tidak Tersedia",
-                            style: poppins.copyWith(
-                                fontWeight: regular, fontSize: 20),
-                          ),
-                        ],
-                      )),
-                    )
-                  ] else ...[
-                    Expanded(
-                        child: GridBuilder(
-                            myProducts: productProvider.searchProduct!.data!))
-                  ]
+                if (productProvider.searchProduct?.data == null) ...[
+                  Expanded(
+                    child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.report_problem,
+                              size: 48,
+                            ),
+                            Text(
+                              "Produk Tidak Tersedia",
+                              style: poppins.copyWith(
+                                  fontWeight: regular, fontSize: 20),
+                            ),
+                          ],
+                        )),
+                  )
                 ] else ...[
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: SuggestionListView(
-                          myCategory: myCategoryFiltered,
-                          searchTextController: searchTextController),
-                    ),
-                  )
-                ],
+                      child: GridBuilder(
+                          myProducts: productProvider.searchProduct!.data!))
+                ]
+              ],
               ],
             ),
           )),
