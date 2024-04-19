@@ -1,19 +1,24 @@
-class DetailProductModel {
+class ProductModel {
   String? message;
-  Data? data;
+  List<Data>? data;
 
-  DetailProductModel({this.message, this.data});
+  ProductModel({this.message, this.data});
 
-  DetailProductModel.fromJson(Map<String, dynamic> json) {
+  ProductModel.fromJson(Map<String, dynamic> json) {
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    if (json['data'] != null) {
+      data = <Data>[];
+      json['data'].forEach((v) {
+        data!.add(new Data.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['message'] = this.message;
     if (this.data != null) {
-      data['data'] = this.data!.toJson();
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -39,12 +44,11 @@ class Data {
   String? gambar4;
   String? gambar5;
   int? isAktiva;
-  String? createdAt;
-  String? updatedAt;
-  String? deletedAt;
+  int? hargaMember;
+  int? diskon;
   List<String>? gambar;
-  List<Stok>? stok;
-  List<Harga>? harga;
+  int? harga;
+  int? hargaDiskon;
   double? rating;
 
   Data(
@@ -67,12 +71,11 @@ class Data {
       this.gambar4,
       this.gambar5,
       this.isAktiva,
-      this.createdAt,
-      this.updatedAt,
-      this.deletedAt,
+      this.hargaMember,
+      this.diskon,
       this.gambar,
-      this.stok,
       this.harga,
+      this.hargaDiskon,
       this.rating});
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -95,22 +98,11 @@ class Data {
     gambar4 = json['gambar4'];
     gambar5 = json['gambar5'];
     isAktiva = json['is_aktiva'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    deletedAt = json['deleted_at'];
+    hargaMember = json['harga_member'];
+    diskon = json['diskon'];
     gambar = json['gambar'].cast<String>();
-    if (json['stok'] != null) {
-      stok = <Stok>[];
-      json['stok'].forEach((v) {
-        stok!.add(new Stok.fromJson(v));
-      });
-    }
-    if (json['harga'] != null) {
-      harga = <Harga>[];
-      json['harga'].forEach((v) {
-        harga!.add(new Harga.fromJson(v));
-      });
-    }
+    harga = json['harga'];
+    hargaDiskon = json['harga_diskon'];
     rating = json['rating'];
   }
 
@@ -135,61 +127,12 @@ class Data {
     data['gambar4'] = this.gambar4;
     data['gambar5'] = this.gambar5;
     data['is_aktiva'] = this.isAktiva;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['deleted_at'] = this.deletedAt;
+    data['harga_member'] = this.hargaMember;
+    data['diskon'] = this.diskon;
     data['gambar'] = this.gambar;
-    if (this.stok != null) {
-      data['stok'] = this.stok!.map((v) => v.toJson()).toList();
-    }
-    if (this.harga != null) {
-      data['harga'] = this.harga!.map((v) => v.toJson()).toList();
-    }
-    data['rating'] = this.rating;
-    return data;
-  }
-}
-
-class Stok {
-  String? cabang;
-  int? stok;
-
-  Stok({this.cabang, this.stok});
-
-  Stok.fromJson(Map<String, dynamic> json) {
-    cabang = json['cabang'];
-    stok = json['stok'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['cabang'] = this.cabang;
-    data['stok'] = this.stok;
-    return data;
-  }
-}
-
-class Harga {
-  String? cabang;
-  int? harga;
-  int? hargaDiskon;
-  int? diskon;
-
-  Harga({this.cabang, this.harga, this.hargaDiskon, this.diskon});
-
-  Harga.fromJson(Map<String, dynamic> json) {
-    cabang = json['cabang'];
-    harga = json['harga'];
-    hargaDiskon = json['harga_diskon'];
-    diskon = json['diskon'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['cabang'] = this.cabang;
     data['harga'] = this.harga;
     data['harga_diskon'] = this.hargaDiskon;
-    data['diskon'] = this.diskon;
+    data['rating'] = this.rating;
     return data;
   }
 }

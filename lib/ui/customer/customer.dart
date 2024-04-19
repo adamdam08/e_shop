@@ -1,5 +1,8 @@
-import 'package:e_shop/ui/customer/customer_information.dart';
+import 'package:e_shop/models/user_model.dart';
+import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
+import 'package:e_shop/provider/customer_provider.dart';
+import 'package:e_shop/ui/customer/customer_information.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,17 +21,56 @@ class _CustomerState extends State<Customer> {
   TextEditingController searchTextController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    // Get Customer List
+    _getCustomer();
+  }
+
+  void _getCustomer() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+    // Get data from SharedPref
+    var data = await authProvider.getLoginData();
+    if (data?.token != null) {
+      if (await customerProvider.getListCustomerData(
+        token: data!.token.toString(),
+      )) {
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Gagal Mendapatkan Daftar Pelanggan!',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
     customerListFiltered = customerProvider.myCustomer;
     customerListFiltered = customerListFiltered
-        .where((element) => element["name"]
+        .where((element) => element["nama_lengkap"]
             .toString()
             .toLowerCase()
             .contains(searchTextController.text.toLowerCase()))
         .toList();
 
+    print("Customer Length : ${customerListFiltered.length}");
+
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
+      print("Update Customer ${myCustomer}");
       return GestureDetector(
         onTap: () {
           Navigator.push(
@@ -145,7 +187,9 @@ class _CustomerState extends State<Customer> {
               alignLabelWithHint: true,
             ),
             onChanged: (query) {
-              setState(() {});
+              if (context.mounted) {
+                setState(() {});
+              }
             },
           ),
         ),
@@ -201,7 +245,7 @@ class _CustomerState extends State<Customer> {
               ],
             ),
           ),
-          if (customerListFiltered.isEmpty) ...[
+          if (customerProvider.myCustomer.isEmpty) ...[
             Expanded(
                 child: Center(
                     child: Column(
@@ -219,15 +263,17 @@ class _CustomerState extends State<Customer> {
             )))
           ] else ...[
             Expanded(
-              child: ListView(
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                children: [
-                  for (int i = 0; i < customerListFiltered.length; i++)
-                    customerDynamicCardVertical(customerListFiltered[i])
-                ],
+                itemCount: customerProvider.myCustomer.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return customerDynamicCardVertical(
+                      customerProvider.myCustomer[index]);
+                },
               ),
-            )
+            ),
           ]
         ],
       ),

@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:e_shop/models/user_model.dart';
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/theme/theme.dart';
@@ -10,21 +7,20 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class CustomerInformation extends StatefulWidget {
+class ProfilEdit extends StatefulWidget {
   final Map<dynamic, dynamic> data;
-  final bool isEditable;
-  final bool isUpdate;
-  const CustomerInformation(
-      {super.key,
-      required this.data,
-      this.isEditable = false,
-      this.isUpdate = false});
+  final bool isPassword;
+  const ProfilEdit({
+    super.key,
+    required this.data,
+    this.isPassword = false,
+  });
 
   @override
-  State<CustomerInformation> createState() => _CustomerInformationState();
+  State<ProfilEdit> createState() => ProfilEditState();
 }
 
-class _CustomerInformationState extends State<CustomerInformation> {
+class ProfilEditState extends State<ProfilEdit> {
   String? selectedValue;
 
   final TextEditingController usernameTextEditingController =
@@ -51,36 +47,18 @@ class _CustomerInformationState extends State<CustomerInformation> {
     super.initState();
     if (widget.data.isNotEmpty) {
       usernameTextEditingController.text = widget.data["nama_lengkap"] ?? "";
-      passwordTextEditingController.text = ""; //widget.data["password"];
       emailTextEditingController.text = widget.data["email"] ?? "";
       nameTextEditingController.text = widget.data["nama_lengkap"] ?? "";
       birthDateTextEditingController.text = widget.data["tgl_lahir"] ?? "";
-      dropdownvalue = widget.data["jenis_kelamin"] ?? "";
       addressTextEditingController.text = widget.data["alamat"] ?? "";
       phoneTextEditingController.text = widget.data["telp"] ?? "";
     }
   }
 
-  // List of items in our dropdown menu
-  var genderItems = [
-    'Laki-Laki',
-    'Perempuan',
-  ];
-
-  // Initial Selected Value
-  String dropdownvalue = 'Laki-Laki';
-
-  // Set Loading State
-  bool isLoading = false;
-
   @override
   Widget build(BuildContext context) {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
-
-    setState(() {
-      isLoading = false;
-    });
 
     return Scaffold(
       body: SafeArea(
@@ -108,7 +86,7 @@ class _CustomerInformationState extends State<CustomerInformation> {
                     ),
                     Center(
                       child: Text(
-                        "Profil Pelanggan",
+                        "Update Data Sales",
                         style: poppins.copyWith(
                             fontWeight: semiBold, fontSize: 18),
                       ),
@@ -119,70 +97,58 @@ class _CustomerInformationState extends State<CustomerInformation> {
               Expanded(
                 child: ListView(
                   children: [
-                    textFormBuilder(
-                      searchBoxController: usernameTextEditingController,
-                      headerText: "Username",
-                      icon: Icons.person,
-                      isEditable: widget.isEditable,
-                      keyboardType: TextInputType.name,
-                    ),
-                    if (widget.isUpdate != true) ...[
+                    if (widget.isPassword == true) ...[
                       textFormBuilder(
                           searchBoxController: passwordTextEditingController,
                           headerText: "Password",
                           icon: Icons.password,
-                          isEditable: widget.isEditable,
+                          isEditable: true,
                           keyboardType: TextInputType.name),
                       textFormBuilder(
                           searchBoxController:
                               confirmPasswordTextEditingController,
                           headerText: "Konfirmasi Password",
                           icon: Icons.password,
-                          isEditable: widget.isEditable,
+                          isEditable: true,
                           keyboardType: TextInputType.name)
                     ] else ...[
                       const SizedBox()
                     ],
-                    textFormBuilder(
-                        searchBoxController: emailTextEditingController,
-                        headerText: "Email",
-                        icon: Icons.email,
-                        isEditable: widget.isEditable,
-                        keyboardType: TextInputType.name),
-                    textFormBuilder(
-                        searchBoxController: nameTextEditingController,
-                        headerText: "Nama Lengkap",
+                    if (widget.isPassword != true) ...[
+                      textFormBuilder(
+                        searchBoxController: usernameTextEditingController,
+                        headerText: "Username",
                         icon: Icons.person,
-                        isEditable: widget.isEditable,
-                        keyboardType: TextInputType.name),
-                    if (widget.isUpdate != true) ...[
-                      datePickerBuilder(
-                          searchBoxController: birthDateTextEditingController,
-                          headerText: "Tanggal Lahir",
-                          icon: Icons.calendar_month,
-                          isEditable: widget.isEditable,
-                          keyboardType: TextInputType.name),
-                      genderPickerBuilder(
-                          searchBoxController: genderTextEditingController,
-                          headerText: "Jenis Kelamin",
+                        isEditable: true,
+                        keyboardType: TextInputType.name,
+                      ),
+                      textFormBuilder(
+                          searchBoxController: nameTextEditingController,
+                          headerText: "Nama Lengkap",
                           icon: Icons.person,
-                          isEditable: widget.isEditable,
+                          isEditable: true,
                           keyboardType: TextInputType.name),
+                      textFormBuilder(
+                          searchBoxController: emailTextEditingController,
+                          headerText: "Email",
+                          icon: Icons.mail,
+                          isEditable: true,
+                          keyboardType: TextInputType.emailAddress),
+                      textFormBuilder(
+                          searchBoxController: addressTextEditingController,
+                          headerText: "Alamat",
+                          icon: Icons.pin_drop,
+                          isEditable: true,
+                          keyboardType: TextInputType.emailAddress),
+                      textFormBuilder(
+                          searchBoxController: phoneTextEditingController,
+                          headerText: "Nomor Telefon",
+                          icon: Icons.phone,
+                          isEditable: true,
+                          keyboardType: TextInputType.number),
                     ] else ...[
                       const SizedBox()
                     ],
-                    textFormBuilder(
-                        searchBoxController: addressTextEditingController,
-                        headerText: "Alamat",
-                        icon: Icons.pin_drop,
-                        isEditable: widget.isEditable,
-                        keyboardType: TextInputType.emailAddress),
-                    textFormBuilder(
-                        searchBoxController: phoneTextEditingController,
-                        headerText: "Nomor Telefon",
-                        icon: Icons.phone,
-                        isEditable: widget.isEditable,
-                        keyboardType: TextInputType.number),
                   ],
                 ),
               ),
@@ -197,16 +163,15 @@ class _CustomerInformationState extends State<CustomerInformation> {
                       onPressed: () async {
                         bool isempty = false;
                         String username = usernameTextEditingController.text;
-                        if (username.isEmpty && isempty == false) {
-                          isempty = true;
-                          showToast("Username wajib diisi");
-                        }
-
                         String password = passwordTextEditingController.text;
                         String confirmPassword =
                             confirmPasswordTextEditingController.text;
+                        String email = emailTextEditingController.text;
+                        String name = nameTextEditingController.text;
+                        String address = addressTextEditingController.text;
+                        String phone = phoneTextEditingController.text;
 
-                        if (widget.isUpdate != true) {
+                        if (widget.isPassword == true) {
                           if (password.isEmpty && isempty == false) {
                             isempty = true;
                             showToast("Password wajib diisi");
@@ -223,78 +188,51 @@ class _CustomerInformationState extends State<CustomerInformation> {
                           }
                         }
 
-                        String email = emailTextEditingController.text;
-                        if (email.isEmpty && isempty == false) {
-                          isempty = true;
-                          showToast("Email wajib diisi");
-                        }
-
-                        String name = nameTextEditingController.text;
-                        if (name.isEmpty && isempty == false) {
-                          isempty = true;
-                          showToast("Nama Lengkap wajib diisi");
-                        }
-
-                        String birthdate = birthDateTextEditingController.text;
-                        if (widget.isUpdate != true) {
-                          if (birthdate.isEmpty && isempty == false) {
+                        if (widget.isPassword != true) {
+                          if (username.isEmpty && isempty == false) {
                             isempty = true;
-                            showToast("Tanggal lahir wajib diisi");
+                            showToast("Username wajib diisi");
+                          }
+
+                          if (name.isEmpty && isempty == false) {
+                            isempty = true;
+                            showToast("Nama Lengkap wajib diisi");
+                          }
+
+                          if (email.isEmpty && isempty == false) {
+                            isempty = true;
+                            showToast("Email wajib diisi");
+                          }
+
+                          if (address.isEmpty && isempty == false) {
+                            isempty = true;
+                            showToast("Alamat wajib diisi");
+                          }
+
+                          if (phone.isEmpty && isempty == false) {
+                            isempty = true;
+                            showToast("Nomor Telefon wajib diisi");
                           }
                         }
 
-                        String address = addressTextEditingController.text;
-                        if (address.isEmpty && isempty == false) {
-                          isempty = true;
-                          showToast("Alamat wajib diisi");
-                        }
-
-                        String phone = phoneTextEditingController.text;
-                        if (phone.isEmpty && isempty == false) {
-                          isempty = true;
-                          showToast("Nomor Telefon wajib diisi");
-                        }
-
                         if (!isempty) {
-                          setState(() {
-                            isLoading = true;
-                          });
-
-                          var jsonData = widget.isUpdate
-                              ? {
-                                  "username": username,
-                                  "email": email,
-                                  "nama_lengkap": name,
-                                  "alamat": address,
-                                  "telp": phone,
-                                  "wilayah": ""
-                                }
+                          var jsonData = widget.isPassword
+                              ? {"password": password}
                               : {
                                   "username": username,
-                                  "password": password,
-                                  "email": email,
                                   "nama_lengkap": name,
-                                  "tgl_lahir": birthdate, // datepicker
-                                  "jenis_kelamin":
-                                      dropdownvalue, // Laki-laki / Perempuan
+                                  "email": email,
                                   "alamat": address,
                                   "telp": phone,
                                   "wilayah": ""
                                 };
 
                           var loginData = await authProvider.getLoginData();
-                          var message = widget.isUpdate == false
-                              ? await customerProvider.addCustomerData(
-                                  data: jsonData,
-                                  token: loginData!.token.toString())
-                              : await customerProvider.updateCustomerData(
+                          var message =
+                              await customerProvider.updateCustomerData(
                                   data: jsonData,
                                   id: widget.data["id"],
                                   token: loginData!.token.toString());
-
-                          setState(() {
-                            isLoading = false;
-                          });
 
                           if (message != "") {
                             showToast(message);
@@ -304,11 +242,7 @@ class _CustomerInformationState extends State<CustomerInformation> {
                               Navigator.pop(context);
                             }
                           }
-                        } else {
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }
+                        } else {}
                       },
                       style: ElevatedButton.styleFrom(
                           shape: StadiumBorder(
@@ -319,28 +253,15 @@ class _CustomerInformationState extends State<CustomerInformation> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            widget.isUpdate == true
-                                ? Icons.refresh
-                                : Icons.person_add,
+                          const Icon(
+                            Icons.refresh,
                             color: Colors.white,
                           ),
-                          isLoading == true
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  widget.isUpdate == true
-                                      ? ' Update Data Pelanggan'
-                                      : ' Simpan Pelanggan',
-                                  style: poppins.copyWith(
-                                      fontWeight: semiBold,
-                                      color: Colors.white),
-                                ),
+                          Text(
+                            'Update Data Sales',
+                            style: poppins.copyWith(
+                                fontWeight: semiBold, color: Colors.white),
+                          ),
                         ],
                       ),
                     ),
@@ -578,60 +499,6 @@ class _CustomerInformationState extends State<CustomerInformation> {
                   print("Date is not selected");
                 }
               },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget genderPickerBuilder(
-      {required TextEditingController searchBoxController,
-      required String headerText,
-      required IconData icon,
-      required bool isEditable,
-      required TextInputType keyboardType}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            headerText,
-            style: poppins.copyWith(fontWeight: semiBold, fontSize: 14),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                border: Border.fromBorderSide(BorderSide(color: Colors.grey))),
-            child: ButtonTheme(
-              alignedDropdown: true,
-              child: DropdownButton(
-                underline: const SizedBox(),
-                isExpanded: true,
-                value: dropdownvalue,
-                icon: const Icon(Icons.keyboard_arrow_down),
-                menuMaxHeight: 300,
-                items: genderItems.map((String items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Text(items),
-                  );
-                }).toList(),
-                // After selecting the desired option,it will
-                // change button value to selected value
-                onChanged: isEditable == true
-                    ? (String? newValue) {
-                        setState(() {
-                          dropdownvalue = newValue!;
-                        });
-                      }
-                    : null,
-              ),
             ),
           ),
         ],

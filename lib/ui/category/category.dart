@@ -1,7 +1,9 @@
+import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/home/search_list.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Category extends StatefulWidget {
   const Category({super.key});
@@ -29,13 +31,16 @@ class _CategoryState extends State<Category> {
   }
 
   void _onFocusChange() {
-    setState(() {
-      print("Searchbar Clicked");
-    });
+    if (context.mounted) {
+      setState(() {
+        print("Searchbar Clicked");
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    ProductProvider productProvider = Provider.of<ProductProvider>(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(bottom: 10),
@@ -53,33 +58,134 @@ class _CategoryState extends State<Category> {
             ),
           ),
           Expanded(
-            child: ListView(
-              children: [
-                ExpansionTileBuilder(
-                    title: "Collapsible 1", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 2", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 3", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 4", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 5", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 1", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 2", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 3", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 4", myProducts: myProducts),
-                ExpansionTileBuilder(
-                    title: "Collapsible 5", myProducts: myProducts),
-              ],
+            child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              itemCount: productProvider.categoryTree!.data!.length,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    kat1ExpansionTile(
+                        title: productProvider.categoryTree?.data![index].kat1
+                                .toString() ??
+                            "",
+                        index: index),
+                  ],
+                );
+              },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget kat1ExpansionTile({required String title, required int index}) {
+    ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      child: ExpandableNotifier(
+          child: ScrollOnExpand(
+        child: ExpandablePanel(
+            header: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+            collapsed: const Divider(),
+            expanded: Column(
+              children: [
+                for (var i = 0;
+                    i <
+                        productProvider
+                            .categoryTree!.data![index].child!.length;
+                    i++)
+                  kat2ExpansionTile(
+                    title: productProvider
+                        .categoryTree!.data![index].child![i].kat2
+                        .toString(),
+                    kat1index: index,
+                    kat2index: i,
+                  ),
+              ],
+            )),
+      )),
+    );
+  }
+
+  Widget kat2ExpansionTile({
+    required String title,
+    required int kat1index,
+    required int kat2index,
+  }) {
+    ProductProvider productProvider = Provider.of<ProductProvider>(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: ExpandableNotifier(
+          child: ScrollOnExpand(
+        child: ExpandablePanel(
+          header: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w400),
+            ),
+          ),
+          collapsed: const Divider(),
+          expanded: Column(
+            children: [
+              for (var i = 0;
+                  i <
+                      productProvider.categoryTree!.data![kat1index]
+                          .child![kat2index].kat2Child!.length;
+                  i++)
+                GestureDetector(
+                  onTap: () {
+                    String kat1 =
+                        "${productProvider.categoryTree?.data?[kat1index].kat1Slug}";
+                    String kat2 =
+                        "${productProvider.categoryTree?.data?[kat1index].child?[kat2index].kat2Slug}";
+                    String kat3 =
+                        "${productProvider.categoryTree?.data?[kat1index].child?[kat2index].kat2Child?[i].kat3Slug}";
+                    print("Category Selected $kat1,$kat2,$kat3");
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchList(
+                          text: "",
+                          cat: "$kat1,$kat2,$kat3",
+                        ),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 30,
+                          child: Text(
+                            productProvider.categoryTree!.data![kat1index]
+                                .child![kat2index].kat2Child![i].kat3
+                                .toString(),
+                            style: const TextStyle(fontWeight: FontWeight.w300),
+                          ),
+                        ),
+                        const Divider(),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      )),
     );
   }
 
@@ -121,13 +227,15 @@ class _CategoryState extends State<Category> {
           }
         },
         onChanged: (query) {
-          setState(() {
-            myCategoryFiltered.clear();
-            myCategoryFiltered = myCategory
-                .where((element) =>
-                    element.toLowerCase().contains(query.toLowerCase()))
-                .toList();
-          });
+          if (context.mounted) {
+            setState(() {
+              myCategoryFiltered.clear();
+              myCategoryFiltered = myCategory
+                  .where((element) =>
+                      element.toLowerCase().contains(query.toLowerCase()))
+                  .toList();
+            });
+          }
         },
       ),
     );
@@ -207,6 +315,7 @@ class SuggestionListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+        shrinkWrap: true,
         children: myCategory
             .map((data) => searchTextController.text == ""
                 ? const SizedBox()
@@ -264,6 +373,12 @@ class SuggestionListView extends StatelessWidget {
                         ))))
             .toList());
   }
+
+  Widget ExpansionTile({
+    required String title,
+  }) {
+    return Container();
+  }
 }
 
 class ExpansionTileBuilder extends StatelessWidget {
@@ -294,67 +409,12 @@ class ExpansionTileBuilder extends StatelessWidget {
             spacing: 5,
             runSpacing: 10,
             children: [
-              for (var i = 0; i < 5; i++)
-                const ExpansionCarditem(itemTitle: "Test 1"),
+              // for (var i = 0; i < 5; i++)
+              // const ExpansionCarditem(itemTitle: "Test 1"),
             ],
           ),
         ),
       )),
-    );
-
-    // return Container(
-    //   padding: const EdgeInsets.symmetric(vertical: 5),
-    //   child: Theme(
-    //     data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-    //     child: ExpansionTile(
-    //       maintainState: true,
-    //       expandedCrossAxisAlignment: CrossAxisAlignment.start,
-    //       backgroundColor: Colors.white,
-    //       collapsedBackgroundColor: Colors.white60,
-    //       title: Text(
-    //         title,
-    //         style: const TextStyle(fontWeight: FontWeight.w500),
-    //       ),
-    //       children: [
-    //         Wrap(
-    //           spacing: 10,
-    //           runSpacing: 10,
-    //           children: [
-    //             for (var i = 0; i < 3; i++)
-    //               const ExpansionCarditem(itemTitle: "Test 1"),
-    //           ],
-    //         )
-    //       ],
-    //     ),
-    //   ),
-    // );
-  }
-}
-
-class ExpansionCarditem extends StatelessWidget {
-  final String itemTitle;
-  const ExpansionCarditem({super.key, required this.itemTitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      width: 75,
-      height: 75,
-      child: Card(
-          elevation: 2,
-          shadowColor: Colors.grey,
-          color: Colors.white,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const Icon(Icons.message, size: 24, color: Colors.black),
-              Text(
-                itemTitle,
-                style: const TextStyle(color: Colors.black),
-              ),
-            ],
-          )),
     );
   }
 }

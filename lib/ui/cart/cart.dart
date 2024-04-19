@@ -1,5 +1,8 @@
+import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
+import 'package:e_shop/provider/product_provider.dart';
+import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/cart/customer_search.dart';
 import 'package:e_shop/ui/product/detail_item.dart';
@@ -17,42 +20,72 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
-  final List<String> items = [
-    'Toko Adamdam',
-    'Toko Adamdam2',
-    'Toko Adamdam3',
-    'Toko Adamdam4',
-    'Toko Adamdam5',
-    'Toko Adamdam7',
-    'Toko Adamdam8',
-    'Jl.Bendungan Sutami GG.6 No 11, Lowokwaru, Kota Malang, Jawa Timur.',
-  ];
-
   String? selectedValue;
   final TextEditingController textEditingController = TextEditingController();
 
   @override
-  void dispose() {
-    textEditingController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+
+    _getCartList();
+  }
+
+  void _getCartList() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    if (await cartProvider.getCartList(
+        token: authProvider.user.token.toString())) {
+      setState(() {});
+      print("${cartProvider.cartList.listData!.first.cartData!.length}");
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     CartProvider cartProduct = Provider.of<CartProvider>(context);
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
 
     int countItem = 0;
     int subTotal = 0;
 
+    String selectedCustomer = "Pilih customer";
+
+//dummy data
+    List<Map<dynamic, dynamic>> customerListFiltered = [];
+    customerListFiltered = customerProvider.myCustomer;
+    customerListFiltered = customerListFiltered
+        .where((element) =>
+            element["id"] == customerProvider.selectCustomer.toString())
+        .toList();
+
+    if (customerProvider.myCustomer.isEmpty) {
+      selectedCustomer = "Pilih customer";
+    } else {
+      if (customerListFiltered.isNotEmpty) {
+        selectedCustomer = customerListFiltered.first["nama_lengkap"];
+      } else {
+        selectedCustomer = "Pilih customer";
+      }
+    }
+
     Widget bottomSheetDialog() {
-      String selectedCustomer = "Select customer";
+      String selectedCustomer = "Pilih customer";
+
+      List<Map<dynamic, dynamic>> customerListFiltered = [];
+      customerListFiltered = customerProvider.myCustomer;
+      customerListFiltered = customerListFiltered
+          .where((element) =>
+              element["id"] == customerProvider.selectCustomer.toString())
+          .toList();
 
       if (customerProvider.myCustomer.isEmpty) {
         selectedCustomer = "Select customer";
       } else {
-        selectedCustomer = customerProvider
-            .myCustomer[customerProvider.selectCustomer]["nama_lengkap"];
+        // selectedCustomer = "Select customer";
+        selectedCustomer = customerListFiltered.first["nama_lengkap"];
       }
 
       return Container(
@@ -283,16 +316,16 @@ class _CartState extends State<Cart> {
     }
 
     Widget cartDynamicCard(int index) {
-      print("Data : ${cartProduct.myProducts[index]}");
+      print("Data : ${cartProduct.cartList.listData!.first.cartData![index]}");
 
-      // subtotal
-      subTotal +=
-          int.parse(cartProduct.myProducts[index]["amount"].toString()) *
-              int.parse(cartProduct.myProducts[index]["price"].toString());
+      // // subtotal
+      // subTotal +=
+      //     int.parse(cartProduct.myProducts[index]["amount"].toString()) *
+      //         int.parse(cartProduct.myProducts[index]["price"].toString());
 
-      // count item
-      countItem +=
-          int.parse(cartProduct.myProducts[index]["amount"].toString());
+      // // count item
+      // countItem +=
+      //     int.parse(cartProduct.myProducts[index]["amount"].toString());
 
       return GestureDetector(
         onTap: () {
@@ -300,12 +333,19 @@ class _CartState extends State<Cart> {
             context,
             MaterialPageRoute(
                 builder: (context) => DetailItem(
-                    imageUrl: cartProduct.myProducts[index]["img"],
-                    id: cartProduct.myProducts[index]["id"])),
-          ).then((value) => setState(() {}));
+                    imageUrl: cartProduct
+                        .cartList.listData!.first.cartData![index].imageUrl
+                        .toString(),
+                    id: cartProduct
+                        .cartList.listData!.first.cartData![index].produkId
+                        .toString())),
+          ).then((value) => setState(() {
+                _getCartList();
+              }));
         },
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
@@ -325,7 +365,8 @@ class _CartState extends State<Cart> {
                 // borderRadius: BorderRadius.circular(8),
                 child: FadeInImage.memoryNetwork(
                   placeholder: kTransparentImage,
-                  image: cartProduct.myProducts[index]["img"],
+                  image:
+                      "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
                   fit: BoxFit.cover,
                   height: 125,
                   width: 125,
@@ -339,7 +380,7 @@ class _CartState extends State<Cart> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${cartProduct.myProducts[index]["name"]}",
+                        "${cartProduct.cartList.listData!.first.cartData![index].namaProduk}",
                         style: poppins.copyWith(
                             overflow: TextOverflow.ellipsis,
                             fontWeight: semiBold,
@@ -347,9 +388,19 @@ class _CartState extends State<Cart> {
                             color: backgroundColor1),
                         maxLines: 2,
                       ),
+                      const SizedBox(
+                        width: 10,
+                      ),
                       Text(
                         CurrencyFormat.convertToIdr(
-                                cartProduct.myProducts[index]["price"], 2)
+                                cartProduct.cartList.listData!.first
+                                            .cartData![index].diskon !=
+                                        0
+                                    ? cartProduct.cartList.listData!.first
+                                        .cartData![index].hargaDiskon
+                                    : cartProduct.cartList.listData!.first
+                                        .cartData![index].harga,
+                                2)
                             .toString(),
                         style: poppins.copyWith(
                             fontWeight: regular,
@@ -362,7 +413,6 @@ class _CartState extends State<Cart> {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            width: 70,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -377,11 +427,11 @@ class _CartState extends State<Cart> {
                                     child: InkWell(
                                       onTap: () {
                                         setState(() {
-                                          cartProduct.myProducts[index]
-                                              ["amount"] += 1;
-                                          print(cartProduct.myProducts[index]
-                                                  ["amount"]
-                                              .toString());
+                                          // cartProduct.myProducts[index]
+                                          //     ["amount"] += 1;
+                                          // print(cartProduct.myProducts[index]
+                                          //         ["amount"]
+                                          //     .toString());
                                         });
                                       },
                                       child: const Icon(
@@ -392,14 +442,20 @@ class _CartState extends State<Cart> {
                                     ),
                                   ),
                                 ),
-                                Text(
-                                  cartProduct.myProducts[index]["amount"]
-                                      .toString(),
-                                  style: poppins.copyWith(
-                                      fontWeight: bold,
-                                      color: backgroundColor3,
-                                      overflow: TextOverflow.ellipsis),
-                                  maxLines: 2,
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Text(
+                                    cartProduct.cartList.listData!.first
+                                        .cartData![index].jumlah
+                                        .toString(),
+                                    style: poppins.copyWith(
+                                        fontWeight: bold,
+                                        color: backgroundColor3,
+                                        overflow: TextOverflow.ellipsis),
+                                    maxLines: 2,
+                                  ),
                                 ),
                                 ClipOval(
                                   child: Container(
@@ -409,18 +465,10 @@ class _CartState extends State<Cart> {
                                       color: backgroundColor2,
                                     ),
                                     child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          cartProduct.myProducts[index]
-                                              ["amount"] -= 1;
-                                          if (cartProduct.myProducts[index]
-                                                  ["amount"] <
-                                              1) {
-                                            print("Index terhapus : $index");
-                                            cartProduct.myProducts
-                                                .removeAt(index);
-                                          }
-                                        });
+                                      onTap: () async {
+                                        if (context.mounted) {
+                                          setState(() {});
+                                        }
                                       },
                                       child: const Icon(
                                         Icons.remove,
@@ -443,7 +491,7 @@ class _CartState extends State<Cart> {
                               child: InkWell(
                                 onTap: () {
                                   setState(() {
-                                    cartProduct.myProducts.removeAt(index);
+                                    // cartProduct.myProducts.removeAt(index);
                                   });
                                 },
                                 child: const Icon(
@@ -455,6 +503,32 @@ class _CartState extends State<Cart> {
                             ),
                           ),
                         ],
+                      ),
+                      ClipOval(
+                        child: Container(
+                          height: 25,
+                          width: 25,
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                // cartProduct.myProducts[index]["amount"] += 1;
+                                print(cartProduct.myProducts[index]["amount"]
+                                    .toString());
+                              });
+                            },
+                            child: const Icon(
+                              Icons.edit_note,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
                       ),
                     ],
                   ),
@@ -503,18 +577,73 @@ class _CartState extends State<Cart> {
                       },
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.05,
-                        child: const Icon(
+                        child: Icon(
                           Icons.shopping_cart_checkout,
-                          color: Colors.white,
+                          color: cartProduct.myProducts.isNotEmpty
+                              ? Colors.white
+                              : Colors.grey,
                         ),
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(
+                  height: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CustomerSearch()),
+                    ).then((value) => {print("Selected Value")});
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                          style: BorderStyle.solid),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.person,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        SizedBox(
+                          child: Text(
+                            selectedCustomer,
+                            // "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque laoreet a tellus eget dapibus.",
+                            style: poppins.copyWith(
+                                fontWeight: regular,
+                                fontSize: 14,
+                                overflow: TextOverflow.ellipsis),
+                            maxLines: 2,
+                          ),
+                        ),
+                        const Spacer(),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
               ],
             ),
           ),
-          if (cartProduct.myProducts.isEmpty) ...[
+          if (cartProduct.cartList.listData!.isEmpty) ...[
             Expanded(
                 child: Center(
                     child: Column(
@@ -536,7 +665,9 @@ class _CartState extends State<Cart> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                 children: [
-                  for (int i = 0; i < cartProduct.myProducts.length; i++)
+                  for (int i = 0;
+                      i < cartProduct.cartList.listData!.first.cartData!.length;
+                      i++)
                     cartDynamicCard(i)
                 ],
               ),

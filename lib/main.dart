@@ -192,9 +192,11 @@ class _BottomNavigationBarExampleState
             showSelectedLabels: false,
             backgroundColor: Colors.transparent,
             onTap: (index) {
-              setState(() {
-                pageProvider.currentIndex = index;
-              });
+              if (context.mounted) {
+                setState(() {
+                  pageProvider.currentIndex = index;
+                });
+              }
             },
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:e_shop/models/product_model.dart';
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/provider/settings_provider.dart';
@@ -29,82 +30,100 @@ class _PromoState extends State<Promo> {
   String _latitude = '';
   String _longitude = '';
 
+  // Produk Terlaku controller
+  int promoIndex = 1;
+  bool _isLoading = false;
+  bool _isLimit = false;
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     searchBarFocusNode.addListener(_onFocusChange);
 
+    // Add a listener to the scroll controller to detect when the user reaches the bottom of the list
+    _scrollController.addListener(_scrollListener);
+
+    // Get Location
     _getLocation();
 
+    // Get Promo
+    _getPromo();
+  }
+
+  // Load more data
+  void _scrollListener() {
+    print("${_scrollController.position.pixels}");
+    if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent &&
+        _isLimit == false) {
+      // User has scrolled to the bottom, load more data
+      print("Reach End");
+      _loadData();
+    } else {
+      print("Not Reach End");
+    }
+  }
+
+  void _loadData() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final settingsProvider =
         Provider.of<SettingsProvider>(context, listen: false);
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
 
-    Future.delayed(Duration.zero, () async {
-      // Get data from SharedPref
+    // Simulated data loading, you would replace this with your actual data loading logic
+    if (context.mounted) {
+      setState(() {
+        _isLoading = true;
+        print("Kondisi loading $_isLoading");
+      });
+    }
+
+    Future.delayed(const Duration(seconds: 5), () async {
       var data = await authProvider.getLoginData();
 
-      // Get Store Location
-      if (data?.token != null) {
-        if (await settingsProvider.getStoreLocation(
-            lat: _latitude,
-            long: _latitude,
-            token: authProvider.user.token.toString())) {
-        } else {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-                backgroundColor: Colors.red,
-                content: Text(
-                  'Gagal Mendapatkan Lokasi!',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-        }
-      }
-
-      // Get Promo
-      print("Cabang ${settingsProvider.storeLocation.data?.first.id}");
-      if (data?.token != null && settingsProvider.storeLocation.data != null) {
+      // Get Best Seller
+      print(
+          "Cabang Load More ${settingsProvider.storeLocation.data?.first.id}");
+      if (data!.token != null &&
+          settingsProvider.storeLocation.data != null &&
+          _isLimit != true) {
         if (await productProvider.getPromoProduct(
             cabangId: settingsProvider.storeLocation.data!.first.id.toString(),
-            token: authProvider.user.token.toString())) {
+            token: authProvider.user.token.toString(),
+            limit: 5,
+            page: promoIndex + 1)) {
+          if (context.mounted) {
+            setState(() {
+              promoIndex = promoIndex + 1;
+            });
+          }
         } else {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-                backgroundColor: Colors.red,
-                content: Text(
-                  'Gagal Mendapatkan Promo Terbaru!',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
+            setState(() {
+              _isLimit = true;
+            });
           }
         }
       }
+      if (context.mounted) {
+        setState(() {
+          _isLoading = false;
+          print("kondisi loading $_isLoading");
+        });
+      }
+
+      // }
     });
   }
 
   void _onFocusChange() {
-    setState(() {
-      print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    searchBarFocusNode.removeListener(_onFocusChange);
-    searchBarFocusNode.dispose();
+    if (context.mounted) {
+      setState(() {
+        print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
+      });
+    }
   }
 
   // Function to get the current location
@@ -112,13 +131,39 @@ class _PromoState extends State<Promo> {
     permission = await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+  }
 
-    setState(() {
-      _latitude = position.latitude.toString();
-      _longitude = position.longitude.toString();
-    });
+  void _getPromo() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
 
-    print("Location : ${_latitude}, ${_longitude} ");
+    // Get data from SharedPref
+    var data = await authProvider.getLoginData();
+
+    // Get Promo
+    if (data?.token != null) {
+      if (await productProvider.getPromoProduct(
+          cabangId: authProvider.user.data.cabangId.toString(),
+          token: authProvider.user.token.toString(),
+          limit: 5,
+          page: promoIndex)) {
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Gagal Mendapatkan Promo Terbaru!',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -128,7 +173,9 @@ class _PromoState extends State<Promo> {
       onWillPop: () async {
         print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
         searchBarFocusNode.removeListener(() {});
-        setState(() {});
+        if (context.mounted) {
+          setState(() {});
+        }
         return true;
       },
       child: Container(
@@ -172,22 +219,34 @@ class _PromoState extends State<Promo> {
               )
             ] else ...[
               Expanded(
-                child: ListView(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: productProvider.promoProduct!.data!.length,
                   padding:
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                  children: [
-                    if (productProvider.promoProduct?.data != null)
-                      for (var i in productProvider.promoProduct!.data!)
-                        DynamicCardVertical(
-                          data: i,
-                          isDiscount: i.diskon != 0,
-                        )
-                    else
-                      SizedBox(),
-                  ],
+                  itemBuilder: (context, index) {
+                    return DynamicCardVertical(
+                      data: productProvider.promoProduct!.data![index],
+                      isDiscount: productProvider
+                                  .promoProduct!.data![index].diskon !=
+                              0 &&
+                          productProvider.promoProduct!.data![index].diskon !=
+                              null,
+                    );
+                  },
                 ),
               ),
-            ]
+            ],
+            _isLoading
+                ? Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -233,13 +292,15 @@ class _PromoState extends State<Promo> {
           }
         },
         onChanged: (query) {
-          setState(() {
-            myCategoryFiltered.clear();
-            myCategoryFiltered = myCategory
-                .where((element) =>
-                    element.toLowerCase().contains(query.toLowerCase()))
-                .toList();
-          });
+          if (context.mounted) {
+            setState(() {
+              myCategoryFiltered.clear();
+              myCategoryFiltered = myCategory
+                  .where((element) =>
+                      element.toLowerCase().contains(query.toLowerCase()))
+                  .toList();
+            });
+          }
         },
       ),
     );

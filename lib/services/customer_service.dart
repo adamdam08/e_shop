@@ -1,25 +1,24 @@
 import 'dart:convert';
-import 'package:e_shop/models/cart/cart_list_model.dart';
+import 'package:e_shop/models/customer/customer_data_model.dart';
 import 'package:e_shop/models/customer/customer_post_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:e_shop/models/store_location_model.dart';
+import 'package:e_shop/models/product_model.dart';
 
-class SettingsService {
+class CustomerService {
   String baseURL = 'http://103.127.132.116/api/v1/';
+  // String baseURL = 'http://192.168.122.217:3001/api/v1/';
 
-  Future<StoreLocationModel> getStoreByCoordinate(
-      {required String lat,
-      required String long,
-      required String token}) async {
-    var url = Uri.parse("${baseURL}pengaturan/cabang");
+  // Get Promo Product
+  Future<ProductModel> getPromoProduct(
+      {required String cabangId, required String token}) async {
+    var url = Uri.parse("${baseURL}produk/promo?cabang=$cabangId");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
     };
-    Map data = {"lat": lat, "lon": long};
-    var body = jsonEncode(data);
-    var response = await http.post(url, headers: header, body: body);
+
+    var response = await http.get(url, headers: header);
     // ignore: avoid_print
     print("Login: ${response.body}");
 
@@ -27,41 +26,17 @@ class SettingsService {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var data = jsonDecode(response.body);
 
-      StoreLocationModel storeLocateModel = StoreLocationModel.fromJson(data);
-      return storeLocateModel;
+      ProductModel promoProductModel = ProductModel.fromJson(data);
+      return promoProductModel;
     } else {
       throw Exception("Gagal Mendapatkan Promo");
     }
   }
 
-  Future<CartListModel> getListCart({
-    required String token,
-  }) async {
-    var url = Uri.parse("${baseURL}keranjang");
-    var header = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json'
-    };
-    var response = await http.get(url, headers: header);
-
-    // ignore: avoid_print
-    print("ListCart: ${response.body}");
-
-    // **success melakukan login
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      var data = jsonDecode(response.body);
-
-      CartListModel storeLocateModel = CartListModel.fromJson(data);
-      return storeLocateModel;
-    } else {
-      throw Exception("Tidak Dapat Mendapatkan List");
-    }
-  }
-
   // Add data customer
-  Future<CustomerPostModel> addCart(
+  Future<CustomerPostModel> addNewCustomer(
       {required Map data, required String token}) async {
-    var url = Uri.parse("${baseURL}keranjang");
+    var url = Uri.parse("${baseURL}akun/register");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -82,17 +57,21 @@ class SettingsService {
     }
   }
 
-  // Delete customer cart
-  Future<CustomerPostModel> deleteCart(
-      {required String cuid, required String token}) async {
-    var url = Uri.parse("${baseURL}keranjang/$cuid");
+  // Add data customer
+  Future<CustomerPostModel> updateCustomer(
+      {required Map data, required String id, required String token}) async {
+    var url = Uri.parse("${baseURL}akun/profil?id=$id");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
     };
-    var response = await http.delete(url, headers: header);
+    var body = jsonEncode(data);
+    var response = await http.put(url, headers: header, body: body);
     // ignore: avoid_print
-    print("Add Customer: ${response.body}");
+    print("Update Customer: ${url}");
+    print("Update Customer: ${id}");
+    print("Update Customer: ${body}");
+    print("Update Customer: ${response.body}");
 
 // **success melakukan login
     if (response.statusCode >= 200 && response.statusCode <= 299) {
@@ -105,23 +84,21 @@ class SettingsService {
     }
   }
 
-// Add data customer
-  Future<CustomerPostModel> updateCart(
-      {required Map data, required String token}) async {
-    var url = Uri.parse("${baseURL}keranjang");
+  // Get List Customer
+  Future<CustomerDataModel> getListCustomer({required String token}) async {
+    var url = Uri.parse("${baseURL}customer");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
     };
-    var body = jsonEncode(data);
-    var response = await http.put(url, headers: header, body: body);
+    var response = await http.get(url, headers: header);
     // ignore: avoid_print
-    print("Add Customer: ${response.body}");
+    print("Login: ${response.body}");
 
 // **success melakukan login
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var data = jsonDecode(response.body);
-      CustomerPostModel callbackData = CustomerPostModel.fromJson(data);
+      CustomerDataModel callbackData = CustomerDataModel.fromJson(data);
       return callbackData;
     } else {
       var data = jsonDecode(response.body);

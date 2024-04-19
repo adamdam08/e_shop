@@ -1,14 +1,20 @@
 import 'dart:math';
 
+import 'package:e_shop/models/product_model.dart';
+import 'package:e_shop/provider/auth_provider.dart';
+import 'package:e_shop/provider/product_provider.dart';
+import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/category/category.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 import '../product/detail_item.dart';
 
 class SearchList extends StatefulWidget {
   final String text;
-  const SearchList({super.key, required this.text});
+  final String cat;
+  const SearchList({super.key, required this.text, this.cat = ""});
 
   @override
   State<SearchList> createState() => _SearchListState();
@@ -29,14 +35,90 @@ class _SearchListState extends State<SearchList> {
       print("Clicked");
       print("Clicked : ${searchBarFocusNode.hasFocus}");
     });
-  }
 
-  final List<Map> myProducts =
-      List.generate(10, (index) => {"id": index, "name": "Product $index"})
-          .toList();
+    //
+    int searchIndex = 1;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
+    Future.delayed(Duration.zero, () async {
+      // Get data from SharedPref
+      var data = await authProvider.getLoginData();
+
+      if (widget.cat != "") {
+        // Get Promo
+        print("Cabang ${settingsProvider.storeLocation.data?.first.id}");
+        if (data?.token != null &&
+            settingsProvider.storeLocation.data != null) {
+          if (await productProvider.getSearchProduct(
+              cabangId: authProvider.user.data.cabangId.toString(),
+              token: authProvider.user.token.toString(),
+              limit: 5,
+              page: searchIndex,
+              cat: widget.cat,
+              query: widget.text)) {
+            print("Search Result ${productProvider.searchProduct}");
+            setState(() {});
+          } else {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    'Data Tidak Ditemukan!',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
+            setState(() {});
+          }
+        }
+      } else {
+        // Get Promo
+        print("Cabang ${settingsProvider.storeLocation.data?.first.id}");
+        if (data?.token != null &&
+            settingsProvider.storeLocation.data != null) {
+          if (await productProvider.getSearchProduct(
+              cabangId: authProvider.user.data.cabangId.toString(),
+              token: authProvider.user.token.toString(),
+              limit: 5,
+              page: searchIndex,
+              cat: widget.cat,
+              query: widget.text)) {
+            print("Search Result ${productProvider.searchProduct}");
+            setState(() {});
+          } else {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    'Data Tidak Ditemukan!',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
+            setState(() {});
+          }
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
     Widget searchBar() {
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -91,22 +173,26 @@ class _SearchListState extends State<SearchList> {
                   onSubmitted: (value) {
                     if (value != "") {
                       FocusScope.of(context).unfocus();
+                      searchTextController.text = widget.text;
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SearchList(text: value)),
+                            builder: (context) => SearchList(
+                                  text: value,
+                                  cat: widget.cat,
+                                )),
                       );
                     }
                   },
                   onChanged: (query) {
-                    setState(() {
-                      myCategoryFiltered.clear();
-                      myCategoryFiltered = myCategory
-                          .where((element) => element
-                              .toLowerCase()
-                              .contains(query.toLowerCase()))
-                          .toList();
-                    });
+                    // setState(() {
+                    //   myCategoryFiltered.clear();
+                    //   myCategoryFiltered = myCategory
+                    //       .where((element) => element
+                    //           .toLowerCase()
+                    //           .contains(query.toLowerCase()))
+                    //       .toList();
+                    // });
                   },
                   onTap: () {
                     print("Focus : ${searchBarFocusNode.hasFocus}");
@@ -134,11 +220,13 @@ class _SearchListState extends State<SearchList> {
                 searchBar(),
                 RichText(
                   text: TextSpan(
-                    text: 'Hasil Pencarian : ',
+                    text: 'Hasil Pencarian : \n',
                     style: poppins.copyWith(color: Colors.black),
                     children: <TextSpan>[
                       TextSpan(
-                          text: widget.text,
+                          text: widget.cat != ""
+                              ? widget.cat.replaceAll('_', ' ')
+                              : "",
                           style: poppins.copyWith(color: backgroundColor1)),
                     ],
                   ),
@@ -147,24 +235,28 @@ class _SearchListState extends State<SearchList> {
                   height: 10,
                 ),
                 if (searchBarFocusNode.hasFocus == false) ...[
-                  if (myProducts.isEmpty) ...[
-                    Center(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.report_problem,
-                          size: 48,
-                        ),
-                        Text(
-                          "Products Not Found",
-                          style: poppins.copyWith(
-                              fontWeight: regular, fontSize: 20),
-                        ),
-                      ],
-                    ))
+                  if (productProvider.searchProduct?.data == null) ...[
+                    Expanded(
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.report_problem,
+                            size: 48,
+                          ),
+                          Text(
+                            "Produk Tidak Tersedia",
+                            style: poppins.copyWith(
+                                fontWeight: regular, fontSize: 20),
+                          ),
+                        ],
+                      )),
+                    )
                   ] else ...[
-                    Expanded(child: GridBuilder(myProducts: myProducts))
+                    Expanded(
+                        child: GridBuilder(
+                            myProducts: productProvider.searchProduct!.data!))
                   ]
                 ] else ...[
                   Expanded(
@@ -184,7 +276,7 @@ class _SearchListState extends State<SearchList> {
 }
 
 class GridBuilder extends StatelessWidget {
-  final List<Map<dynamic, dynamic>> myProducts;
+  final List<Data> myProducts;
   const GridBuilder({super.key, required this.myProducts});
 
   @override
@@ -197,32 +289,34 @@ class GridBuilder extends StatelessWidget {
             mainAxisSpacing: 10),
         itemCount: myProducts.length,
         itemBuilder: (BuildContext ctx, index) {
-          return const SearchDynamicCard(text: "1");
+          return SearchDynamicCard(text: myProducts[index]);
         });
   }
 }
 
 class SearchDynamicCard extends StatelessWidget {
-  final String text;
+  final Data text;
   final bool isDiscount;
   const SearchDynamicCard(
       {super.key, required this.text, this.isDiscount = true});
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => DetailItem(
-                    imageUrl:
-                        "https://picsum.photos/300?image=${(int.tryParse(text)! * Random().nextInt(10))}",
-                    id: "1",
+                    imageUrl: text.gambar?.first,
+                    id: text.id.toString(),
                   )),
         );
       },
       child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
         width: 150,
         height: 300,
         decoration: BoxDecoration(
@@ -241,8 +335,7 @@ class SearchDynamicCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               child: FadeInImage.memoryNetwork(
                 placeholder: kTransparentImage,
-                image:
-                    "https://picsum.photos/300?image=${(int.tryParse(text)! * Random().nextInt(10))}",
+                image: text.gambar!.first,
                 fit: BoxFit.cover,
                 height: 175,
                 width: 175,
@@ -256,7 +349,7 @@ class SearchDynamicCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Lorem ipsum dolor sit ametasdasdasd",
+                      text.namaProduk.toString(),
                       style: poppins.copyWith(
                           overflow: TextOverflow.ellipsis,
                           fontWeight: semiBold,
@@ -265,16 +358,16 @@ class SearchDynamicCard extends StatelessWidget {
                       maxLines: 2,
                     ),
                     Text(
-                      "Rp.100.000",
+                      "Rp. ${text.diskon == null ? text.harga.toString() : text.hargaDiskon.toString()}",
                       style: poppins.copyWith(
                           fontWeight: medium, color: backgroundColor3),
                     ),
-                    if (this.isDiscount)
+                    if (text.diskon != null) ...[
                       Row(
                         children: [
                           Flexible(
                             child: Text(
-                              "Rp.100.000.000",
+                              "Rp. ${text.hargaDiskon.toString()}",
                               maxLines: 1,
                               style: poppins.copyWith(
                                   overflow: TextOverflow.ellipsis,
@@ -284,7 +377,7 @@ class SearchDynamicCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            " 50%",
+                            " ${text.diskon}%",
                             style: poppins.copyWith(
                               fontSize: 10,
                               fontWeight: bold,
@@ -293,6 +386,7 @@ class SearchDynamicCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ],
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -303,7 +397,7 @@ class SearchDynamicCard extends StatelessWidget {
                           size: 12,
                         ),
                         Text(
-                          " Cab.Trenggalek",
+                          " Cab. ${settingsProvider.storeLocation.data?.first.namaCabang}",
                           style: poppins.copyWith(
                             fontSize: 12,
                             fontWeight: semiBold,
@@ -311,7 +405,7 @@ class SearchDynamicCard extends StatelessWidget {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

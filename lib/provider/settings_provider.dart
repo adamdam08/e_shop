@@ -13,19 +13,20 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> getStoreLocation(
-      {required String lat,
-      required String long,
-      required String token}) async {
+  Future<bool> getStoreLocation({
+    required String lat,
+    required String long,
+    required String token,
+    required String cabangId,
+  }) async {
     print("Store Location :  $lat : $long");
     try {
       StoreLocationModel storeLocation = await SettingsService()
           .getStoreByCoordinate(lat: lat, long: long, token: token);
       _storeLocation = storeLocation;
       _storeLocation.data = _storeLocation.data
-          ?.where((element) => element.terdekat == true)
+          ?.where((element) => element.id == int.parse(cabangId))
           .toList();
-
       print("Store Location :  ${storeLocation.data?.length}");
       return true;
     } catch (e) {

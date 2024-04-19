@@ -24,7 +24,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
 
     customerListFiltered = customerProvider.myCustomer;
     customerListFiltered = customerListFiltered
-        .where((element) => element["name"]
+        .where((element) => element["nama_lengkap"]
             .toString()
             .toLowerCase()
             .contains(searchTextController.text.toLowerCase()))
@@ -33,8 +33,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
         onTap: () {
-          print((myCustomer["id"] is int));
-          customerProvider.selectCustomer = myCustomer["id"] - 1;
+          customerProvider.selectCustomer = int.tryParse(myCustomer["id"])!;
           print("customerId nya adalah: ${customerProvider.selectCustomer}");
           Navigator.pop(context);
         },
@@ -172,14 +171,17 @@ class _CustomerSearchState extends State<CustomerSearch> {
                 )))
               ] else ...[
                 Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    children: [
-                      for (int i = 0; i < customerListFiltered.length; i++)
-                        customerDynamicCardVertical(customerListFiltered[i])
-                    ],
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                    itemCount: customerListFiltered.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return customerDynamicCardVertical(
+                          customerListFiltered[index]);
+                    },
                   ),
-                )
+                ),
               ],
               Padding(
                 padding:

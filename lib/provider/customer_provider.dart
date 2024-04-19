@@ -1,17 +1,14 @@
+import 'dart:ffi';
+
+import 'package:e_shop/models/customer/customer_data_model.dart';
+import 'package:e_shop/services/customer_service.dart';
 import 'package:flutter/cupertino.dart';
 
 class CustomerProvider with ChangeNotifier {
-  // final List<Map> myProducts = List.generate(0, (index) => {
-  //   "id": index,
-  //   "name": "Product $index",
-  //   "phone" : "6288888888",
-  //   "address" : "Malang city"
-  // }).toList();
+  List<Map<String, String?>> _myCustomer = [];
+  List<Map<String, String?>> get myCustomer => _myCustomer;
 
-  List<Map> _myCustomer = [];
-  List<Map> get myCustomer => _myCustomer;
-
-  set myCustomer(List<Map> customer) {
+  set myCustomer(List<Map<String, String?>> customer) {
     _myCustomer = customer;
     notifyListeners();
   }
@@ -22,5 +19,68 @@ class CustomerProvider with ChangeNotifier {
   set selectCustomer(int customer) {
     _selectCustomer = customer;
     notifyListeners();
+  }
+
+  Future<String> addCustomerData({
+    required Map data,
+    required String token,
+  }) async {
+    try {
+      await CustomerService().addNewCustomer(data: data, token: token);
+      return "";
+    } catch (e) {
+      return "$e";
+    }
+  }
+
+  Future<String> updateCustomerData({
+    required Map data,
+    required String id,
+    required String token,
+  }) async {
+    try {
+      await CustomerService().updateCustomer(data: data, id: id, token: token);
+      return "";
+    } catch (e) {
+      return "$e";
+    }
+  }
+
+  Future<bool> getListCustomerData({
+    required String token,
+  }) async {
+    try {
+      CustomerDataModel data =
+          await CustomerService().getListCustomer(token: token);
+      _myCustomer = data.data!
+          .map((e) => {
+                "id": e.id.toString(),
+                "username": e.username,
+                "password": e.password,
+                "email": e.emailPelanggan,
+                "nama_lengkap": e.namaPelanggan,
+                "tgl_lahir": e.tglLahirPelanggan, // datepicker
+                "jenis_kelamin":
+                    e.jenisKelaminPelanggan, // Laki-laki / Perempuan
+                "alamat": e.alamatPelanggan,
+                "telp": e.telpPelanggan,
+              })
+          .toList();
+
+      print("List Customer : ${data.data?.map((e) => {
+            "id": e.id,
+            "username": e.username,
+            "password": e.password,
+            "email": e.emailPelanggan,
+            "nama_lengkap": e.namaPelanggan,
+            "tgl_lahir": e.tglLahirPelanggan, // datepicker
+            "jenis_kelamin": e.jenisKelaminPelanggan, // Laki-laki / Perempuan
+            "alamat": e.alamatPelanggan,
+            "telp": e.telpPelanggan,
+          }.toString())}");
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

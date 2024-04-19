@@ -267,22 +267,22 @@ class _LoginPageState extends State<LoginPage> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: isLoading == true ?
-           const SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              color: Colors.white,
-            ) ,
-          )
-         : Text(
-            'Sign In',
-            style: poppins.copyWith(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: medium,
-            ),
-          ),
+          child: isLoading == true
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  'Sign In',
+                  style: poppins.copyWith(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: medium,
+                  ),
+                ),
         ),
       );
     }
