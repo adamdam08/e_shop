@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:e_shop/models/cart/cart_list_model.dart';
 import 'package:e_shop/models/customer/customer_post_model.dart';
+import 'package:e_shop/models/settings/district_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:e_shop/models/store_location_model.dart';
@@ -107,8 +108,8 @@ class SettingsService {
 
 // Add data customer
   Future<CustomerPostModel> updateCart(
-      {required Map data, required String token}) async {
-    var url = Uri.parse("${baseURL}keranjang");
+      {required Map data, required String token, required String cuid}) async {
+    var url = Uri.parse("${baseURL}keranjang/$cuid");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

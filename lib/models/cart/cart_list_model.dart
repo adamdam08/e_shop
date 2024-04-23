@@ -57,7 +57,7 @@ class CartData {
   String? sId;
   int? pelangganId;
   int? cabangId;
-  int? produkId;
+  dynamic produkId;
   int? jumlah;
   String? catatan;
   String? createdAt;

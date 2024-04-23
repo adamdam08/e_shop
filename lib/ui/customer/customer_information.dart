@@ -5,7 +5,10 @@ import 'package:e_shop/models/user_model.dart';
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/theme/theme.dart';
+import 'package:e_shop/ui/cart/customer_search.dart';
+import 'package:e_shop/ui/customer/district_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -108,7 +111,9 @@ class _CustomerInformationState extends State<CustomerInformation> {
                     ),
                     Center(
                       child: Text(
-                        "Profil Pelanggan",
+                        widget.isUpdate
+                            ? "Perbarui Data Pelanggan"
+                            : "Tambah Pelanggan Baru",
                         style: poppins.copyWith(
                             fontWeight: semiBold, fontSize: 18),
                       ),
@@ -177,6 +182,71 @@ class _CustomerInformationState extends State<CustomerInformation> {
                         icon: Icons.pin_drop,
                         isEditable: widget.isEditable,
                         keyboardType: TextInputType.emailAddress),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        "Wilayah",
+                        style: poppins.copyWith(
+                            fontWeight: semiBold, fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DistrictSearch()),
+                        ).then((value) => () {
+                              setState(() {
+                                print("Selected Value");
+                              });
+                            });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                              color: Colors.grey,
+                              width: 1,
+                              style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        width: double.infinity,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.map,
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              child: SizedBox(
+                                child: Text(
+                                  customerProvider.selectedCity,
+                                  // "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque laoreet a tellus eget dapibus.",
+                                  style: poppins.copyWith(
+                                      fontWeight: regular,
+                                      fontSize: 14,
+                                      overflow: TextOverflow.ellipsis),
+                                  maxLines: 3,
+                                ),
+                              ),
+                            ),
+                            // const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     textFormBuilder(
                         searchBoxController: phoneTextEditingController,
                         headerText: "Nomor Telefon",
@@ -267,7 +337,7 @@ class _CustomerInformationState extends State<CustomerInformation> {
                                   "nama_lengkap": name,
                                   "alamat": address,
                                   "telp": phone,
-                                  "wilayah": ""
+                                  "wilayah": customerProvider.selectedCity
                                 }
                               : {
                                   "username": username,
@@ -279,7 +349,7 @@ class _CustomerInformationState extends State<CustomerInformation> {
                                       dropdownvalue, // Laki-laki / Perempuan
                                   "alamat": address,
                                   "telp": phone,
-                                  "wilayah": ""
+                                  "wilayah": customerProvider.selectedCity
                                 };
 
                           var loginData = await authProvider.getLoginData();
@@ -288,6 +358,7 @@ class _CustomerInformationState extends State<CustomerInformation> {
                                   data: jsonData,
                                   token: loginData!.token.toString())
                               : await customerProvider.updateCustomerData(
+                                  isSales: false,
                                   data: jsonData,
                                   id: widget.data["id"],
                                   token: loginData!.token.toString());

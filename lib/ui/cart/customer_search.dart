@@ -91,7 +91,7 @@ class _CustomerSearchState extends State<CustomerSearch> {
                         maxLines: 2,
                       ),
                       Text(
-                        myCustomer["tgl_lahir"],
+                        myCustomer["telp"],
                         style: poppins.copyWith(
                             overflow: TextOverflow.ellipsis,
                             fontWeight: semiBold,

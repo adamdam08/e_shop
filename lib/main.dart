@@ -2,6 +2,7 @@ import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/ui/cart/cart.dart';
+import 'package:e_shop/ui/cart/checkout_page.dart';
 import 'package:e_shop/ui/category/category.dart';
 import 'package:e_shop/ui/home/home.dart';
 import 'package:e_shop/ui/login/login.dart';
@@ -84,6 +85,12 @@ class MyApp extends StatelessWidget {
               case '/profile':
                 return PageTransition(
                     child: const ProfilePage(), type: PageTransitionType.fade);
+              case '/cart':
+                return PageTransition(
+                    child: const Cart(), type: PageTransitionType.fade);
+              case '/checkout_summary':
+                return PageTransition(
+                    child: CheckoutPage(), type: PageTransitionType.fade);
               default:
                 return null;
             }
@@ -107,7 +114,7 @@ class _BottomNavigationBarExampleState
     Category(),
     Promo(),
     Customer(),
-    Cart()
+    // Cart()
   ];
 
   @override
@@ -139,7 +146,7 @@ class _BottomNavigationBarExampleState
           splashColor: Colors.transparent,
         ),
         child: BottomAppBar(
-          height: 70,
+          height: 80,
           elevation: 0,
           color: backgroundColor3,
           notchMargin: 10,
@@ -151,39 +158,49 @@ class _BottomNavigationBarExampleState
             items: [
               BottomNavigationBarItem(
                 icon: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(Icons.home),
+                  height: 14,
+                  child: const Icon(
+                    Icons.home,
+                  ),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(Icons.menu),
+                  height: 10,
+                  child: const Icon(
+                    Icons.menu,
+                  ),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(Icons.percent),
+                  height: 10,
+                  child: const Icon(
+                    Icons.percent,
+                  ),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(SolarIconsBold.usersGroupRounded),
+                  height: 10,
+                  child: const Icon(
+                    SolarIconsBold.usersGroupRounded,
+                  ),
                 ),
                 label: '',
               ),
-              BottomNavigationBarItem(
-                icon: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: const Icon(Icons.shopping_cart),
-                ),
-                label: '',
-              ),
+              // BottomNavigationBarItem(
+              //   icon: Container(
+              //     height: 10,
+              //     child: const Icon(
+              //       Icons.shopping_cart,
+              //     ),
+              //   ),
+              //   label: '',
+              // ),
             ],
             currentIndex: pageProvider.currentIndex,
             selectedItemColor: Colors.white,

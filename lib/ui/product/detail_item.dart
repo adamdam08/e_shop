@@ -155,7 +155,7 @@ class _DetailItemState extends State<DetailItem> {
                                           Object error,
                                           StackTrace? stackTrace) {
                                         return Container(
-                                          color: Colors.grey,
+                                          color: Colors.white,
                                           child: const Center(
                                             child: Icon(Icons.error),
                                           ),
@@ -182,15 +182,24 @@ class _DetailItemState extends State<DetailItem> {
                                 ),
                               ),
                               Container(
-                                alignment: Alignment.bottomRight,
-                                padding: EdgeInsets.all(10),
-                                color: Colors.grey,
-                                child: Text(
-                                  " ${carouselIndex + 1}/${imgList.length}",
-                                  style: poppins.copyWith(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                      fontWeight: bold),
+                                margin: const EdgeInsets.only(left: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: backgroundColor3,
+                                      ),
+                                      padding: const EdgeInsets.all(10),
+                                      child: Text(
+                                        " ${carouselIndex + 1}/${imgList.length}",
+                                        style: poppins.copyWith(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                            fontWeight: bold),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Container(
@@ -323,7 +332,7 @@ class _DetailItemState extends State<DetailItem> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "Merk Produk",
+                                          "Merk",
                                           style: poppins.copyWith(
                                             color: Colors.black,
                                           ),
@@ -352,7 +361,7 @@ class _DetailItemState extends State<DetailItem> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "Satuan Produk",
+                                          "Satuan",
                                           style: poppins.copyWith(
                                             color: Colors.black,
                                           ),
@@ -381,7 +390,38 @@ class _DetailItemState extends State<DetailItem> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "Golongan Produk",
+                                          "Golongan",
+                                          style: poppins.copyWith(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          "${productProvider.detailProduct?.data?.golonganProduk.toString()}",
+                                          style: poppins.copyWith(
+                                            color: backgroundColor1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.only(bottom: 10),
+                                      child: Divider(
+                                        height: 1,
+                                        thickness: 1,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Stok",
                                           style: poppins.copyWith(
                                             color: Colors.black,
                                           ),
@@ -449,15 +489,7 @@ class _DetailItemState extends State<DetailItem> {
                                 onTap: () {
                                   // Some code to undo the change.
                                   if (context.mounted) {
-                                    setState(() {
-                                      pageProvider.currentIndex = 4;
-                                    });
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const BottomNavigationBarExample()),
-                                        (route) => false);
+                                    Navigator.pushNamed(context, '/cart');
                                   }
                                 },
                                 child: Container(
@@ -503,23 +535,18 @@ class _DetailItemState extends State<DetailItem> {
                               showToast("Gagal Menambahkan Barang");
                             } else {
                               final snackBar = SnackBar(
+                                backgroundColor: backgroundColor1,
+                                showCloseIcon: true,
                                 content: const Text(
                                     'Berhasil menambahkan item ke keranjang!'),
                                 duration: const Duration(seconds: 1),
                                 action: SnackBarAction(
                                   label: 'Menuju Keranjang',
+                                  textColor: Colors.white,
+                                  backgroundColor: backgroundColor2,
                                   onPressed: () {
                                     if (context.mounted) {
-// Some code to undo the change.
-                                      setState(() {
-                                        pageProvider.currentIndex = 4;
-                                      });
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const BottomNavigationBarExample()),
-                                          (route) => false);
+                                      Navigator.pushNamed(context, '/cart');
                                     }
                                   },
                                 ),

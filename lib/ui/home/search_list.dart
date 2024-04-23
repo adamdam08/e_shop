@@ -7,6 +7,7 @@ import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/category/category.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 import '../product/detail_item.dart';
@@ -15,7 +16,8 @@ class SearchList extends StatefulWidget {
   final String text;
   final bool isPromo;
   final String cat;
-  const SearchList({super.key, required this.text, this.isPromo = false, this.cat = ""});
+  const SearchList(
+      {super.key, required this.text, this.isPromo = false, this.cat = ""});
 
   @override
   State<SearchList> createState() => _SearchListState();
@@ -26,6 +28,9 @@ class _SearchListState extends State<SearchList> {
   List<String> _myCategory = [];
 
   int searchIndex = 1;
+  bool _isLoading = false;
+  bool _isLimit = false;
+  final ScrollController _scrollController = ScrollController();
 
   FocusNode searchBarFocusNode = FocusNode();
   TextEditingController searchTextController = TextEditingController();
@@ -36,16 +41,19 @@ class _SearchListState extends State<SearchList> {
     searchTextController.text = "";
     searchBarFocusNode.addListener(_onFocusChange);
 
+    // Add a listener to the scroll controller to detect when the user reaches the bottom of the list
+    _scrollController.addListener(_scrollListener);
+
     print("Promo : ${widget.isPromo}");
-    
+
     if (widget.cat != "") {
       // Get Promo
       _getByCategory();
     } else {
-      if (widget.isPromo){
+      if (widget.isPromo) {
         // Get Promo
         _getPromoList();
-      }else{
+      } else {
         _getBySearch();
       }
     }
@@ -54,12 +62,77 @@ class _SearchListState extends State<SearchList> {
     _getSuggestionList();
   }
 
+  // Load more data
+  void _scrollListener() {
+    print("${_scrollController.position.pixels}");
+    if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent &&
+        _isLimit == false) {
+      // User has scrolled to the bottom, load more data
+      print("Reach End");
+      _loadData();
+    } else {
+      print("Not Reach End");
+    }
+  }
+
+  void _loadData() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
+    // Simulated data loading, you would replace this with your actual data loading logic
+    if (context.mounted) {
+      setState(() {
+        _isLoading = true;
+        print("Kondisi loading $_isLoading");
+      });
+    }
+
+    Future.delayed(const Duration(seconds: 5), () async {
+      var data = await authProvider.getLoginData();
+
+      // Get Best Seller
+      print(
+          "Cabang Load More ${settingsProvider.storeLocation.data?.first.id}");
+      if (data!.token != null &&
+          settingsProvider.storeLocation.data != null &&
+          _isLimit != true) {
+        if (await productProvider.getPromoProduct(
+            cabangId: settingsProvider.storeLocation.data!.first.id.toString(),
+            token: authProvider.user.token.toString(),
+            limit: 5,
+            page: searchIndex + 1,
+            query: searchTextController.text.isEmpty
+                ? null
+                : searchTextController.text)) {
+          setState(() {
+            searchIndex = searchIndex + 1;
+          });
+        } else {
+          setState(() {
+            _isLimit = true;
+          });
+        }
+      }
+
+      setState(() {
+        _isLoading = false;
+        print("kondisi loading $_isLoading");
+      });
+
+      // }
+    });
+  }
+
   void _getBySearch() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final settingsProvider =
-    Provider.of<SettingsProvider>(context, listen: false);
+        Provider.of<SettingsProvider>(context, listen: false);
     final productProvider =
-    Provider.of<ProductProvider>(context, listen: false);
+        Provider.of<ProductProvider>(context, listen: false);
     if (await authProvider.getLoginData() != null &&
         settingsProvider.storeLocation.data != null) {
       if (await productProvider.getSearchProduct(
@@ -94,9 +167,9 @@ class _SearchListState extends State<SearchList> {
   void _getByCategory() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final settingsProvider =
-    Provider.of<SettingsProvider>(context, listen: false);
+        Provider.of<SettingsProvider>(context, listen: false);
     final productProvider =
-    Provider.of<ProductProvider>(context, listen: false);
+        Provider.of<ProductProvider>(context, listen: false);
     if (await authProvider.getLoginData() != null &&
         settingsProvider.storeLocation.data != null) {
       if (await productProvider.getSearchProduct(
@@ -131,9 +204,9 @@ class _SearchListState extends State<SearchList> {
   void _getPromoList() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final settingsProvider =
-    Provider.of<SettingsProvider>(context, listen: false);
+        Provider.of<SettingsProvider>(context, listen: false);
     final productProvider =
-    Provider.of<ProductProvider>(context, listen: false);
+        Provider.of<ProductProvider>(context, listen: false);
     if (await authProvider.getLoginData() != null &&
         settingsProvider.storeLocation.data != null) {
       if (await productProvider.getSearchProduct(
@@ -168,7 +241,7 @@ class _SearchListState extends State<SearchList> {
   void _getSuggestionList() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final productProvider =
-    Provider.of<ProductProvider>(context, listen: false);
+        Provider.of<ProductProvider>(context, listen: false);
 
     // Get data from SharedPref
     var data = await authProvider.getLoginData();
@@ -191,7 +264,7 @@ class _SearchListState extends State<SearchList> {
     if (context.mounted) {
       setState(() {
         print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
-        if(searchBarFocusNode.hasFocus == false){
+        if (searchBarFocusNode.hasFocus == false) {
           searchTextController.text = "";
         }
       });
@@ -202,13 +275,13 @@ class _SearchListState extends State<SearchList> {
   Widget build(BuildContext context) {
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
-    Widget searchBar() {
+    Widget searchBar(bool isKeyboardVisible) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            if (searchBarFocusNode.hasFocus == false) ...[
+            if (isKeyboardVisible == false) ...[
               InkWell(
                 onTap: () {
                   Navigator.pop(context);
@@ -288,71 +361,71 @@ class _SearchListState extends State<SearchList> {
       );
     }
 
-    return Scaffold(
-      body: SafeArea(
-          top: true,
-          left: true,
-          right: true,
-          bottom: true,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                searchBar(),
-              if (searchBarFocusNode.hasFocus) ...[
-                Expanded(
-                  child: SuggestionListView(
-                      myCategory: myCategoryFiltered,
-                      searchTextController: searchTextController),
-                )
-              ] else ...[
-                if(widget.isPromo)...[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: backgroundColor3
+    return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+      return Scaffold(
+        body: SafeArea(
+            top: true,
+            left: true,
+            right: true,
+            bottom: true,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  searchBar(isKeyboardVisible),
+                  if (isKeyboardVisible) ...[
+                    Expanded(
+                      child: SuggestionListView(
+                          myCategory: myCategoryFiltered,
+                          searchTextController: searchTextController),
+                    )
+                  ] else ...[
+                    if (widget.isPromo) ...[
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: backgroundColor3),
+                        child: Text("Promo",
+                            style: poppins.copyWith(color: Colors.white)),
+                      )
+                    ],
+                    if (widget.cat != "") ...[
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: backgroundColor3),
+                        child: Text(widget.cat.replaceAll('_', ' '),
+                            style: poppins.copyWith(color: Colors.white)),
+                      )
+                    ],
+                    const SizedBox(
+                      height: 10,
                     ),
-                    child: Text("Promo", style: poppins.copyWith(
-                      color: Colors.white
-                    )),
-                  )
-                ],
-                if(widget.cat != "")...[
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: backgroundColor3
+                    if (widget.text.isNotEmpty) ...[
+                      RichText(
+                        text: TextSpan(
+                          text: 'Hasil Pencarian : ',
+                          style: poppins.copyWith(color: Colors.black),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: widget.text,
+                                style:
+                                    poppins.copyWith(color: backgroundColor1)),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(
+                      height: 10,
                     ),
-                    child: Text(widget.cat.replaceAll('_', ' '), style: poppins.copyWith(
-                        color: Colors.white
-                    )),
-                  )
-                ],
-                SizedBox(height: 10,),
-                if(widget.text.isNotEmpty)...[
-                  RichText(
-                    text: TextSpan(
-                      text: 'Hasil Pencarian : \n',
-                      style: poppins.copyWith(color: Colors.black),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: widget.text,
-                            style: poppins.copyWith(color: backgroundColor1)),
-                      ],
-                    ),
-                  ),
-                ],
-                const SizedBox(
-                  height: 10,
-                ),
-                if (productProvider.searchProduct?.data == null) ...[
-                  Expanded(
-                    child: Center(
-                        child: Column(
+                    if (productProvider.searchProduct?.data == null) ...[
+                      Expanded(
+                        child: Center(
+                            child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(
@@ -366,36 +439,49 @@ class _SearchListState extends State<SearchList> {
                             ),
                           ],
                         )),
-                  )
-                ] else ...[
-                  Expanded(
-                      child: GridBuilder(
-                          myProducts: productProvider.searchProduct!.data!))
-                ]
-              ],
-              ],
-            ),
-          )),
-    );
-  }
-}
-
-class GridBuilder extends StatelessWidget {
-  final List<Data> myProducts;
-  const GridBuilder({super.key, required this.myProducts});
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            mainAxisExtent: 300,
-            crossAxisSpacing: 25,
-            mainAxisSpacing: 10),
-        itemCount: myProducts.length,
-        itemBuilder: (BuildContext ctx, index) {
-          return SearchDynamicCard(text: myProducts[index]);
-        });
+                      )
+                    ] else ...[
+                      Expanded(
+                        child: GridView.builder(
+                          controller: _scrollController,
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 200,
+                                  mainAxisExtent: 300,
+                                  crossAxisSpacing: 25,
+                                  mainAxisSpacing: 10),
+                          itemCount:
+                              productProvider.searchProduct!.data!.length,
+                          itemBuilder: (BuildContext ctx, index) {
+                            return SearchDynamicCard(
+                                text: productProvider
+                                    .searchProduct!.data![index]);
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: _isLoading == false ? 40 : 0,
+                      ),
+                      _isLoading
+                          ? Center(
+                              child: Container(
+                                height: 15,
+                                width: 15,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ]
+                  ],
+                ],
+              ),
+            )),
+      );
+    });
   }
 }
 

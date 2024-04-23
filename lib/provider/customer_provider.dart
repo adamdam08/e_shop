@@ -34,12 +34,14 @@ class CustomerProvider with ChangeNotifier {
   }
 
   Future<String> updateCustomerData({
+    required bool isSales,
     required Map data,
     required String id,
     required String token,
   }) async {
     try {
-      await CustomerService().updateCustomer(data: data, id: id, token: token);
+      await CustomerService()
+          .updateCustomer(isSales: isSales, data: data, id: id, token: token);
       return "";
     } catch (e) {
       return "$e";
@@ -82,5 +84,13 @@ class CustomerProvider with ChangeNotifier {
     } catch (e) {
       return false;
     }
+  }
+
+  String _selectedCity = "-";
+  String get selectedCity => _selectedCity;
+
+  set selectedCity(String selectedCity) {
+    _selectedCity = selectedCity;
+    notifyListeners();
   }
 }

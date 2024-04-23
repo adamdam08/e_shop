@@ -2,19 +2,50 @@ import 'package:e_shop/models/cart/cart_list_model.dart';
 import 'package:e_shop/services/settings_service.dart';
 import 'package:flutter/cupertino.dart';
 
+class parameterCart {
+  final String note;
+  final int total;
+
+  const parameterCart({required this.note, required this.total});
+}
+
 class CartProvider with ChangeNotifier {
-  // final List<Map> myProducts = List.generate(10, (index) => {
-  //   "id": index,
-  //   "name": "Lorem Ipsum Sit Dolor Amet",
-  //   "price": 100000,
-  //   "amount": 1
-  // }).toList();
+  List<Map> _selectedProducts = [];
+  List<Map> get selectedProducts => _selectedProducts;
+
+  set selectedProducts(List<Map> products) {
+    _selectedProducts = products;
+    notifyListeners();
+  }
+
+  // Example
+  //  {
+  //     "id": 1,
+  //     "nama_produk": "Sunco 2 liter",
+  //     "image_url": "filename.jpg",
+  //     "harga": 35000,
+  //     "jumlah": 2,
+  //     "total_harga": 70000
+  // },
 
   List<Map> _myProducts = [];
   List<Map> get myProducts => _myProducts;
 
   set myProducts(List<Map> products) {
     _myProducts = products;
+    notifyListeners();
+  }
+
+  // Catatan Model
+  String _cartNote = "";
+  String get cartNote => _cartNote;
+
+  int _cartTotal = 0;
+  int get cartTotal => _cartTotal;
+
+  set cartUpdate(parameterCart data) {
+    _cartNote = data.note;
+    _cartTotal = data.total;
     notifyListeners();
   }
 
@@ -57,11 +88,12 @@ class CartProvider with ChangeNotifier {
 
   // Add Cart Model
   Future<String> updateCart({
+    required String cuid,
     required Map data,
     required String token,
   }) async {
     try {
-      await SettingsService().updateCart(data: data, token: token);
+      await SettingsService().updateCart(cuid: cuid, data: data, token: token);
       return "";
     } catch (e) {
       return "$e";

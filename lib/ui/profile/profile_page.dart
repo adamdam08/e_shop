@@ -23,6 +23,32 @@ class _ProfilePageState extends State<ProfilePage> {
         authProvider.user.data.namaLengkap.toString());
     UserModel loginData = authProvider.user;
 
+    // Load Latest Profil
+    void _getLatestProfil() async {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      // Check Latest Profil
+      if (await authProvider.salesLogin(
+        email: authProvider.user.data.email.toString(),
+        password: authProvider.user.data.password.toString(),
+      )) {
+        setState(() {});
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+              backgroundColor: Colors.red,
+              content: Text(
+                'Gagal Mendapatkan Profil Terbaru!',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+      }
+    }
+
     Widget textData(String title, String data) {
       return Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
@@ -82,6 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Icon(Icons.arrow_back),
                     ),
                   ),
+                  Spacer(),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
@@ -170,7 +197,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             data: dataUpdate,
                             isPassword: false,
                           )),
-                ).then((value) => setState(() {}));
+                ).then((value) => setState(() {
+                      _getLatestProfil();
+                    }));
               },
               child: Padding(
                 padding:

@@ -13,6 +13,7 @@ import 'package:e_shop/ui/category/category.dart';
 import 'package:e_shop/ui/home/search_list.dart';
 import 'package:e_shop/ui/product/detail_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -67,6 +68,9 @@ class _HomeState extends State<Home> {
     // Location Settings
     _getLocationSettings();
 
+    // List Banner
+    _getListBanner();
+
     // Get Category
     _getCategoryTree();
   }
@@ -75,31 +79,26 @@ class _HomeState extends State<Home> {
     if (context.mounted) {
       setState(() {
         print("Focus Node : ${searchBarFocusNode.hasFocus}");
-        if(searchBarFocusNode.hasFocus == false){
+        if (searchBarFocusNode.hasFocus == false) {
           searchTextController.text = "";
         }
       });
     }
   }
 
-  void _loadData() {
+  void _loadData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final settingsProvider =
         Provider.of<SettingsProvider>(context, listen: false);
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
 
-    // Simulated data loading, you would replace this with your actual data loading logic
-
-    if (context.mounted) {
-      setState(() {
-        _isLoading = true;
-        print("Kondisi loading $_isLoading");
-      });
-    }
+    setState(() {
+      _isLoading = true;
+      print("Kondisi loading $_isLoading");
+    });
 
     Future.delayed(const Duration(seconds: 5), () async {
-      // if (!_isLoading) {
       // Get data from SharedPref
       var data = await authProvider.getLoginData();
 
@@ -114,28 +113,22 @@ class _HomeState extends State<Home> {
             token: authProvider.user.token.toString(),
             limit: 5,
             page: bestSellerIndex + 1)) {
-          if (context.mounted) {
-            setState(() {
-              print(
-                  "Best seller : ${productProvider.bestSellerProduct?.data.toString()}");
-              bestSellerIndex = bestSellerIndex + 1;
-            });
-          }
+          setState(() {
+            print(
+                "Best seller : ${productProvider.bestSellerProduct?.data.toString()}");
+            bestSellerIndex = bestSellerIndex + 1;
+          });
         } else {
-          if (context.mounted) {
-            setState(() {
-              _isLimit = true;
-            });
-          }
+          setState(() {
+            _isLimit = true;
+          });
         }
       }
 
-      if (context.mounted) {
-        setState(() {
-          _isLoading = false;
-          print("kondisi loading $_isLoading");
-        });
-      }
+      setState(() {
+        _isLoading = false;
+        print("kondisi loading $_isLoading");
+      });
 
       // }
     });
@@ -194,9 +187,6 @@ class _HomeState extends State<Home> {
       token: authProvider.user.token.toString(),
       cabangId: authProvider.user.data.cabangId.toString(),
     )) {
-      // List Banner
-      _getListBanner();
-
       // Get Promo
       _getListPromo();
 
@@ -408,175 +398,204 @@ class _HomeState extends State<Home> {
       );
     }
 
-    return Column(
-      children: [
-        Container(
-          height: 100,
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              searchbar(),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, '/profile');
-                },
-                child: Icon(
-                  Icons.view_list,
-                  size: 30,
-                  color: backgroundColor3,
-                ),
+    return KeyboardVisibilityBuilder(
+      builder: (context, isKeyboardVisible) {
+        return Column(
+          children: [
+            Container(
+              height: 100,
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  searchbar(),
+                  if (isKeyboardVisible == false) ...[
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/cart');
+                      },
+                      child: Icon(
+                        Icons.shopping_cart,
+                        size: 30,
+                        color: backgroundColor3,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/profile');
+                      },
+                      child: Icon(
+                        Icons.view_list,
+                        size: 30,
+                        color: backgroundColor3,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            controller: _scrollController,
-            children: [
-              if (searchBarFocusNode.hasFocus) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SuggestionListView(
-                      myCategory: myCategoryFiltered,
-                      searchTextController: searchTextController),
-                )
-              ] else ...[
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 30),
-                  child: ((productProvider.bannerData ?? []).isNotEmpty)
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Stack(
-                            children: [
-                              CarouselSlider(
-                                items: [
-                                  for (var sliderItem
-                                      in productProvider.bannerData ?? [])
-                                    FadeInImage.memoryNetwork(
-                                      placeholder: kTransparentImage,
-                                      image: sliderItem,
-                                      fit: BoxFit.cover,
-                                      imageErrorBuilder: (BuildContext context,
-                                          Object error,
-                                          StackTrace? stackTrace) {
-                                        return Container(
-                                          color: Colors.grey,
-                                          child: const Center(
-                                            child: Icon(Icons.error),
-                                          ),
-                                        );
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                controller: _scrollController,
+                children: [
+                  if (isKeyboardVisible) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SuggestionListView(
+                          myCategory: myCategoryFiltered,
+                          searchTextController: searchTextController),
+                    )
+                  ] else ...[
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 30),
+                      child: ((productProvider.bannerData ?? []).isNotEmpty)
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Stack(
+                                children: [
+                                  CarouselSlider(
+                                    items: [
+                                      for (var sliderItem
+                                          in productProvider.bannerData ?? [])
+                                        FadeInImage.memoryNetwork(
+                                          placeholder: kTransparentImage,
+                                          image: sliderItem,
+                                          fit: BoxFit.cover,
+                                          imageErrorBuilder:
+                                              (BuildContext context,
+                                                  Object error,
+                                                  StackTrace? stackTrace) {
+                                            return Container(
+                                              color: Colors.grey,
+                                              child: const Center(
+                                                child: Icon(Icons.error),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                    ],
+                                    options: CarouselOptions(
+                                      viewportFraction: 1,
+                                      autoPlay: true,
+                                      autoPlayCurve: Curves.linear,
+                                      reverse: false,
+                                      autoPlayInterval:
+                                          const Duration(seconds: 5),
+                                      initialPage: carouselIndex,
+                                      scrollDirection: Axis.horizontal,
+                                      onPageChanged: (index, reason) {
+                                        if (context.mounted) {
+                                          setState(() {
+                                            carouselIndex = index;
+                                          });
+                                        }
                                       },
                                     ),
-                                ],
-                                options: CarouselOptions(
-                                  viewportFraction: 1,
-                                  autoPlay: true,
-                                  autoPlayCurve: Curves.linear,
-                                  reverse: false,
-                                  autoPlayInterval: const Duration(seconds: 5),
-                                  initialPage: carouselIndex,
-                                  scrollDirection: Axis.horizontal,
-                                  onPageChanged: (index, reason) {
-                                    if (context.mounted) {
-                                      setState(() {
-                                        carouselIndex = index;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 5,
-                                left: 0,
-                                right: 0,
-                                child: DotsIndicator(
-                                  dotsCount:
-                                      (productProvider.bannerData ?? []).length,
-                                  position: carouselIndex,
-                                  decorator: DotsDecorator(
-                                    color: Colors.black38, // Inactive color
-                                    activeColor: backgroundColor2,
                                   ),
+                                  Positioned(
+                                    bottom: 5,
+                                    left: 0,
+                                    right: 0,
+                                    child: DotsIndicator(
+                                      dotsCount:
+                                          (productProvider.bannerData ?? [""])
+                                              .length,
+                                      position: carouselIndex,
+                                      decorator: DotsDecorator(
+                                        color: Colors.black38, // Inactive color
+                                        activeColor: backgroundColor2,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const SizedBox(),
+                    ),
+                    if (productProvider.promoProduct != null) ...[
+                      CardSectionHorizontal(
+                        headerText: "Promo",
+                        productItem: productProvider.promoProduct,
+                      ),
+                    ] else
+                      ...[],
+                    if (productProvider.bestSellerProduct != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (productProvider
+                                .bestSellerProduct!.data!.isNotEmpty) ...[
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                width: double.infinity,
+                                child: Text(
+                                  "Produk Terlaku",
+                                  style: poppins.copyWith(
+                                      fontSize: 24,
+                                      fontWeight: semiBold,
+                                      color: backgroundColor1),
                                 ),
                               ),
+                              ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: productProvider
+                                    .bestSellerProduct!.data!.length,
+                                itemBuilder: (context, index) {
+                                  return DynamicCardVertical(
+                                    data: productProvider
+                                        .bestSellerProduct!.data![index],
+                                    isDiscount: productProvider
+                                                .bestSellerProduct!
+                                                .data![index]
+                                                .diskon !=
+                                            0 &&
+                                        productProvider.bestSellerProduct!
+                                                .data![index].diskon !=
+                                            null,
+                                  );
+                                },
+                              ),
+                            ] else ...[
+                              const SizedBox()
                             ],
-                          ),
-                        )
-                      : const SizedBox(),
-                ),
-                if (productProvider.promoProduct != null) ...[
-                  CardSectionHorizontal(
-                    headerText: "Promo",
-                    productItem: productProvider.promoProduct,
-                  ),
-                ] else
-                  ...[],
-                if (productProvider.bestSellerProduct != null) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    width: double.infinity,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (productProvider
-                            .bestSellerProduct!.data!.isNotEmpty) ...[
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            width: double.infinity,
-                            child: Text(
-                              "Produk Terlaku",
-                              style: poppins.copyWith(
-                                  fontSize: 24,
-                                  fontWeight: semiBold,
-                                  color: backgroundColor1),
-                            ),
-                          ),
-                          ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount:
-                                productProvider.bestSellerProduct!.data!.length,
-                            itemBuilder: (context, index) {
-                              return DynamicCardVertical(
-                                data: productProvider
-                                    .bestSellerProduct!.data![index],
-                                isDiscount: productProvider.bestSellerProduct!
-                                            .data![index].diskon !=
-                                        0 &&
-                                    productProvider.bestSellerProduct!
-                                            .data![index].diskon !=
-                                        null,
-                              );
-                            },
-                          ),
-                        ] else ...[
-                          const SizedBox()
-                        ],
-                      ],
-                    ),
-                  ),
-                ] else
-                  ...[],
-                _isLoading
-                    ? Container(
-                        margin: const EdgeInsets.only(top: 10, bottom: 30),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+                          ],
                         ),
-                      )
-                    : Container(),
-                SizedBox(
-                  height: _isLimit == false ? 60 : 0,
-                )
-              ],
-            ],
-          ),
-        ),
-      ],
+                      ),
+                    ] else
+                      ...[],
+                    _isLoading
+                        ? Container(
+                            width: 10,
+                            margin: const EdgeInsets.only(top: 10, bottom: 10),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : Container(),
+                    SizedBox(
+                      height: _isLimit == false ? 40 : 0,
+                    )
+                  ],
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -595,12 +614,9 @@ class CardSectionHorizontal extends StatefulWidget {
 }
 
 class _CardSectionHorizontalState extends State<CardSectionHorizontal> {
-
-
   @override
   Widget build(BuildContext context) {
-    final pageProvider =
-    Provider.of<PageProvider>(context, listen: false);
+    final pageProvider = Provider.of<PageProvider>(context, listen: false);
 
     return SizedBox(
         height: 340,
@@ -625,14 +641,14 @@ class _CardSectionHorizontalState extends State<CardSectionHorizontal> {
                 padding: const EdgeInsets.only(left: 30, right: 30, bottom: 5),
                 scrollDirection: Axis.horizontal,
                 children: [
-                  if (widget.productItem?.data != null)...[
-                    for (var i in widget.productItem!.data!)...[
+                  if (widget.productItem?.data != null) ...[
+                    for (var i in widget.productItem!.data!) ...[
                       DynamicCardHorizontal(
                         data: i,
                         isDiscount: i.diskon != 0 && i.diskon != null,
                       )
                     ],
-                    if(widget.productItem!.data!.length >= 5)...[
+                    if (widget.productItem!.data!.length >= 5) ...[
                       GestureDetector(
                         onTap: () async {
                           setState(() {
@@ -652,7 +668,7 @@ class _CardSectionHorizontalState extends State<CardSectionHorizontal> {
                                     blurRadius: 4,
                                     offset: const Offset(0, 0))
                               ]),
-                          child:  Center(
+                          child: Center(
                             child: Text(
                               "Lihat \nSelengkapnya",
                               style: poppins.copyWith(
@@ -666,9 +682,9 @@ class _CardSectionHorizontalState extends State<CardSectionHorizontal> {
                         ),
                       )
                     ],
-                    ]else...[
-                      const SizedBox(),
-                    ],
+                  ] else ...[
+                    const SizedBox(),
+                  ],
                 ],
               ),
             ),

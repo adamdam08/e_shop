@@ -6,6 +6,7 @@ import 'package:e_shop/ui/home/home.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/home/search_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
@@ -47,9 +48,6 @@ class _PromoState extends State<Promo> {
     // Get Suggestion
     _getSuggestionList();
 
-    // Get Location
-    _getLocation();
-
     // Get Promo
     _getPromo();
   }
@@ -57,7 +55,7 @@ class _PromoState extends State<Promo> {
   void _getSuggestionList() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final productProvider =
-    Provider.of<ProductProvider>(context, listen: false);
+        Provider.of<ProductProvider>(context, listen: false);
 
     // Get data from SharedPref
     var data = await authProvider.getLoginData();
@@ -119,27 +117,23 @@ class _PromoState extends State<Promo> {
             token: authProvider.user.token.toString(),
             limit: 5,
             page: promoIndex + 1,
-            query: searchTextController.text.isEmpty ? null : searchTextController.text
-        )) {
-          if (context.mounted) {
-            setState(() {
-              promoIndex = promoIndex + 1;
-            });
-          }
+            query: searchTextController.text.isEmpty
+                ? null
+                : searchTextController.text)) {
+          setState(() {
+            promoIndex = promoIndex + 1;
+          });
         } else {
-          if (context.mounted) {
-            setState(() {
-              _isLimit = true;
-            });
-          }
+          setState(() {
+            _isLimit = true;
+          });
         }
       }
-      if (context.mounted) {
-        setState(() {
-          _isLoading = false;
-          print("kondisi loading $_isLoading");
-        });
-      }
+
+      setState(() {
+        _isLoading = false;
+        print("kondisi loading $_isLoading");
+      });
 
       // }
     });
@@ -149,18 +143,11 @@ class _PromoState extends State<Promo> {
     if (context.mounted) {
       setState(() {
         print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
-        if(searchBarFocusNode.hasFocus == false){
+        if (searchBarFocusNode.hasFocus == false) {
           searchTextController.text = "";
         }
       });
     }
-  }
-
-  // Function to get the current location
-  void _getLocation() async {
-    permission = await Geolocator.requestPermission();
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
   }
 
   void _getPromo() async {
@@ -178,8 +165,7 @@ class _PromoState extends State<Promo> {
           token: authProvider.user.token.toString(),
           limit: 5,
           page: promoIndex,
-          query: searchTextController.text
-      )) {
+          query: searchTextController.text)) {
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -201,90 +187,94 @@ class _PromoState extends State<Promo> {
   @override
   Widget build(BuildContext context) {
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
-    return WillPopScope(
-      onWillPop: () async {
-        print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
-        searchBarFocusNode.removeListener(() {});
-        if (context.mounted) {
-          setState(() {});
-        }
-        return true;
-      },
-      child: Container(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              color: backgroundColor3,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Promo",
-                          style: poppins.copyWith(
-                              fontSize: 20,
-                              fontWeight: semiBold,
-                              color: Colors.white),
-                        ),
-                      ],
+    return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+      return WillPopScope(
+        onWillPop: () async {
+          print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
+          searchBarFocusNode.removeListener(() {});
+          if (context.mounted) {
+            setState(() {});
+          }
+          return true;
+        },
+        child: Container(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                color: backgroundColor3,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Promo",
+                            style: poppins.copyWith(
+                                fontSize: 20,
+                                fontWeight: semiBold,
+                                color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  searchbar()
-                ],
+                    searchbar()
+                  ],
+                ),
               ),
-            ),
-            if (searchBarFocusNode.hasFocus) ...[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SuggestionListView(
+              if (isKeyboardVisible) ...[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: SuggestionListView(
                       myCategory: myCategoryFiltered,
                       searchTextController: searchTextController,
-                    isPromo: true,
+                      isPromo: true,
+                    ),
+                  ),
+                )
+              ] else ...[
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: productProvider.promoProduct!.data!.length,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                    itemBuilder: (context, index) {
+                      return DynamicCardVertical(
+                        data: productProvider.promoProduct!.data![index],
+                        isDiscount: productProvider
+                                    .promoProduct!.data![index].diskon !=
+                                0 &&
+                            productProvider.promoProduct!.data![index].diskon !=
+                                null,
+                      );
+                    },
                   ),
                 ),
-              )
-            ] else ...[
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: productProvider.promoProduct!.data!.length,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                  itemBuilder: (context, index) {
-                    return DynamicCardVertical(
-                      data: productProvider.promoProduct!.data![index],
-                      isDiscount: productProvider
-                                  .promoProduct!.data![index].diskon !=
-                              0 &&
-                          productProvider.promoProduct!.data![index].diskon !=
-                              null,
-                    );
-                  },
-                ),
-              ),
+              ],
+              _isLoading
+                  ? Container(
+                      height: 15,
+                      width: 15,
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : Container(),
             ],
-            _isLoading
-                ? Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : Container(),
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget searchbar() {
@@ -321,7 +311,11 @@ class _PromoState extends State<Promo> {
           if (value != "") {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SearchList(text: value, isPromo: true,)),
+              MaterialPageRoute(
+                  builder: (context) => SearchList(
+                        text: value,
+                        isPromo: true,
+                      )),
             );
           }
         },

@@ -24,10 +24,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
 
-    setState(() {
-      isLoading = false;
-    });
-
     handleSignIn() async {
       setState(() {
         isLoading = true;

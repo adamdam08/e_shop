@@ -230,6 +230,7 @@ class ProfilEditState extends State<ProfilEdit> {
                           var loginData = await authProvider.getLoginData();
                           var message =
                               await customerProvider.updateCustomerData(
+                                  isSales: true,
                                   data: jsonData,
                                   id: widget.data["id"],
                                   token: loginData!.token.toString());
@@ -237,7 +238,7 @@ class ProfilEditState extends State<ProfilEdit> {
                           if (message != "") {
                             showToast(message);
                           } else {
-                            showToast("Add data customer success");
+                            showToast("Berhasil memperbarui profil sales");
                             if (context.mounted) {
                               Navigator.pop(context);
                             }

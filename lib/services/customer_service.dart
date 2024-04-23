@@ -59,8 +59,13 @@ class CustomerService {
 
   // Add data customer
   Future<CustomerPostModel> updateCustomer(
-      {required Map data, required String id, required String token}) async {
-    var url = Uri.parse("${baseURL}akun/profil?id=$id");
+      {required Map data,
+      required String id,
+      required String token,
+      required bool isSales}) async {
+    var url = isSales
+        ? Uri.parse("${baseURL}akun/profil")
+        : Uri.parse("${baseURL}akun/profil?id=$id");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

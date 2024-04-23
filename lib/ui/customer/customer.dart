@@ -17,6 +17,7 @@ class Customer extends StatefulWidget {
 }
 
 class _CustomerState extends State<Customer> {
+  List<Map<dynamic, dynamic>> _customerList = [];
   List<Map<dynamic, dynamic>> customerListFiltered = [];
   TextEditingController searchTextController = TextEditingController();
 
@@ -38,6 +39,13 @@ class _CustomerState extends State<Customer> {
       if (await customerProvider.getListCustomerData(
         token: data!.token.toString(),
       )) {
+        _customerList.clear();
+        _customerList = customerProvider.myCustomer;
+        customerListFiltered = _customerList;
+        print("Customer Refreshesed");
+        if (context.mounted) {
+          setState(() {});
+        }
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -59,14 +67,6 @@ class _CustomerState extends State<Customer> {
   @override
   Widget build(BuildContext context) {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
-    customerListFiltered = customerProvider.myCustomer;
-    customerListFiltered = customerListFiltered
-        .where((element) => element["nama_lengkap"]
-            .toString()
-            .toLowerCase()
-            .contains(searchTextController.text.toLowerCase()))
-        .toList();
-
     print("Customer Length : ${customerListFiltered.length}");
 
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
@@ -188,7 +188,14 @@ class _CustomerState extends State<Customer> {
             ),
             onChanged: (query) {
               if (context.mounted) {
-                setState(() {});
+                setState(() {
+                  customerListFiltered = _customerList
+                      .where((element) => element["nama_lengkap"]
+                          .toLowerCase()
+                          .contains(query.toLowerCase()))
+                      .toList();
+                  print("Search Customer q : ${_customerList}");
+                });
               }
             },
           ),
@@ -221,6 +228,9 @@ class _CustomerState extends State<Customer> {
                       ),
                       InkWell(
                         onTap: () {
+                          setState(() {
+                            customerProvider.selectedCity = "-";
+                          });
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -228,7 +238,9 @@ class _CustomerState extends State<Customer> {
                                       data: {},
                                       isEditable: true,
                                     )),
-                          ).then((value) => setState(() {}));
+                          ).then((value) => setState(() {
+                                _getCustomer();
+                              }));
                         },
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.05,
@@ -245,7 +257,7 @@ class _CustomerState extends State<Customer> {
               ],
             ),
           ),
-          if (customerProvider.myCustomer.isEmpty) ...[
+          if (customerListFiltered.isEmpty) ...[
             Expanded(
                 child: Center(
                     child: Column(
@@ -267,10 +279,10 @@ class _CustomerState extends State<Customer> {
                 scrollDirection: Axis.vertical,
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                itemCount: customerProvider.myCustomer.length,
+                itemCount: customerListFiltered.length,
                 itemBuilder: (BuildContext context, int index) {
                   return customerDynamicCardVertical(
-                      customerProvider.myCustomer[index]);
+                      customerListFiltered[index]);
                 },
               ),
             ),

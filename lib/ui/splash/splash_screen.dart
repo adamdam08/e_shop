@@ -1,8 +1,12 @@
+import 'dart:convert';
+
+import 'package:e_shop/models/settings/district_model.dart';
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreenPage extends StatefulWidget {
@@ -20,6 +24,9 @@ class SplashScreenPageState extends State<SplashScreenPage> {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     final customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
+
+    // Load District
+    loadDistrict();
 
     Future.delayed(const Duration(seconds: 1), () async {
       var data = await authProvider.getLoginData();
@@ -39,11 +46,12 @@ class SplashScreenPageState extends State<SplashScreenPage> {
               }
             } else {}
 
-            if (data?.token != null) {
+            if (data.token != null) {
               if (await customerProvider.getListCustomerData(
-                  token: data!.token.toString())) {
+                  token: data.token.toString())) {
               } else {}
             }
+
             Navigator.pushNamedAndRemoveUntil(
                 context, '/home', (route) => false);
           });
@@ -53,6 +61,13 @@ class SplashScreenPageState extends State<SplashScreenPage> {
         }
       }
     });
+  }
+
+  Future<List<String?>> loadDistrict() async {
+    String data = await rootBundle.loadString('assets/district.json');
+    print("Assets : ${json.decode(data)}");
+    DistrictModel districtData = DistrictModel.fromJson(json.decode(data));
+    return districtData.districtData!.map((e) => e.name).toList();
   }
 
   @override
