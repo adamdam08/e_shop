@@ -29,6 +29,7 @@ INJECTED from /Users/enygmasystem/Documents/Adamdam/e_shop/android/app/src/main/
 MERGED from /Users/enygmasystem/Documents/Adamdam/e_shop/android/app/src/main/AndroidManifest.xml:1:1-38:12
 MERGED from [:shared_preferences_android] /Users/enygmasystem/Documents/Adamdam/e_shop/build/shared_preferences_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
 MERGED from [:geolocator_android] /Users/enygmasystem/Documents/Adamdam/e_shop/build/geolocator_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-17:12
+MERGED from [:flutter_keyboard_visibility] /Users/enygmasystem/Documents/Adamdam/e_shop/build/flutter_keyboard_visibility/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
 MERGED from [:fluttertoast] /Users/enygmasystem/Documents/Adamdam/e_shop/build/fluttertoast/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
 MERGED from [:path_provider_android] /Users/enygmasystem/Documents/Adamdam/e_shop/build/path_provider_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
 MERGED from [androidx.window:window-java:1.0.0-beta04] /Users/enygmasystem/.gradle/caches/transforms-3/ae81e06d24c799147c26814497a2a305/transformed/jetified-window-java-1.0.0-beta04/AndroidManifest.xml:17:1-23:12
@@ -91,6 +92,8 @@ MERGED from [:shared_preferences_android] /Users/enygmasystem/Documents/Adamdam/
 MERGED from [:shared_preferences_android] /Users/enygmasystem/Documents/Adamdam/e_shop/build/shared_preferences_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:geolocator_android] /Users/enygmasystem/Documents/Adamdam/e_shop/build/geolocator_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:geolocator_android] /Users/enygmasystem/Documents/Adamdam/e_shop/build/geolocator_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:flutter_keyboard_visibility] /Users/enygmasystem/Documents/Adamdam/e_shop/build/flutter_keyboard_visibility/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:flutter_keyboard_visibility] /Users/enygmasystem/Documents/Adamdam/e_shop/build/flutter_keyboard_visibility/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:fluttertoast] /Users/enygmasystem/Documents/Adamdam/e_shop/build/fluttertoast/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:fluttertoast] /Users/enygmasystem/Documents/Adamdam/e_shop/build/fluttertoast/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
 MERGED from [:path_provider_android] /Users/enygmasystem/Documents/Adamdam/e_shop/build/path_provider_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41

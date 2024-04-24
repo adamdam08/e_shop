@@ -29,8 +29,8 @@ class _DistrictSearchState extends State<DistrictSearch> {
     String data = await rootBundle.loadString('assets/district.json');
     print("Assets : ${json.decode(data)}");
     DistrictModel districtData = DistrictModel.fromJson(json.decode(data));
-    districtList = districtData.districtData!.map((e) => e.name).toList();
-    return districtData.districtData!.map((e) => e.name).toList();
+    districtList = districtData.districtData!.map((e) => e.value).toList();
+    return districtData.districtData!.map((e) => e.value).toList();
   }
 
   void getDistrictList() async {

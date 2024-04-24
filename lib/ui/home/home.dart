@@ -56,9 +56,6 @@ class _HomeState extends State<Home> {
     // Add a listener to the scroll controller to detect when the user reaches the bottom of the list
     _scrollController.addListener(_scrollListener);
 
-    final settingsProvider =
-        Provider.of<SettingsProvider>(context, listen: false);
-
     // Latest Profil
     _getLatestProfil();
 

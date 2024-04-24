@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:e_shop/models/customer/customer_address_model.dart';
 import 'package:e_shop/models/customer/customer_data_model.dart';
 import 'package:e_shop/services/customer_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -91,6 +92,37 @@ class CustomerProvider with ChangeNotifier {
 
   set selectedCity(String selectedCity) {
     _selectedCity = selectedCity;
+    notifyListeners();
+  }
+
+  //Address
+  CustomerAddressModel? _customerAddressList;
+  CustomerAddressModel? get customerAddressList => _customerAddressList;
+
+  set customerAddressList(CustomerAddressModel? customerAddressList) {
+    _customerAddressList = customerAddressList;
+    notifyListeners();
+  }
+
+  Future<bool> getListCustomerAddress({
+    required String id,
+    required String token,
+  }) async {
+    try {
+      CustomerAddressModel data = await CustomerService().getListCustomerAddress(userId: id, token: token);
+      _customerAddressList = data!;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+
+  int? _selectAddress;
+  int? get selectAddress => _selectAddress;
+
+  set selectAddress(int? selectAddress) {
+    _selectAddress = selectAddress;
     notifyListeners();
   }
 }

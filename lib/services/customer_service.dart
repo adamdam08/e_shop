@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:e_shop/models/customer/customer_address_model.dart';
 import 'package:e_shop/models/customer/customer_data_model.dart';
 import 'package:e_shop/models/customer/customer_post_model.dart';
 import 'package:flutter/material.dart';
@@ -108,6 +109,30 @@ class CustomerService {
     } else {
       var data = jsonDecode(response.body);
       throw ErrorDescription('${data['message']}');
+    }
+  }
+
+  // Get List Customer
+  Future<CustomerAddressModel> getListCustomerAddress(
+      {required String userId, required String token}) async {
+    var url = Uri.parse("${baseURL}customer/alamat?id=$userId");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    var response = await http.get(url, headers: header);
+    // ignore: avoid_print
+    print("Address: ${response.body}");
+
+    // **success melakukan login
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+
+      CustomerAddressModel dataModel = CustomerAddressModel.fromJson(data);
+      return dataModel;
+    } else {
+      throw Exception("Gagal Mendapatkan List Alamat");
     }
   }
 }

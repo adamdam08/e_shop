@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 
+import '../../provider/auth_provider.dart';
 import '../customer/customer_information.dart';
 
 class CustomerSearch extends StatefulWidget {
@@ -17,6 +18,26 @@ class _CustomerSearchState extends State<CustomerSearch> {
   //dummy data
   List<Map<dynamic, dynamic>> customerListFiltered = [];
   TextEditingController searchTextController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    CustomerProvider customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    if(customerProvider.myCustomer.isEmpty){
+      _getCustomerList();
+    }
+  }
+
+  void _getCustomerList() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    CustomerProvider customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+
+    var data = await authProvider.getLoginData();
+
+    if (await customerProvider.getListCustomerData(token: data!.token.toString())) {
+    } else {}
+  }
 
   @override
   Widget build(BuildContext context) {
