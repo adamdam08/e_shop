@@ -1,7 +1,10 @@
+import 'package:e_shop/models/settings/shipping_model.dart';
 import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
+import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/cart/address_search.dart';
+import 'package:e_shop/ui/cart/shipping_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -23,6 +26,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String selectedAddress = "Pilih Alamat";
   String? customerID;
   int _totalData = 0;
+  String selectedShip = "Pilih Metode Pengiriman";
+  String selectedShipPrice = "-";
+  String? shipId;
 
   @override
   void initState() {
@@ -35,7 +41,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   void _setCustomerData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     List<Map<dynamic, dynamic>> customerListFiltered = [];
     customerListFiltered = customerProvider.myCustomer;
@@ -44,49 +51,128 @@ class _CheckoutPageState extends State<CheckoutPage> {
             element["id"] == customerProvider.selectCustomer.toString())
         .toList();
 
+    //Jika list customer kosong
     if (customerProvider.myCustomer.isEmpty) {
       selectedCustomer = "Pilih customer";
     } else {
       if (customerListFiltered.isNotEmpty) {
-        selectedCustomer = customerListFiltered.first["nama_lengkap"];
-        customerID = customerListFiltered.first["id"];
-        if(await customerProvider.getListCustomerAddress(id: customerID.toString(), token: authProvider.user.token.toString())){
-          print("Customer List Data ${customerProvider.customerAddressList?.addressData?.first}");
-          if(customerProvider.customerAddressList!.addressData!.isEmpty){
+        if (await customerProvider.getListCustomerAddress(
+            id: customerID.toString(),
+            token: authProvider.user.token.toString())) {
+          customerID = customerListFiltered.first["id"]; // Set Customer ID
+
+          if (customerProvider.customerAddressList!.addressData!.isEmpty) {
             selectedAddress = "Pilih Alamat";
-          }else{
-            if(customerProvider.selectAddress != null){
-              var selectedData = customerProvider.customerAddressList!.addressData!.where((element) => element.id == customerProvider.selectAddress);
+            // selectedCustomer = customerListFiltered.first["nama_lengkap"];
+            selectedCustomer = "-";
+          } else {
+            if (customerProvider.selectAddress != null) {
+              var selectedData = customerProvider
+                  .customerAddressList!.addressData!
+                  .where((element) =>
+                      element.id == customerProvider.selectAddress);
               selectedAddress = selectedData.first.alamatLengkap.toString();
               selectedCustomer = selectedData.first.namaAlamat.toString();
-            }else{
-              selectedAddress = customerProvider.customerAddressList!.addressData!.first.alamatLengkap.toString();
-              selectedCustomer = customerProvider.customerAddressList!.addressData!.first.namaAlamat.toString();
+            } else {
+              customerProvider.selectAddress =
+                  customerProvider.customerAddressList!.addressData!.first.id;
+              selectedAddress = customerProvider
+                  .customerAddressList!.addressData!.first.alamatLengkap
+                  .toString();
+              selectedCustomer = customerProvider
+                  .customerAddressList!.addressData!.first.namaAlamat
+                  .toString();
             }
-            setState(() {});
           }
-        }else{
-          selectedAddress = "Pilih Alamat";
+        } else {
+          selectedAddress = "-";
+          selectedCustomer = "-";
         }
       } else {
-        selectedCustomer = "Pilih customer";
+        selectedCustomer = "-";
       }
+
+      //reset customer state
+      if (customerProvider.customerAddressList!.addressData!.isEmpty &&
+          customerProvider.selectAddress != null) {
+        customerProvider.selectAddress = null;
+        setState(() {});
+      } else {
+        setState(() {});
+      }
+
+      print(
+          "Selected Address isEmpty : ${customerProvider.customerAddressList!.addressData!.isEmpty}");
+      print("Selected Address : ${customerProvider.selectAddress}");
     }
   }
 
   void _getTotalData() {
-    CartProvider cartProduct = Provider.of<CartProvider>(context, listen: false);
+    CartProvider cartProduct =
+        Provider.of<CartProvider>(context, listen: false);
     var data = cartProduct.selectedProducts;
-    for (int i = 0; i < cartProduct.selectedProducts.length; i++){
+    for (int i = 0; i < cartProduct.selectedProducts.length; i++) {
       var data2 = data[i];
       _totalData = _totalData + int.tryParse(data2["total_harga"].toString())!;
     }
     print("Total data : ${_totalData}");
   }
 
+  void _setShipData() async {
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+
+    shipId = settingsProvider.selectedShip.toString();
+
+    List<ShipData>? checkShipData = settingsProvider.shippingList?.shipData
+        ?.where((element) => element.id.toString() == shipId)
+        .toList();
+
+    if (checkShipData != null && customerProvider.selectAddress != null) {
+      selectedShip = checkShipData.first.namaKurir.toString();
+      selectedShipPrice = "15000";
+    } else {
+      selectedShip = "Pilih Metode Pengiriman";
+      selectedShipPrice = "-";
+      shipId = null;
+    }
+
+    setState(() {});
+  }
+
+  void _getShippingList() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+
+    var data = await authProvider.getLoginData();
+    if (await settingsProvider.getShippingList(
+        token: data!.token.toString(),
+        cabangId: authProvider.user.data.cabangId.toString())) {
+      print("Shipping list ${settingsProvider.shippingList.toString()}");
+
+      if (customerProvider.selectAddress != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ShippingSearch()),
+        ).then((value) {
+          _setShipData();
+        });
+      }
+    } else {}
+  }
+
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
     CartProvider cartProduct = Provider.of<CartProvider>(context);
+    CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
+    SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
 
     Widget cartDynamicCard(int index) {
       var data = cartProduct.selectedProducts[index];
@@ -94,7 +180,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         onTap: () {},
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
@@ -114,8 +200,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 // borderRadius: BorderRadius.circular(8),
                 child: FadeInImage.memoryNetwork(
                   placeholder: kTransparentImage,
-                  image:
-                  "https://tokosm.online/uploads/images/${data["image_url"]}",
+                  image: data["image_url"],
                   fit: BoxFit.cover,
                   height: 125,
                   width: 125,
@@ -182,18 +267,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
     }
 
-    Widget selectAddressCard(){
+    Widget selectAddressCard() {
       return GestureDetector(
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const AddressSearch()),
-          ).then((value) => () {
+            MaterialPageRoute(builder: (context) => const AddressSearch()),
+          ).then((value) {
+            shipId = null;
             _setCustomerData();
-            setState(() {
-              print("BO Full Servis 3 Jam ${selectedAddress}");
-            });
           });
         },
         child: Column(
@@ -215,14 +297,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 10, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
-                    color: Colors.grey,
-                    width: 1,
-                    style: BorderStyle.solid),
+                    color: Colors.grey, width: 1, style: BorderStyle.solid),
                 borderRadius: BorderRadius.circular(10),
               ),
               width: double.infinity,
@@ -269,14 +348,89 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
     }
 
-    Widget cartSummaryCard(){
+    Widget selectKurirCard() {
+      return GestureDetector(
+        onTap: () {
+          _getShippingList();
+
+          print("customer select address ${customerProvider.selectAddress}");
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                "Pilih Pengiriman",
+                style: poppins.copyWith(
+                    fontWeight: regular,
+                    fontSize: 16,
+                    overflow: TextOverflow.ellipsis),
+                maxLines: 1,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                    color: Colors.grey, width: 1, style: BorderStyle.solid),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              width: double.infinity,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.local_shipping,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          selectedShip,
+                          style: poppins.copyWith(
+                              fontWeight: regular,
+                              fontSize: 14,
+                              overflow: TextOverflow.ellipsis),
+                          maxLines: 1,
+                        ),
+                        Text(
+                          "Rp. $selectedShipPrice",
+                          style: poppins.copyWith(
+                              fontWeight: thin,
+                              fontSize: 10,
+                              overflow: TextOverflow.ellipsis),
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget cartSummaryCard() {
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
-              color: Colors.grey,
-              width: 1,
-              style: BorderStyle.solid),
+              color: Colors.grey, width: 1, style: BorderStyle.solid),
           borderRadius: BorderRadius.circular(10),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -285,10 +439,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Total Item",
@@ -304,12 +456,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Total Harga",
@@ -325,12 +477,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Total Ongkir",
@@ -339,7 +491,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
                 Text(
-                  "Rp. 15000",
+                  settingsProvider.selectedShip != null
+                      ? "Rp. $selectedShipPrice "
+                      : "Rp. -",
                   style: poppins.copyWith(
                     color: backgroundColor1,
                   ),
@@ -347,8 +501,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ],
             ),
             const Padding(
-              padding:
-              EdgeInsets.symmetric(vertical: 10),
+              padding: EdgeInsets.symmetric(vertical: 10),
               child: Divider(
                 height: 1,
                 thickness: 1,
@@ -356,10 +509,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
             ),
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Total Harga + Ongkir",
@@ -371,9 +522,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 Text(
                   "Rp. ${_totalData + 15000}",
                   style: poppins.copyWith(
-                    color: backgroundColor1,
-                    fontWeight: bold
-                  ),
+                      color: backgroundColor1, fontWeight: bold),
                 ),
               ],
             ),
@@ -396,8 +545,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             Container(
               margin: const EdgeInsets.only(bottom: 10),
               color: backgroundColor3,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -406,8 +554,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       Navigator.pop(context);
                     },
                     child: const SizedBox(
-                      width:
-                          20, //MediaQuery.of(context).size.width * 0.1,
+                      width: 20, //MediaQuery.of(context).size.width * 0.1,
                       child: Icon(
                         Icons.arrow_back,
                         color: Colors.white,
@@ -436,16 +583,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     child: Text(
                       "Data Pembelian",
                       style: poppins.copyWith(
-                          fontSize: 16, fontWeight: regular, color: Colors.black),
+                          fontSize: 16,
+                          fontWeight: regular,
+                          color: Colors.black),
                     ),
                   ),
-                  const SizedBox(height: 10,),
-                  for (int i = 0; i < cartProduct.selectedProducts.length; i++)...[
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  for (int i = 0;
+                      i < cartProduct.selectedProducts.length;
+                      i++) ...[
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 20),
                       child: cartDynamicCard(i),
                     )
                   ],
+                  selectKurirCard(),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -457,7 +611,103 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           fontSize: 18),
                     ),
                   ),
-                  cartSummaryCard()
+                  cartSummaryCard(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    child: Center(
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            String? selectedName;
+                            String? selectedAddress;
+
+                            if (customerProvider.selectAddress != null) {
+                              var selectedData = customerProvider
+                                  .customerAddressList!.addressData!
+                                  .where((element) =>
+                                      element.id ==
+                                      customerProvider.selectAddress);
+                              selectedAddress =
+                                  selectedData.first.alamatLengkap.toString();
+                              selectedName =
+                                  selectedData.first.namaPenerima.toString();
+                            } else {
+                              customerProvider.selectAddress = customerProvider
+                                  .customerAddressList!.addressData!.first.id;
+                              selectedAddress = customerProvider
+                                  .customerAddressList!
+                                  .addressData!
+                                  .first
+                                  .alamatLengkap
+                                  .toString();
+                              selectedName = customerProvider
+                                  .customerAddressList!
+                                  .addressData!
+                                  .first
+                                  .namaPenerima
+                                  .toString();
+                            }
+
+                            // Ship ID
+                            List<ShipData>? checkShipData = settingsProvider
+                                .shippingList?.shipData
+                                ?.where((element) =>
+                                    element.id.toString() == shipId)
+                                .toList();
+
+                            var data = {
+                              "pelanggan_id": customerID,
+                              "cabang_id": authProvider.user.data.cabangId,
+                              "kurir_id": shipId,
+                              "pengiriman_id": customerProvider
+                                  .selectAddress, // id alamat pengiriman
+                              "nama_kurir":
+                                  checkShipData!.first.namaKurir.toString(),
+                              "total_harga": _totalData,
+                              "total_ongkos_kirim": 15000,
+                              "total_belanja": _totalData + 15000,
+                              "metode_pembayaran": "cash",
+                              "nama_penerima":
+                                  selectedName, // nama dari id alamat pengiriman
+                              "alamat_penerima":
+                                  selectedAddress, // alamat dari id alamat pengiriman
+                              "produk": cartProduct.selectedProducts.toString()
+                            };
+                            print(data);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              shape: StadiumBorder(
+                                  side: BorderSide(
+                                      width: 1, color: backgroundColor3)),
+                              backgroundColor:
+                                  (customerProvider.selectAddress != null &&
+                                          customerProvider.customerAddressList!
+                                              .addressData!.isNotEmpty &&
+                                          settingsProvider.selectedShip != null)
+                                      ? backgroundColor3
+                                      : Colors.grey),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.shopping_cart_outlined,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                ' Pilih Pembayaran',
+                                style: poppins.copyWith(
+                                    fontWeight: semiBold, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             )

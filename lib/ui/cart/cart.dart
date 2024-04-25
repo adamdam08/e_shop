@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
+import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/cart/customer_search.dart';
 import 'package:e_shop/ui/customer/customer_information.dart';
@@ -69,6 +70,7 @@ class _CartState extends State<Cart> {
   ) {
     CartProvider cartProduct = Provider.of<CartProvider>(context);
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
+    SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
 
     int countItem = 0;
     int subTotal = 0;
@@ -463,7 +465,8 @@ class _CartState extends State<Cart> {
             cartProduct.selectedProducts[i] = {
               "id": data.produkId.toString(),
               "nama_produk": data.namaProduk.toString(),
-              "image_url": data.imageUrl,
+              "image_url":
+                  "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
               "harga": data.diskon != null ? data.hargaDiskon : data.harga,
               "jumlah": data.jumlah,
               "total_harga": totalHarga,
@@ -531,7 +534,8 @@ class _CartState extends State<Cart> {
                     cartProduct.selectedProducts.add({
                       "id": data.produkId.toString(),
                       "nama_produk": data.namaProduk.toString(),
-                      "image_url": data.imageUrl,
+                      "image_url":
+                          "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
                       "harga":
                           data.diskon != null ? data.hargaDiskon : data.harga,
                       "jumlah": data.jumlah,
@@ -1068,6 +1072,9 @@ class _CartState extends State<Cart> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
+                            // Reset data
+                            settingsProvider.selectedShip = null;
+                            // customerProvider.selectAddress = null;
                             if (cartProduct.cartList.listData!.isNotEmpty &&
                                 customerListFiltered.isNotEmpty &&
                                 cartProduct.selectedProducts.isNotEmpty) {

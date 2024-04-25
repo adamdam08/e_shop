@@ -109,14 +109,14 @@ class CustomerProvider with ChangeNotifier {
     required String token,
   }) async {
     try {
-      CustomerAddressModel data = await CustomerService().getListCustomerAddress(userId: id, token: token);
+      CustomerAddressModel data = await CustomerService()
+          .getListCustomerAddress(userId: id, token: token);
       _customerAddressList = data!;
       return true;
     } catch (e) {
       return false;
     }
   }
-
 
   int? _selectAddress;
   int? get selectAddress => _selectAddress;

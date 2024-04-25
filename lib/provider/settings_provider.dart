@@ -1,3 +1,4 @@
+import 'package:e_shop/models/settings/shipping_model.dart';
 import 'package:e_shop/models/store_location_model.dart';
 import 'package:e_shop/services/settings_service.dart';
 import 'package:flutter/material.dart';
@@ -33,5 +34,39 @@ class SettingsProvider with ChangeNotifier {
       print("Error : $e");
       return false;
     }
+  }
+
+  // Login Model
+  ShippingModel? _shippingList;
+
+  ShippingModel? get shippingList => _shippingList;
+
+  set shippingList(ShippingModel? shippingList) {
+    _shippingList = shippingList;
+    notifyListeners();
+  }
+
+  Future<bool> getShippingList({
+    required String token,
+    required String cabangId,
+  }) async {
+    try {
+      ShippingModel data = await SettingsService()
+          .getListShipping(token: token, cabang: cabangId);
+      _shippingList = data;
+      print("Store Location :  ${storeLocation.data?.length}");
+      return true;
+    } catch (e) {
+      print("Error : $e");
+      return false;
+    }
+  }
+
+  int? _selectedShip;
+  int? get selectedShip => _selectedShip;
+
+  set selectedShip(int? selectedShip) {
+    _selectedShip = selectedShip;
+    notifyListeners();
   }
 }

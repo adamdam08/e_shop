@@ -23,26 +23,28 @@ class _CustomerSearchState extends State<CustomerSearch> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    CustomerProvider customerProvider = Provider.of<CustomerProvider>(context, listen: false);
-    if(customerProvider.myCustomer.isEmpty){
+    CustomerProvider customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+    if (customerProvider.myCustomer.isEmpty) {
       _getCustomerList();
     }
   }
 
   void _getCustomerList() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    CustomerProvider customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    CustomerProvider customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
 
     var data = await authProvider.getLoginData();
 
-    if (await customerProvider.getListCustomerData(token: data!.token.toString())) {
+    if (await customerProvider.getListCustomerData(
+        token: data!.token.toString())) {
     } else {}
   }
 
   @override
   Widget build(BuildContext context) {
     CustomerProvider customerProvider = Provider.of<CustomerProvider>(context);
-
     customerListFiltered = customerProvider.myCustomer;
     customerListFiltered = customerListFiltered
         .where((element) => element["nama_lengkap"]
@@ -50,6 +52,8 @@ class _CustomerSearchState extends State<CustomerSearch> {
             .toLowerCase()
             .contains(searchTextController.text.toLowerCase()))
         .toList();
+
+    print("Selected Item : ${customerListFiltered.toString()}");
 
     Widget customerDynamicCardVertical(Map<dynamic, dynamic> myCustomer) {
       return GestureDetector(
