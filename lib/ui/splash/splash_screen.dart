@@ -39,8 +39,7 @@ class SplashScreenPageState extends State<SplashScreenPage> {
             print("Token : ${data!.token}");
             if (await cartProvider.getCartList(
                 token: authProvider.user.token.toString())) {
-              print(
-                  "${cartProvider.cartList.listData!.first.cartData!.length}");
+              //print(cartProvider.cartList.listData?.first.cartData?.length.toString());
               if (context.mounted) {
                 setState(() {});
               }

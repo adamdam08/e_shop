@@ -246,4 +246,17 @@ class ProductProvider with ChangeNotifier {
       return false;
     }
   }
+
+  // Add Transaction
+  Future<String> addTransaction({
+    required Map<String, Object?>? data,
+    required String token,
+  }) async {
+    try {
+      await ProductService().addTransaction(data: data!, token: token);
+      return "";
+    } catch (e) {
+      return "$e";
+    }
+  }
 }

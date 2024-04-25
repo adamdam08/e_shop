@@ -1,3 +1,4 @@
+import 'package:e_shop/models/settings/payment_model.dart';
 import 'package:e_shop/models/settings/shipping_model.dart';
 import 'package:e_shop/models/store_location_model.dart';
 import 'package:e_shop/services/settings_service.dart';
@@ -36,7 +37,7 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
-  // Login Model
+  // Shipping list
   ShippingModel? _shippingList;
 
   ShippingModel? get shippingList => _shippingList;
@@ -67,6 +68,39 @@ class SettingsProvider with ChangeNotifier {
 
   set selectedShip(int? selectedShip) {
     _selectedShip = selectedShip;
+    notifyListeners();
+  }
+
+  // Payment List
+  PaymentModel? _paymentList;
+
+  PaymentModel? get paymentList => _paymentList;
+
+  set paymentList(PaymentModel? paymentList) {
+    _paymentList = paymentList;
+    notifyListeners();
+  }
+
+  Future<bool> getPaymentList({
+    required String token,
+    required String cabangId,
+  }) async {
+    try {
+      PaymentModel data = await SettingsService().getListPayment(token: token, cabang: cabangId);
+      _paymentList = data;
+      print("Store Location :  ${storeLocation.data?.length}");
+      return true;
+    } catch (e) {
+      print("Error : $e");
+      return false;
+    }
+  }
+
+  int? _selectedPayment;
+  int? get selectedPayment => _selectedPayment;
+
+  set selectedPayment(int? selectedPayment) {
+    _selectedPayment = selectedPayment;
     notifyListeners();
   }
 }

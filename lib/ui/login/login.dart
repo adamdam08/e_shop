@@ -143,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         child: TextFormField(
+                          keyboardType: TextInputType.emailAddress,
                           style: poppins,
                           controller: emailController,
                           cursorColor: backgroundColor3,

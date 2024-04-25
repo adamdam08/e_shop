@@ -39,6 +39,9 @@ class _CustomerSearchState extends State<CustomerSearch> {
 
     if (await customerProvider.getListCustomerData(
         token: data!.token.toString())) {
+      setState(() {
+        
+      });
     } else {}
   }
 

@@ -449,7 +449,7 @@ class _CartState extends State<Cart> {
           .isNotEmpty) {
         print("Data Before : ${cartProduct.selectedProducts.toString()}");
         for (int i = 0; i < cartProduct.selectedProducts.length; i++) {
-          if (cartProduct.selectedProducts[i]["id"] ==
+          if (cartProduct.selectedProducts[i]["id"].toString() ==
               cartProduct.cartList.listData!.first.cartData![index].produkId
                   .toString()) {
             print("Found at index ${i}");
@@ -463,7 +463,7 @@ class _CartState extends State<Cart> {
               totalHarga = data.harga!.toInt() * data.jumlah!.toInt();
             }
             cartProduct.selectedProducts[i] = {
-              "id": data.produkId.toString(),
+              "id": data.produkId,
               "nama_produk": data.namaProduk.toString(),
               "image_url":
                   "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
@@ -532,7 +532,7 @@ class _CartState extends State<Cart> {
                       totalHarga = data.harga!.toInt() * data.jumlah!.toInt();
                     }
                     cartProduct.selectedProducts.add({
-                      "id": data.produkId.toString(),
+                      "id": data.produkId,
                       "nama_produk": data.namaProduk.toString(),
                       "image_url":
                           "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",

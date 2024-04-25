@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:e_shop/models/cart/cart_list_model.dart';
 import 'package:e_shop/models/customer/customer_post_model.dart';
 import 'package:e_shop/models/settings/district_model.dart';
+import 'package:e_shop/models/settings/payment_model.dart';
 import 'package:e_shop/models/settings/shipping_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -147,10 +148,35 @@ class SettingsService {
     print("Shipping: ${url}");
     print("Shipping: ${response.body}");
 
-// **success melakukan login
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var data = jsonDecode(response.body);
       ShippingModel callbackData = ShippingModel.fromJson(data);
+      return callbackData;
+    } else {
+      var data = jsonDecode(response.body);
+      throw ErrorDescription('${data['message']}');
+    }
+  }
+
+  // List Ship
+  Future<PaymentModel> getListPayment({
+    required String token,
+    required String cabang,
+  }) async {
+    var url = Uri.parse("${baseURL}pengaturan/bank?cabang=$cabang");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    var response = await http.get(url, headers: header);
+    // ignore: avoid_print
+    print("Shipping: ${url}");
+    print("Shipping: ${response.body}");
+
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+      PaymentModel callbackData = PaymentModel.fromJson(data);
       return callbackData;
     } else {
       var data = jsonDecode(response.body);

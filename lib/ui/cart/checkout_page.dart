@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:e_shop/models/settings/shipping_model.dart';
 import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/cart/address_search.dart';
+import 'package:e_shop/ui/cart/checkout_payment.dart';
 import 'package:e_shop/ui/cart/shipping_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -269,14 +272,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     Widget selectAddressCard() {
       return GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddressSearch()),
-          ).then((value) {
-            shipId = null;
-            _setCustomerData();
-          });
+        onTap: () async {
+          var data = await authProvider.getLoginData();
+          if (await customerProvider.getListCustomerAddress(
+          id: customerProvider.selectCustomer.toString(),
+          token: data!.token.toString())) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddressSearch()),
+            ).then((value) {
+              shipId = null;
+              _setCustomerData();
+            });
+          } else {}
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,63 +628,80 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         height: 50,
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            String? selectedName;
-                            String? selectedAddress;
+                          onPressed: () async {
+                            var data = await authProvider.getLoginData();
+                            if (await settingsProvider.getPaymentList(
+                                token: data!.token.toString(),
+                                cabangId: authProvider.user.data.cabangId.toString())){
 
-                            if (customerProvider.selectAddress != null) {
-                              var selectedData = customerProvider
-                                  .customerAddressList!.addressData!
-                                  .where((element) =>
-                                      element.id ==
+                                print("Payment List : ${settingsProvider.paymentList.toString()}");
+
+                                String? selectedName;
+                                String? selectedAddress;
+
+                                if (customerProvider.selectAddress != null) {
+                                  var selectedData = customerProvider
+                                      .customerAddressList!.addressData!
+                                      .where((element) =>
+                                  element.id ==
                                       customerProvider.selectAddress);
-                              selectedAddress =
-                                  selectedData.first.alamatLengkap.toString();
-                              selectedName =
-                                  selectedData.first.namaPenerima.toString();
-                            } else {
-                              customerProvider.selectAddress = customerProvider
-                                  .customerAddressList!.addressData!.first.id;
-                              selectedAddress = customerProvider
-                                  .customerAddressList!
-                                  .addressData!
-                                  .first
-                                  .alamatLengkap
-                                  .toString();
-                              selectedName = customerProvider
-                                  .customerAddressList!
-                                  .addressData!
-                                  .first
-                                  .namaPenerima
-                                  .toString();
-                            }
+                                  selectedAddress =
+                                      selectedData.first.alamatLengkap.toString();
+                                  selectedName =
+                                      selectedData.first.namaPenerima.toString();
+                                } else {
+                                  customerProvider.selectAddress = customerProvider
+                                      .customerAddressList!.addressData!.first.id;
+                                  selectedAddress = customerProvider
+                                      .customerAddressList!
+                                      .addressData!
+                                      .first
+                                      .alamatLengkap
+                                      .toString();
+                                  selectedName = customerProvider
+                                      .customerAddressList!
+                                      .addressData!
+                                      .first
+                                      .namaPenerima
+                                      .toString();
+                                }
 
-                            // Ship ID
-                            List<ShipData>? checkShipData = settingsProvider
-                                .shippingList?.shipData
-                                ?.where((element) =>
-                                    element.id.toString() == shipId)
-                                .toList();
+                                // Ship ID
+                                List<ShipData>? checkShipData = settingsProvider
+                                    .shippingList?.shipData
+                                    ?.where((element) =>
+                                element.id.toString() == shipId)
+                                    .toList();
 
-                            var data = {
-                              "pelanggan_id": customerID,
-                              "cabang_id": authProvider.user.data.cabangId,
-                              "kurir_id": shipId,
-                              "pengiriman_id": customerProvider
-                                  .selectAddress, // id alamat pengiriman
-                              "nama_kurir":
+                                var data = {
+                                  "pelanggan_id": int.tryParse(customerID.toString()),
+                                  "cabang_id": authProvider.user.data.cabangId,
+                                  "kurir_id": int.tryParse(shipId.toString()),
+                                  "pengiriman_id": customerProvider.selectAddress, // id alamat pengiriman
+                                  "nama_kurir":
                                   checkShipData!.first.namaKurir.toString(),
-                              "total_harga": _totalData,
-                              "total_ongkos_kirim": 15000,
-                              "total_belanja": _totalData + 15000,
-                              "metode_pembayaran": "cash",
-                              "nama_penerima":
+                                  "total_harga": _totalData,
+                                  "total_ongkos_kirim": 15000,
+                                  "total_belanja": _totalData + 15000,
+                                  "metode_pembayaran": "cash",
+                                  "nama_penerima":
                                   selectedName, // nama dari id alamat pengiriman
-                              "alamat_penerima":
+                                  "alamat_penerima":
                                   selectedAddress, // alamat dari id alamat pengiriman
-                              "produk": cartProduct.selectedProducts.toString()
-                            };
-                            print(data);
+                                  "produk":  jsonEncode(cartProduct.selectedProducts.toString())
+                                };
+                                print(data);
+
+                                // Context Checker
+                                if(!context.mounted) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CheckoutPayment(
+                                        mapData: data,
+                                      )),
+                                );
+                            }else{}
                           },
                           style: ElevatedButton.styleFrom(
                               shape: StadiumBorder(

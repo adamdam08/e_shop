@@ -24,20 +24,6 @@ class _AddressSearchState extends State<AddressSearch> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    _getCustomerList();
-  }
-
-  void _getCustomerList() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    CustomerProvider customerProvider =
-        Provider.of<CustomerProvider>(context, listen: false);
-    var data = await authProvider.getLoginData();
-    if (await customerProvider.getListCustomerAddress(
-        id: customerProvider.selectCustomer.toString(),
-        token: data!.token.toString())) {
-      setState(() {});
-    } else {}
   }
 
   @override
