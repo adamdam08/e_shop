@@ -6,7 +6,7 @@ import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/cart/customer_search.dart';
-import 'package:e_shop/ui/customer/customer_information.dart';
+import 'package:e_shop/ui/customer/add_customer_page.dart';
 import 'package:e_shop/ui/product/detail_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

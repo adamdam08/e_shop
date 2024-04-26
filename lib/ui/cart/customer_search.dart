@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 
 import '../../provider/auth_provider.dart';
-import '../customer/customer_information.dart';
+import '../customer/add_customer_page.dart';
 
 class CustomerSearch extends StatefulWidget {
   const CustomerSearch({Key? key}) : super(key: key);

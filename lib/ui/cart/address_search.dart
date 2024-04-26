@@ -7,7 +7,7 @@ import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/customer_provider.dart';
 import '../../theme/theme.dart';
-import '../customer/customer_information.dart';
+import '../customer/add_customer_page.dart';
 
 class AddressSearch extends StatefulWidget {
   const AddressSearch({super.key});

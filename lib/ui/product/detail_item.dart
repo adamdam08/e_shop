@@ -35,7 +35,7 @@ class _DetailItemState extends State<DetailItem> {
 
     if (context.mounted) {
       setState(() {
-        isLoading = false;
+        isLoading = true;
       });
     }
 
@@ -97,7 +97,15 @@ class _DetailItemState extends State<DetailItem> {
           }
         }
       }
+
+      if (context.mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
+
+
   }
 
   @override

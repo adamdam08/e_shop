@@ -1,13 +1,14 @@
-import 'package:e_shop/models/user_model.dart';
+
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
-import 'package:e_shop/provider/customer_provider.dart';
-import 'package:e_shop/ui/customer/customer_information.dart';
+import 'package:e_shop/ui/customer/add_customer_page.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 import 'package:solar_icons/solar_icons.dart';
+
+import 'customer_transact_page.dart';
 
 class Customer extends StatefulWidget {
   const Customer({super.key});
@@ -20,6 +21,8 @@ class _CustomerState extends State<Customer> {
   List<Map<dynamic, dynamic>> _customerList = [];
   List<Map<dynamic, dynamic>> customerListFiltered = [];
   TextEditingController searchTextController = TextEditingController();
+  bool isLoading = false;
+
 
   @override
   void initState() {
@@ -30,6 +33,11 @@ class _CustomerState extends State<Customer> {
   }
 
   void _getCustomer() async {
+
+    setState(() {
+      isLoading = true;
+    });
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
@@ -62,6 +70,10 @@ class _CustomerState extends State<Customer> {
         }
       }
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -73,15 +85,18 @@ class _CustomerState extends State<Customer> {
       print("Update Customer ${myCustomer}");
       return GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => CustomerInformation(
-                      data: myCustomer,
-                      isEditable: true,
-                      isUpdate: true,
-                    )),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //       builder: (context) => CustomerInformation(
+          //             data: myCustomer,
+          //             isEditable: true,
+          //             isUpdate: true,
+          //           )),
+          // );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CustomerTransactPage(
+            myCustomer: myCustomer,
+          )));
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -205,7 +220,8 @@ class _CustomerState extends State<Customer> {
 
     return Container(
       padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
+      child: isLoading == false
+          ? Column(
         children: [
           Container(
             margin: const EdgeInsets.only(bottom: 10),
@@ -288,6 +304,30 @@ class _CustomerState extends State<Customer> {
             ),
           ]
         ],
+      ) : Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.transparent,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: backgroundColor1,
+            ),
+            Container(
+              height: 30,
+            ),
+            Text(
+              "Loading Data",
+              style: poppins.copyWith(
+                fontWeight: semiBold,
+                color: backgroundColor1,
+                fontSize: 15,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

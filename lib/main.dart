@@ -192,15 +192,6 @@ class _BottomNavigationBarExampleState
                 ),
                 label: '',
               ),
-              // BottomNavigationBarItem(
-              //   icon: Container(
-              //     height: 10,
-              //     child: const Icon(
-              //       Icons.shopping_cart,
-              //     ),
-              //   ),
-              //   label: '',
-              // ),
             ],
             currentIndex: pageProvider.currentIndex,
             selectedItemColor: Colors.white,

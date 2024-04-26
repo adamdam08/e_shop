@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 
-import '../customer/customer_information.dart';
+import '../customer/add_customer_page.dart';
 
 class DistrictSearch extends StatefulWidget {
   const DistrictSearch({Key? key}) : super(key: key);

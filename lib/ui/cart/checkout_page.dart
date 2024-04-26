@@ -9,6 +9,7 @@ import 'package:e_shop/ui/cart/address_search.dart';
 import 'package:e_shop/ui/cart/checkout_payment.dart';
 import 'package:e_shop/ui/cart/shipping_search.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -291,14 +292,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
           if (await customerProvider.getListCustomerAddress(
               id: customerProvider.selectCustomer.toString(),
               token: data!.token.toString())) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddressSearch()),
-            ).then((value) {
-              _setCustomerData();
-              _setShipData();
-            });
-          } else {}
+                if(customerProvider.customerAddressList!.addressData!.isNotEmpty){
+                  if(context.mounted){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AddressSearch()),
+                    ).then((value) {
+                      _setCustomerData();
+                      _setShipData();
+                    });
+                  }
+                }else{
+                  showToast("Alamat Pelanggan Tidak Tersedia");
+                }
+          } else {
+
+          }
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,5 +776,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       ),
     );
+  }
+
+  void showToast(String text) {
+    Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: backgroundColor1,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }

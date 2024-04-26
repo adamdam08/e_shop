@@ -1,7 +1,7 @@
 import 'package:e_shop/models/user_model.dart';
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/theme/theme.dart';
-import 'package:e_shop/ui/customer/customer_information.dart';
+import 'package:e_shop/ui/customer/add_customer_page.dart';
 import 'package:e_shop/ui/profile/profile_edit.dart';
 import 'package:flutter/material.dart';
 import 'package:placeholder_images/placeholder_images.dart';
@@ -127,38 +127,19 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      var dataUpdate = {
-                        "id": loginData.data.id.toString(),
-                        "username": loginData.data.username.toString(),
-                        "nama_lengkap": loginData.data.namaLengkap.toString(),
-                        "telp": loginData.data.telp.toString(),
-                        "alamat": loginData.data.alamat.toString()
-                      };
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfilEdit(
-                                  data: dataUpdate,
-                                  isPassword: false,
-                                )),
-                      );
-                    },
-                    child: Container(
-                      width: 75,
-                      height: 75,
-                      decoration: BoxDecoration(
-                          color: backgroundColor3, shape: BoxShape.circle),
-                      margin: const EdgeInsets.symmetric(vertical: 20),
-                      child: Center(
-                        child: Text(
-                          getInitials(loginData.data.namaLengkap.toString()),
-                          style: poppins.copyWith(
-                            fontWeight: regular,
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
+                  Container(
+                    width: 75,
+                    height: 75,
+                    decoration: BoxDecoration(
+                        color: backgroundColor3, shape: BoxShape.circle),
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: Text(
+                        getInitials(loginData.data.namaLengkap.toString()),
+                        style: poppins.copyWith(
+                          fontWeight: regular,
+                          color: Colors.black,
+                          fontSize: 18,
                         ),
                       ),
                     ),
