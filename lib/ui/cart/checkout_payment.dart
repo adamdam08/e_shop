@@ -1,5 +1,4 @@
 import 'package:e_shop/provider/product_provider.dart';
-import 'package:e_shop/services/product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +6,6 @@ import 'package:transparent_image/transparent_image.dart';
 
 import '../../provider/auth_provider.dart';
 import '../../provider/cart_provider.dart';
-import '../../provider/customer_provider.dart';
 import '../../provider/settings_provider.dart';
 import '../../theme/theme.dart';
 
@@ -53,9 +51,10 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color:
-                data.id == settingsProvider.selectedPayment ? backgroundColor1 :Colors.transparent
-              ),
+              border: Border.all(
+                  color: data.id == settingsProvider.selectedPayment
+                      ? backgroundColor1
+                      : Colors.transparent),
               boxShadow: [
                 BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
@@ -67,7 +66,8 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Checkbox(
-                value: data.id == settingsProvider.selectedPayment ? true : false,
+                value:
+                    data.id == settingsProvider.selectedPayment ? true : false,
                 activeColor: backgroundColor1,
                 onChanged: (value) async {
                   print("Checkbox tapped $value");
@@ -190,7 +190,8 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
                     color: Colors.black,
                   ),
                 ),
-                Text( "Rp. ${widget.mapData?["total_ongkos_kirim"]}",
+                Text(
+                  "Rp. ${widget.mapData?["total_ongkos_kirim"]}",
                   style: poppins.copyWith(
                     color: backgroundColor1,
                   ),
@@ -243,7 +244,8 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
               Container(
                 margin: const EdgeInsets.only(bottom: 10),
                 color: backgroundColor3,
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -271,114 +273,130 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
               ),
               Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ListView(
-                      children: [
-                        Text(
-                          "Metode Pembayaran Tersedia",
-                          style: poppins.copyWith(
-                              fontSize: 16,
-                              fontWeight: regular,
-                              color: Colors.black),
-                        ),
-                        const SizedBox(height: 10,),
-                        for (int i = 0;
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ListView(
+                  children: [
+                    Text(
+                      "Metode Pembayaran Tersedia",
+                      style: poppins.copyWith(
+                          fontSize: 16,
+                          fontWeight: regular,
+                          color: Colors.black),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    for (int i = 0;
                         i < settingsProvider.paymentList!.paymentData!.length;
-                        i++) ...[
-                          cartDynamicCard(i)
-                        ],
-                        Text(
-                          "Ringkasan Pembelian",
-                          style: poppins.copyWith(
-                              fontSize: 16,
-                              fontWeight: regular,
-                              color: Colors.black),
-                        ),
-                        const SizedBox(height: 10,),
-                        cartSummaryCard(),
-                        const SizedBox(height: 10,),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10),
-                          child: Center(
-                            child: SizedBox(
-                              height: 50,
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  setState(() {
-                                    isLoading = true;
+                        i++) ...[cartDynamicCard(i)],
+                    Text(
+                      "Ringkasan Pembelian",
+                      style: poppins.copyWith(
+                          fontSize: 16,
+                          fontWeight: regular,
+                          color: Colors.black),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    cartSummaryCard(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Center(
+                        child: SizedBox(
+                          height: 50,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              setState(() {
+                                isLoading = true;
+                              });
+
+                              if (settingsProvider.selectedPayment != null) {
+                                var bankData = settingsProvider
+                                    .paymentList!.paymentData
+                                    ?.where((element) =>
+                                        element.id ==
+                                        settingsProvider.selectedPayment);
+                                print(
+                                    "bankData : ${settingsProvider.selectedPayment}");
+                                print(
+                                    "bankData : ${settingsProvider.paymentList!.paymentData?.first.id}");
+
+                                if (bankData != null || bankData!.isNotEmpty) {
+                                  widget.mapData?["metode_pembayaran"] =
+                                      "transfer";
+                                  widget.mapData?.addAll({
+                                    "bank_transfer": bankData.first.namaBank,
+                                    "norekening_transfer":
+                                        bankData.first.noRekening
                                   });
-
-                                  if (settingsProvider.selectedPayment != null) {
-                                    var bankData = settingsProvider.paymentList!.paymentData?.where((element) => element.id == settingsProvider.selectedPayment);
-                                    print("bankData : ${settingsProvider.selectedPayment}");
-                                    print("bankData : ${settingsProvider.paymentList!.paymentData?.first.id}");
-
-                                    if(bankData != null || bankData!.isNotEmpty){
-                                      widget.mapData?["metode_pembayaran"] = "transfer";
-                                      widget.mapData?.addAll({
-                                        "bank_transfer" : bankData.first.namaBank,
-                                        "norekening_transfer" : bankData.first.noRekening
-                                      });
-                                    }
-                                    print("selectedProducts : ${widget.mapData.toString()}");
-                                  }
-                                  var data = await authProvider.getLoginData();
-                                  var message = await productProvider.addTransaction(
+                                }
+                                print(
+                                    "selectedProducts : ${widget.mapData.toString()}");
+                              }
+                              var data = await authProvider.getLoginData();
+                              var message =
+                                  await productProvider.addTransaction(
                                       data: widget.mapData,
                                       token: data!.token.toString());
 
-                                  setState(() {
-                                    isLoading = false;
-                                  });
+                              setState(() {
+                                isLoading = false;
+                              });
 
-                                  if (message != "") {
-                                    showToast(message);
-                                  } else {
-                                    showToast("Berhasil Menambahkan Transaksi");
-                                    if (context.mounted) {
-                                      // Navigator.pushNamedAndRemoveUntil(context, "/home", (Route<dynamic> route) => false);
-                                    }
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    shape: StadiumBorder(
-                                        side: BorderSide(
-                                            width: 1, color: backgroundColor3)),
-                                    backgroundColor: (settingsProvider.selectedPayment != null)
+                              if (message != "") {
+                                showToast(message);
+                              } else {
+                                showToast("Berhasil Menambahkan Transaksi");
+                                if (context.mounted) {
+                                  Navigator.pushNamedAndRemoveUntil(context,
+                                      "/home", (Route<dynamic> route) => false);
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                                shape: StadiumBorder(
+                                    side: BorderSide(
+                                        width: 1, color: backgroundColor3)),
+                                backgroundColor:
+                                    (settingsProvider.selectedPayment != null)
                                         ? backgroundColor3
                                         : Colors.grey),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    isLoading == true ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                isLoading == true
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.shopping_cart_outlined,
                                         color: Colors.white,
                                       ),
-                                    ) :
-                                    const Icon(
-                                      Icons.shopping_cart_outlined,
-                                      color: Colors.white,
-                                    ),
-                                    Text(
-                                      ' Konfirmasi Transaksi',
-                                      style: poppins.copyWith(
-                                          fontWeight: semiBold, color: Colors.white),
-                                    ),
-                                  ],
+                                Text(
+                                  ' Konfirmasi Transaksi',
+                                  style: poppins.copyWith(
+                                      fontWeight: semiBold,
+                                      color: Colors.white),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  )
-              ),
+                  ],
+                ),
+              )),
             ],
           ),
         ),

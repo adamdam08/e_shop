@@ -1,4 +1,5 @@
 import 'package:e_shop/models/customer/customer_address_model.dart';
+import 'package:e_shop/provider/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
@@ -40,6 +41,8 @@ class _AddressSearchState extends State<AddressSearch> {
     Widget customerDynamicCardVertical(AddressData myCustomer) {
       return GestureDetector(
         onTap: () {
+          final settingsProvider =
+              Provider.of<SettingsProvider>(context, listen: false);
           customerProvider.selectAddress = myCustomer.id;
           print("customerId nya adalah: ${customerProvider.selectAddress}");
           Navigator.pop(context);
