@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:e_shop/models/detail_product_model.dart';
 import 'package:e_shop/models/product/banner_model.dart';
 import 'package:e_shop/models/product/product_category_tree_model.dart';
 import 'package:e_shop/models/product/suggestion_model.dart';
+import 'package:e_shop/models/product/transaction_history_model.dart';
 import 'package:e_shop/models/product_category_model.dart';
 import 'package:e_shop/models/product_model.dart';
 import 'package:e_shop/services/product_service.dart';
@@ -26,7 +29,11 @@ class ProductProvider with ChangeNotifier {
       String? query}) async {
     try {
       ProductModel promoProduct = await ProductService().getPromoProduct(
-          cabangId: cabangId, token: token, limit: limit, page: page, query:query);
+          cabangId: cabangId,
+          token: token,
+          limit: limit,
+          page: page,
+          query: query);
       if (page != 1) {
         _promoProduct!.data!.addAll(promoProduct.data!.toList());
       } else {
@@ -87,7 +94,7 @@ class ProductProvider with ChangeNotifier {
       required String token,
       required int limit,
       required int page,
-        required String sort,
+      required String sort,
       String? cat,
       String query = ""}) async {
     try {
@@ -257,6 +264,32 @@ class ProductProvider with ChangeNotifier {
       return "";
     } catch (e) {
       return "$e";
+    }
+  }
+
+  // Banner Model
+  TransactionHistoryModel? _transactionHistory;
+  TransactionHistoryModel? get transactionHistory => _transactionHistory;
+
+  set transactionHistory(TransactionHistoryModel? transactionHistory) {
+    _transactionHistory = transactionHistory;
+    notifyListeners();
+  }
+
+  // Add Transaction
+  Future<bool> getListTransaction({
+    required String customerId,
+    required String token,
+    required String status,
+  }) async {
+    try {
+      TransactionHistoryModel callback = await ProductService()
+          .getListTransaction(
+              token: token, customerId: customerId, status: status);
+      _transactionHistory = callback;
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

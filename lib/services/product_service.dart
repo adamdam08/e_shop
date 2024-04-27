@@ -3,6 +3,7 @@ import 'package:e_shop/models/detail_product_model.dart';
 import 'package:e_shop/models/product/banner_model.dart';
 import 'package:e_shop/models/product/product_category_tree_model.dart';
 import 'package:e_shop/models/product/suggestion_model.dart';
+import 'package:e_shop/models/product/transaction_history_model.dart';
 import 'package:e_shop/models/product_category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -85,7 +86,7 @@ class ProductService {
       required String token,
       required int page,
       required int limit,
-        required String sort,
+      required String sort,
       String? cat,
       String query = ""}) async {
     var url = Uri.parse(
@@ -248,6 +249,35 @@ class ProductService {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       var data = jsonDecode(response.body);
       CustomerPostModel callbackData = CustomerPostModel.fromJson(data);
+      return callbackData;
+    } else {
+      var data = jsonDecode(response.body);
+      throw ErrorDescription('${data['message']}');
+    }
+  }
+
+  // Add data customer
+  Future<TransactionHistoryModel> getListTransaction({
+    required String customerId,
+    required String status,
+    required String token,
+  }) async {
+    var url = Uri.parse("${baseURL}transaksi?customer_id=$customerId");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    var response = await http.get(url, headers: header);
+    // ignore: avoid_print
+    print("Get List Transaction: ${url}");
+    print("Get List Transaction: ${response.body}");
+
+// **success melakukan login
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+      TransactionHistoryModel callbackData =
+          TransactionHistoryModel.fromJson(data);
       return callbackData;
     } else {
       var data = jsonDecode(response.body);
