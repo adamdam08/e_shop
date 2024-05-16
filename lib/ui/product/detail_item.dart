@@ -6,6 +6,7 @@ import 'package:e_shop/provider/page_provider.dart';
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/provider/settings_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -104,8 +105,6 @@ class _DetailItemState extends State<DetailItem> {
         });
       }
     });
-
-
   }
 
   @override
@@ -125,396 +124,387 @@ class _DetailItemState extends State<DetailItem> {
         child: isLoading == false
             ? Column(
                 children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    color: Colors.white,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (context.mounted) {
+                              setState(() {
+                                Navigator.pop(context);
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              size: 30,
+                              color: backgroundColor1,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            // Some code to undo the change.
+                            if (context.mounted) {
+                              Navigator.pushNamed(context, '/cart');
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.shopping_cart,
+                              size: 30,
+                              color: backgroundColor1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Expanded(
                     child: Stack(
                       children: [
-                        NotificationListener<ScrollUpdateNotification>(
-                          onNotification: (ScrollNotification scrollInfo) {
-                            if (scrollInfo.metrics.axis == Axis.vertical &&
-                                context.mounted) {
-                              setState(() {
-                                double newAlpha = 0.0 +
-                                    (scrollInfo.metrics.pixels /
-                                        scrollInfo.metrics.maxScrollExtent);
-                                print("MASUK $newAlpha");
-                                // print("MASUK ${}");
-                                print(
-                                    "MASUK ${scrollInfo.metrics.pixels / scrollInfo.metrics.maxScrollExtent}");
-                                if (newAlpha > 0.0) {
-                                  headerAlpha = 1;
-                                } else {
-                                  headerAlpha = 0;
-                                }
-                              });
-                            }
-
-                            return false;
-                          },
-                          child: ListView(
-                            children: [
-                              CarouselSlider(
-                                items: [
-                                  for (var sliderItem in imgList)
-                                    FadeInImage.memoryNetwork(
-                                      placeholder: kTransparentImage,
-                                      image: sliderItem,
-                                      fit: BoxFit.cover,
-                                      imageErrorBuilder: (BuildContext context,
-                                          Object error,
-                                          StackTrace? stackTrace) {
-                                        return Container(
-                                          color: Colors.white,
-                                          child: const Center(
-                                            child: Icon(Icons.error),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                ],
-                                options: CarouselOptions(
-                                  viewportFraction: 1,
-                                  autoPlay: false,
-                                  autoPlayCurve: Curves.linear,
-                                  reverse: false,
-                                  autoPlayInterval: const Duration(seconds: 5),
-                                  initialPage: carouselIndex,
-                                  scrollDirection: Axis.horizontal,
-                                  enableInfiniteScroll: false,
-                                  onPageChanged: (index, reason) {
-                                    if (context.mounted) {
-                                      setState(() {
-                                        carouselIndex = index;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(left: 10),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: backgroundColor3,
-                                      ),
-                                      padding: const EdgeInsets.all(10),
-                                      child: Text(
-                                        " ${carouselIndex + 1}/${imgList.length}",
-                                        style: poppins.copyWith(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                            fontWeight: bold),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.only(
-                                    top: 30, left: 30, right: 30),
-                                width: double.infinity,
-                                decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(30))),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Rp. ${productProvider.detailProduct?.data?.harga?.first.diskon != 0 ? productProvider.detailProduct?.data?.harga?.first.hargaDiskon : productProvider.detailProduct?.data?.harga?.first.harga}",
-                                      style: poppins.copyWith(
-                                        fontWeight: semiBold,
-                                        color: backgroundColor1,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        // Harga Sebeum Diskon
-                                        if (productProvider.detailProduct?.data
-                                                ?.harga?.first.diskon !=
-                                            null)
-                                          Flexible(
-                                            child: Text(
-                                              "Rp.${productProvider.detailProduct?.data?.harga?.first.harga}",
-                                              maxLines: 1,
-                                              style: poppins.copyWith(
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  fontSize: 14,
-                                                  color: Colors.grey,
-                                                  decoration: TextDecoration
-                                                      .lineThrough),
-                                            ),
-                                          ),
-
-                                        // Diskon
-                                        if (productProvider.detailProduct?.data
-                                                ?.harga?.first.diskon !=
-                                            null)
-                                          Text(
-                                            " ${productProvider.detailProduct?.data?.harga?.first.diskon}%",
-                                            style: poppins.copyWith(
-                                                fontSize: 12,
-                                                color: Colors.red,
-                                                fontWeight: bold),
-                                          ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.location_city,
-                                            color: Colors.orange,
-                                            size: 12,
-                                          ),
-                                          Text(
-                                            " Cabang ${settingsProvider.storeLocation.data?.first.namaCabang}",
-                                            style: poppins.copyWith(
-                                              fontSize: 12,
-                                              fontWeight: semiBold,
-                                              color: backgroundColor2,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Text(
-                                        "${productProvider.detailProduct?.data?.namaProduk}",
-                                        style: poppins.copyWith(
-                                          fontWeight: bold,
-                                          fontSize: 18,
-                                          color: backgroundColor1,
+                        ListView(
+                          children: [
+                            CarouselSlider(
+                              items: [
+                                for (var sliderItem in imgList)
+                                  FadeInImage.memoryNetwork(
+                                    placeholder: kTransparentImage,
+                                    image: sliderItem,
+                                    fit: BoxFit.cover,
+                                    imageErrorBuilder: (BuildContext context,
+                                        Object error, StackTrace? stackTrace) {
+                                      return Container(
+                                        color: Colors.white,
+                                        child: const Center(
+                                          child: Icon(Icons.error),
                                         ),
-                                        textAlign: TextAlign.justify,
-                                      ),
-                                    ),
-                                    ReadMoreText(
-                                      productProvider.detailProduct?.data
-                                                  ?.deskripsiProduk ==
-                                              null
-                                          ? "Deskripsi Tidak Tersedia"
-                                          : "${productProvider.detailProduct?.data?.deskripsiProduk}",
-                                      style: poppins.copyWith(
-                                        fontWeight: regular,
-                                        fontSize: 14,
-                                        color: productProvider.detailProduct
-                                                    ?.data?.deskripsiProduk ==
-                                                null
-                                            ? Colors.grey
-                                            : Colors.black,
-                                      ),
-                                      trimLines: 3,
-                                      colorClickableText: Colors.grey,
-                                      trimMode: TrimMode.Line,
-                                      trimCollapsedText: ' Show more',
-                                      trimExpandedText: ' Show less ',
-                                      textAlign: TextAlign.justify,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 20, bottom: 10),
-                                      child: Text(
-                                        "Detail produk",
-                                        style: poppins.copyWith(
-                                            fontWeight: semiBold,
-                                            color: backgroundColor1,
-                                            fontSize: 18),
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Merk",
-                                          style: poppins.copyWith(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${productProvider.detailProduct?.data?.merkProduk.toString()}",
-                                          style: poppins.copyWith(
-                                            color: backgroundColor1,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      child: Divider(
-                                        height: 1,
-                                        thickness: 1,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Satuan",
-                                          style: poppins.copyWith(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${productProvider.detailProduct?.data?.satuanProduk.toString()}",
-                                          style: poppins.copyWith(
-                                            color: backgroundColor1,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      child: Divider(
-                                        height: 1,
-                                        thickness: 1,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Golongan",
-                                          style: poppins.copyWith(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${productProvider.detailProduct?.data?.golonganProduk.toString()}",
-                                          style: poppins.copyWith(
-                                            color: backgroundColor1,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Divider(
-                                        height: 1,
-                                        thickness: 1,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Stok",
-                                          style: poppins.copyWith(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${productProvider.detailProduct?.data?.golonganProduk.toString()}",
-                                          style: poppins.copyWith(
-                                            color: backgroundColor1,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.only(bottom: 10),
-                                      child: Divider(
-                                        height: 1,
-                                        thickness: 1,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 100),
-                          padding: (headerAlpha > 0.0)
-                              ? const EdgeInsets.symmetric(horizontal: 10)
-                              : const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                          color: Colors.white
-                              .withAlpha((headerAlpha * 255).round()),
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
+                                      );
+                                    },
+                                  ),
+                              ],
+                              options: CarouselOptions(
+                                viewportFraction: 1,
+                                autoPlay: false,
+                                autoPlayCurve: Curves.linear,
+                                reverse: false,
+                                autoPlayInterval: const Duration(seconds: 5),
+                                initialPage: carouselIndex,
+                                scrollDirection: Axis.horizontal,
+                                enableInfiniteScroll: false,
+                                onPageChanged: (index, reason) {
                                   if (context.mounted) {
                                     setState(() {
-                                      Navigator.pop(context);
+                                      carouselIndex = index;
                                     });
                                   }
                                 },
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.arrow_back,
-                                    size: 30,
-                                    color: backgroundColor1,
-                                  ),
-                                ),
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Some code to undo the change.
-                                  if (context.mounted) {
-                                    Navigator.pushNamed(context, '/cart');
-                                  }
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: backgroundColor3,
+                                    ),
+                                    padding: const EdgeInsets.all(10),
+                                    child: Text(
+                                      " ${carouselIndex + 1}/${imgList.length}",
+                                      style: poppins.copyWith(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                          fontWeight: bold),
+                                    ),
                                   ),
-                                  child: Icon(
-                                    Icons.shopping_cart,
-                                    size: 30,
-                                    color: backgroundColor1,
-                                  ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(top: 30),
+                              width: double.infinity,
+                              decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(30))),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            "${productProvider.detailProduct?.data?.namaProduk}",
+                                            style: poppins.copyWith(
+                                              fontWeight: bold,
+                                              fontSize: 18,
+                                              color: backgroundColor1,
+                                            ),
+                                            textAlign: TextAlign.justify,
+                                          ),
+                                        ),
+                                        Text(
+                                          "Rp. ${productProvider.detailProduct?.data?.harga?.first.diskon != 0 ? productProvider.detailProduct?.data?.harga?.first.hargaDiskon : productProvider.detailProduct?.data?.harga?.first.harga}",
+                                          style: poppins.copyWith(
+                                            fontWeight: semiBold,
+                                            color: Colors.red,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            // Harga Sebeum Diskon
+                                            if (productProvider
+                                                    .detailProduct
+                                                    ?.data
+                                                    ?.harga
+                                                    ?.first
+                                                    .diskon !=
+                                                null)
+                                              Flexible(
+                                                child: Text(
+                                                  "Rp.${productProvider.detailProduct?.data?.harga?.first.harga}",
+                                                  maxLines: 1,
+                                                  style: poppins.copyWith(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontSize: 14,
+                                                      color: Colors.grey,
+                                                      decoration: TextDecoration
+                                                          .lineThrough),
+                                                ),
+                                              ),
+
+                                            // Diskon
+                                            if (productProvider
+                                                    .detailProduct
+                                                    ?.data
+                                                    ?.harga
+                                                    ?.first
+                                                    .diskon !=
+                                                null)
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5,
+                                                      vertical: 3),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.red
+                                                      .withOpacity(0.4),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: Colors.pink
+                                                            .withOpacity(0.2),
+                                                        blurRadius: 4,
+                                                        offset:
+                                                            const Offset(0, 0))
+                                                  ]),
+                                              child: Text(
+                                                "${productProvider.detailProduct?.data?.harga?.first.diskon}%",
+                                                style: poppins.copyWith(
+                                                    fontSize: 12,
+                                                    color: Colors.pink,
+                                                    fontWeight: bold),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.star,
+                                              size: 20,
+                                              color: Colors.yellow,
+                                            ),
+                                            Text(
+                                              "${productProvider.detailProduct?.data?.rating}",
+                                              style: poppins.copyWith(
+                                                  fontSize: 13,
+                                                  color: Colors.black,
+                                                  fontWeight: semiBold),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 10),
+                                    child: Divider(
+                                      height: 1,
+                                      thickness: 1,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          child: Text(
+                                            "Detail produk",
+                                            style: poppins.copyWith(
+                                                fontWeight: semiBold,
+                                                color: backgroundColor1,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  "Merk",
+                                                  style: poppins.copyWith(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Satuan",
+                                                  style: poppins.copyWith(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Kategori",
+                                                  style: poppins.copyWith(
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              width: 30,
+                                            ),
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${productProvider.detailProduct?.data?.merkProduk.toString()}",
+                                                  style: poppins.copyWith(
+                                                    color: backgroundColor1,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "${productProvider.detailProduct?.data?.satuanProduk.toString()}",
+                                                  style: poppins.copyWith(
+                                                    color: backgroundColor1,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "${productProvider.detailProduct?.data?.golonganProduk.toString()}",
+                                                  style: poppins.copyWith(
+                                                    color: backgroundColor1,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 10),
+                                          child: Text(
+                                            "Deskripsi produk",
+                                            style: poppins.copyWith(
+                                                fontWeight: semiBold,
+                                                color: backgroundColor1,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                        ReadMoreText(
+                                          productProvider.detailProduct?.data
+                                                      ?.deskripsiProduk ==
+                                                  null
+                                              ? "Deskripsi Tidak Tersedia Deskripsi Tidak Tersedia Deskripsi Tidak Tersedia Deskripsi Tidak TersediaDeskripsi Tidak TersediaDeskripsi Tidak TersediaDeskripsi Tidak TersediavDeskripsi Tidak TersediaDeskripsi Tidak TersediavvDeskripsi Tidak TersediaDeskripsi Tidak Tersedia"
+                                              : "${productProvider.detailProduct?.data?.deskripsiProduk}",
+                                          style: poppins.copyWith(
+                                            fontWeight: regular,
+                                            fontSize: 14,
+                                            color: productProvider
+                                                        .detailProduct
+                                                        ?.data
+                                                        ?.deskripsiProduk ==
+                                                    null
+                                                ? Colors.grey
+                                                : Colors.black,
+                                          ),
+                                          trimLines: 3,
+                                          colorClickableText: backgroundColor3,
+                                          trimMode: TrimMode.Length,
+                                          trimCollapsedText:
+                                              ' Baca Selengkapnya',
+                                          trimExpandedText:
+                                              ' Tampilkan Lebih Sedikit ',
+                                          textAlign: TextAlign.justify,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 10),
+                                    child: Divider(
+                                      height: 1,
+                                      thickness: 1,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

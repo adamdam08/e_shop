@@ -13,6 +13,7 @@ import 'package:e_shop/ui/category/category.dart';
 import 'package:e_shop/ui/home/search_list.dart';
 import 'package:e_shop/ui/product/detail_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -42,6 +43,7 @@ class _HomeState extends State<Home> {
 
   // Produk Terlaku controller
   int bestSellerIndex = 1;
+  bool _isInitLoading = false;
   bool _isLoading = false;
   bool _isLimit = false;
   final ScrollController _scrollController = ScrollController();
@@ -49,6 +51,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+
+    setState(() {
+      _isInitLoading = true;
+    });
 
     // Search Bar
     searchBarFocusNode.addListener(_onFocusChange);
@@ -272,8 +278,14 @@ class _HomeState extends State<Home> {
     if (await productProvider.getCategoryTree(
         bearerToken: data!.token.toString())) {
       print("Category Tree : ${productProvider.categoryTree}");
+      setState(() {
+        _isInitLoading = false;
+      });
     } else {
       if (context.mounted) {
+        setState(() {
+          _isInitLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -439,156 +451,187 @@ class _HomeState extends State<Home> {
               ),
             ),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                controller: _scrollController,
-                children: [
-                  if (isKeyboardVisible) ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: SuggestionListView(
-                          myCategory: myCategoryFiltered,
-                          searchTextController: searchTextController),
+              child: _isInitLoading
+                  ? Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            color: backgroundColor1,
+                          ),
+                          Container(
+                            height: 30,
+                          ),
+                          Text(
+                            "Loading Data",
+                            style: poppins.copyWith(
+                              fontWeight: semiBold,
+                              color: backgroundColor1,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
                     )
-                  ] else ...[
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 30),
-                      child: ((productProvider.bannerData ?? []).isNotEmpty)
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Stack(
-                                children: [
-                                  CarouselSlider(
-                                    items: [
-                                      for (var sliderItem
-                                          in productProvider.bannerData ?? [])
-                                        FadeInImage.memoryNetwork(
-                                          placeholder: kTransparentImage,
-                                          image: sliderItem,
-                                          fit: BoxFit.cover,
-                                          imageErrorBuilder:
-                                              (BuildContext context,
-                                                  Object error,
-                                                  StackTrace? stackTrace) {
-                                            return Container(
-                                              color: Colors.grey,
-                                              child: const Center(
-                                                child: Icon(Icons.error),
+                  : ListView(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      controller: _scrollController,
+                      children: [
+                        if (isKeyboardVisible) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: SuggestionListView(
+                                myCategory: myCategoryFiltered,
+                                searchTextController: searchTextController),
+                          )
+                        ] else ...[
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 30),
+                            child: ((productProvider.bannerData ?? [])
+                                    .isNotEmpty)
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Stack(
+                                      children: [
+                                        CarouselSlider(
+                                          items: [
+                                            for (var sliderItem
+                                                in productProvider.bannerData ??
+                                                    [])
+                                              FadeInImage.memoryNetwork(
+                                                placeholder: kTransparentImage,
+                                                image: sliderItem,
+                                                fit: BoxFit.cover,
+                                                imageErrorBuilder: (BuildContext
+                                                        context,
+                                                    Object error,
+                                                    StackTrace? stackTrace) {
+                                                  return Container(
+                                                    color: Colors.grey,
+                                                    child: const Center(
+                                                      child: Icon(Icons.error),
+                                                    ),
+                                                  );
+                                                },
                                               ),
-                                            );
-                                          },
+                                          ],
+                                          options: CarouselOptions(
+                                            viewportFraction: 1,
+                                            autoPlay: true,
+                                            autoPlayCurve: Curves.linear,
+                                            reverse: false,
+                                            autoPlayInterval:
+                                                const Duration(seconds: 5),
+                                            initialPage: carouselIndex,
+                                            scrollDirection: Axis.horizontal,
+                                            onPageChanged: (index, reason) {
+                                              if (context.mounted) {
+                                                setState(() {
+                                                  carouselIndex = index;
+                                                });
+                                              }
+                                            },
+                                          ),
                                         ),
-                                    ],
-                                    options: CarouselOptions(
-                                      viewportFraction: 1,
-                                      autoPlay: true,
-                                      autoPlayCurve: Curves.linear,
-                                      reverse: false,
-                                      autoPlayInterval:
-                                          const Duration(seconds: 5),
-                                      initialPage: carouselIndex,
-                                      scrollDirection: Axis.horizontal,
-                                      onPageChanged: (index, reason) {
-                                        if (context.mounted) {
-                                          setState(() {
-                                            carouselIndex = index;
-                                          });
-                                        }
-                                      },
+                                        Positioned(
+                                          bottom: 5,
+                                          left: 0,
+                                          right: 0,
+                                          child: DotsIndicator(
+                                            dotsCount:
+                                                (productProvider.bannerData ??
+                                                        [""])
+                                                    .length,
+                                            position: carouselIndex,
+                                            decorator: DotsDecorator(
+                                              color: Colors
+                                                  .black38, // Inactive color
+                                              activeColor: backgroundColor2,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  Positioned(
-                                    bottom: 5,
-                                    left: 0,
-                                    right: 0,
-                                    child: DotsIndicator(
-                                      dotsCount:
-                                          (productProvider.bannerData ?? [""])
-                                              .length,
-                                      position: carouselIndex,
-                                      decorator: DotsDecorator(
-                                        color: Colors.black38, // Inactive color
-                                        activeColor: backgroundColor2,
+                                  )
+                                : const SizedBox(),
+                          ),
+                          if (productProvider.promoProduct != null) ...[
+                            CardSectionHorizontal(
+                              headerText: "Promo",
+                              productItem: productProvider.promoProduct,
+                            ),
+                          ] else
+                            ...[],
+                          if (productProvider.bestSellerProduct != null) ...[
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 30),
+                              width: double.infinity,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (productProvider
+                                      .bestSellerProduct!.data!.isNotEmpty) ...[
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      width: double.infinity,
+                                      child: Text(
+                                        "Produk Terlaku",
+                                        style: poppins.copyWith(
+                                            fontSize: 24,
+                                            fontWeight: semiBold,
+                                            color: backgroundColor1),
                                       ),
                                     ),
-                                  ),
+                                    GridView.builder(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                                              maxCrossAxisExtent: 200,
+                                              mainAxisExtent: 300,
+                                              crossAxisSpacing: 15,
+                                              mainAxisSpacing: 10),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: productProvider
+                                          .bestSellerProduct!.data!.length,
+                                      itemBuilder: (context, index) {
+                                        return SearchDynamicCard(
+                                          text: productProvider
+                                              .bestSellerProduct!.data![index],
+                                        );
+                                      },
+                                    ),
+                                  ] else ...[
+                                    const SizedBox()
+                                  ],
                                 ],
                               ),
-                            )
-                          : const SizedBox(),
-                    ),
-                    if (productProvider.promoProduct != null) ...[
-                      CardSectionHorizontal(
-                        headerText: "Promo",
-                        productItem: productProvider.promoProduct,
-                      ),
-                    ] else
-                      ...[],
-                    if (productProvider.bestSellerProduct != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (productProvider
-                                .bestSellerProduct!.data!.isNotEmpty) ...[
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                width: double.infinity,
-                                child: Text(
-                                  "Produk Terlaku",
-                                  style: poppins.copyWith(
-                                      fontSize: 24,
-                                      fontWeight: semiBold,
-                                      color: backgroundColor1),
-                                ),
-                              ),
-                              ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: productProvider
-                                    .bestSellerProduct!.data!.length,
-                                itemBuilder: (context, index) {
-                                  return DynamicCardVertical(
-                                    data: productProvider
-                                        .bestSellerProduct!.data![index],
-                                    isDiscount: productProvider
-                                                .bestSellerProduct!
-                                                .data![index]
-                                                .diskon !=
-                                            0 &&
-                                        productProvider.bestSellerProduct!
-                                                .data![index].diskon !=
-                                            null,
-                                  );
-                                },
-                              ),
-                            ] else ...[
-                              const SizedBox()
-                            ],
-                          ],
-                        ),
-                      ),
-                    ] else
-                      ...[],
-                    _isLoading
-                        ? Container(
-                            width: 10,
-                            margin: const EdgeInsets.only(top: 10, bottom: 10),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
                             ),
+                          ] else
+                            ...[],
+                          _isLoading
+                              ? Container(
+                                  width: 10,
+                                  margin: const EdgeInsets.only(
+                                      top: 10, bottom: 10),
+                                  child: const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                              : Container(),
+                          SizedBox(
+                            height: _isLimit == false ? 40 : 0,
                           )
-                        : Container(),
-                    SizedBox(
-                      height: _isLimit == false ? 40 : 0,
-                    )
-                  ],
-                ],
-              ),
+                        ],
+                      ],
+                    ),
             ),
           ],
         );

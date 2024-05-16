@@ -4,6 +4,7 @@ import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/home/search_list.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -309,12 +310,11 @@ class SuggestionListView extends StatelessWidget {
   final TextEditingController searchTextController;
   final bool isPromo;
 
-  const SuggestionListView({
-    super.key,
-    required this.myCategory,
-    required this.searchTextController,
-    this.isPromo = false
-  });
+  const SuggestionListView(
+      {super.key,
+      required this.myCategory,
+      required this.searchTextController,
+      this.isPromo = false});
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +328,10 @@ class SuggestionListView extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SearchList(text: data, isPromo: isPromo,)),
+                            builder: (context) => SearchList(
+                                  text: data,
+                                  isPromo: isPromo,
+                                )),
                       );
                     },
                     child: Container(
@@ -349,18 +352,20 @@ class SuggestionListView extends StatelessWidget {
                                     color: Colors.grey,
                                     size: 18,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Text(
-                                      data,
-                                      style: poppins.copyWith(
-                                        fontWeight: light,
-                                        color: Colors.black,
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Text(
+                                        data,
+                                        style: poppins.copyWith(
+                                            fontWeight: light,
+                                            color: Colors.black,
+                                            overflow: TextOverflow.ellipsis),
+                                        maxLines: 1,
                                       ),
                                     ),
                                   ),
-                                  const Spacer(),
                                   const Icon(
                                     Icons.call_made,
                                     color: Colors.grey,

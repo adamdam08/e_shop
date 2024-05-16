@@ -507,9 +507,8 @@ class SearchDynamicCard extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
         width: 150,
-        height: 300,
+        height: 325,
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
@@ -596,6 +595,9 @@ class SearchDynamicCard extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                    SizedBox(
+                      height: 10,
                     ),
                   ],
                 ),

@@ -6,6 +6,7 @@ import 'package:e_shop/ui/customer/customer_transact_detail_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -377,6 +378,76 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                                     overflow: TextOverflow.ellipsis),
                                 maxLines: 1,
                               ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      top:
+                                                          Radius.circular(20))),
+                                          backgroundColor: Colors.white,
+                                          clipBehavior:
+                                              Clip.antiAliasWithSaveLayer,
+                                          builder: (BuildContext context) {
+                                            return Padding(
+                                              padding: MediaQuery.of(context)
+                                                  .viewInsets,
+                                              child: bottomSheetDialog(1),
+                                            );
+                                          });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                          color: backgroundColor1,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 0))
+                                          ]),
+                                      child: Text(
+                                        "Ajukan Perubahan Data",
+                                        style: poppins.copyWith(
+                                            fontSize: 13,
+                                            color: Colors.white,
+                                            fontWeight: semiBold),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                        color: backgroundColor3,
+                                        borderRadius: BorderRadius.circular(5),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 0))
+                                        ]),
+                                    child: const Icon(
+                                      Icons.map,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -484,6 +555,144 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget bottomSheetDialog(int index) {
+    bool isLoading = false;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      color: Colors.white,
+      child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter stateSetter) {
+        TextEditingController descriptionTextController =
+            TextEditingController();
+
+        descriptionTextController.selection = TextSelection.collapsed(
+            offset: descriptionTextController.text.length);
+
+        return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+          return ListView(
+            shrinkWrap: true,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Catatan perubahan data",
+                      style: poppins.copyWith(
+                          fontSize: 14,
+                          fontWeight: semiBold,
+                          color: backgroundColor1),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    TextFormField(
+                      controller: descriptionTextController,
+                      textInputAction: TextInputAction.newline,
+                      obscureText: false,
+                      keyboardType: TextInputType.multiline,
+                      cursorColor: Colors.grey,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderSide: BorderSide(color: Colors.white, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          borderSide:
+                              BorderSide(color: backgroundColor3, width: 1),
+                        ),
+                        hintText: "Tambahkan Catatan Disini...",
+                        hintStyle: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.normal),
+                        alignLabelWithHint: true,
+                      ),
+                      onChanged: (value) => {},
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    if (isLoading) ...[
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                            shape: StadiumBorder(
+                              side:
+                                  BorderSide(width: 1, color: backgroundColor3),
+                            ),
+                            backgroundColor: backgroundColor1),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            isLoading
+                                ? Container(
+                                    width: 15,
+                                    height: 15,
+                                    margin: const EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                          ],
+                        ),
+                      ),
+                    ] else ...[
+                      ElevatedButton(
+                        onPressed: () async {
+                          // Navigator.pop(context);
+                          stateSetter(() {
+                            isLoading = true;
+                          });
+
+                          stateSetter(() {
+                            isLoading = false;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                            shape: StadiumBorder(
+                              side:
+                                  BorderSide(width: 1, color: backgroundColor3),
+                            ),
+                            backgroundColor: backgroundColor1),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.send,
+                              color: Colors.white,
+                            ),
+                            Text(
+                              ' Ajukan Perubahan Data',
+                              style: poppins.copyWith(
+                                  fontWeight: semiBold, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        });
+      }),
     );
   }
 

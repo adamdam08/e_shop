@@ -34,6 +34,7 @@ class _PromoState extends State<Promo> {
   // Produk Terlaku controller
   int promoIndex = 1;
   bool _isLoading = false;
+  bool _isInitLoading = false;
   bool _isLimit = false;
   final ScrollController _scrollController = ScrollController();
 
@@ -45,11 +46,19 @@ class _PromoState extends State<Promo> {
     // Add a listener to the scroll controller to detect when the user reaches the bottom of the list
     _scrollController.addListener(_scrollListener);
 
+    setState(() {
+      _isInitLoading = true;
+    });
+
+    print("Before promo ${_isInitLoading}");
+
     // Get Suggestion
     _getSuggestionList();
 
     // Get Promo
     _getPromo();
+
+    print("After promo ${_isInitLoading}");
   }
 
   void _getSuggestionList() async {
@@ -166,6 +175,9 @@ class _PromoState extends State<Promo> {
           limit: 5,
           page: promoIndex,
           query: searchTextController.text)) {
+        setState(() {
+          _isInitLoading = false;
+        });
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +191,10 @@ class _PromoState extends State<Promo> {
               ),
             ),
           );
-        }
+          setState(() {
+            _isInitLoading = false;
+          });
+        } else {}
       }
     }
   }
@@ -199,79 +214,106 @@ class _PromoState extends State<Promo> {
         },
         child: Container(
           padding: const EdgeInsets.only(bottom: 10),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                color: backgroundColor3,
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
+          child: !_isInitLoading
+              ? Column(
                   children: [
                     Container(
                       margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      color: backgroundColor3,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
                         children: [
-                          Text(
-                            "Promo",
-                            style: poppins.copyWith(
-                                fontSize: 20,
-                                fontWeight: semiBold,
-                                color: Colors.white),
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Promo",
+                                  style: poppins.copyWith(
+                                      fontSize: 20,
+                                      fontWeight: semiBold,
+                                      color: Colors.white),
+                                ),
+                              ],
+                            ),
                           ),
+                          searchbar()
                         ],
                       ),
                     ),
-                    searchbar()
-                  ],
-                ),
-              ),
-              if (isKeyboardVisible) ...[
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: SuggestionListView(
-                      myCategory: myCategoryFiltered,
-                      searchTextController: searchTextController,
-                      isPromo: true,
-                    ),
-                  ),
-                )
-              ] else ...[
-                Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: productProvider.promoProduct!.data!.length,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                    itemBuilder: (context, index) {
-                      return DynamicCardVertical(
-                        data: productProvider.promoProduct!.data![index],
-                        isDiscount: productProvider
-                                    .promoProduct!.data![index].diskon !=
-                                0 &&
-                            productProvider.promoProduct!.data![index].diskon !=
-                                null,
-                      );
-                    },
-                  ),
-                ),
-              ],
-              _isLoading
-                  ? Container(
-                      height: 15,
-                      width: 15,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: const Center(
-                        child: CircularProgressIndicator(),
+                    if (isKeyboardVisible) ...[
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: SuggestionListView(
+                            myCategory: myCategoryFiltered,
+                            searchTextController: searchTextController,
+                            isPromo: true,
+                          ),
+                        ),
+                      )
+                    ] else ...[
+                      Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: productProvider.promoProduct!.data!.length,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 20),
+                          itemBuilder: (context, index) {
+                            return DynamicCardVertical(
+                              data: productProvider.promoProduct!.data![index],
+                              isDiscount: productProvider
+                                          .promoProduct!.data![index].diskon !=
+                                      0 &&
+                                  productProvider
+                                          .promoProduct!.data![index].diskon !=
+                                      null,
+                            );
+                          },
+                        ),
                       ),
-                    )
-                  : Container(),
-            ],
-          ),
+                    ],
+                    _isLoading
+                        ? Container(
+                            height: 15,
+                            width: 15,
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : Container(),
+                  ],
+                )
+              : Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.transparent,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: backgroundColor1,
+                      ),
+                      Container(
+                        height: 30,
+                      ),
+                      Text(
+                        "Loading Data",
+                        style: poppins.copyWith(
+                          fontWeight: semiBold,
+                          color: backgroundColor1,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
         ),
       );
     });
