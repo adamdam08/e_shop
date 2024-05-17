@@ -13,7 +13,6 @@ import 'package:e_shop/ui/category/category.dart';
 import 'package:e_shop/ui/home/search_list.dart';
 import 'package:e_shop/ui/product/detail_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -73,9 +72,6 @@ class _HomeState extends State<Home> {
 
     // List Banner
     _getListBanner();
-
-    // Get Category
-    _getCategoryTree();
   }
 
   void _onFocusChange() {
@@ -114,7 +110,7 @@ class _HomeState extends State<Home> {
         if (await productProvider.getBestSellerProduct(
             cabangId: settingsProvider.storeLocation.data!.first.id.toString(),
             token: authProvider.user.token.toString(),
-            limit: 5,
+            limit: 6,
             page: bestSellerIndex + 1)) {
           setState(() {
             print(
@@ -172,7 +168,6 @@ class _HomeState extends State<Home> {
     if (await productProvider.getBannerList(
       bearerToken: authProvider.user.token.toString(),
     )) {
-      setState(() {});
     } else {}
   }
 
@@ -195,6 +190,10 @@ class _HomeState extends State<Home> {
 
       // Get Best Seller
       _getListBestSeller();
+
+      setState(() {
+        _isInitLoading = false;
+      });
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -203,7 +202,7 @@ class _HomeState extends State<Home> {
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             backgroundColor: Colors.red,
             content: Text(
-              'Gagal Mendapatkan Lokasi!',
+              'Gagal Mendapatkan Data!',
               textAlign: TextAlign.center,
             ),
           ),
@@ -230,7 +229,7 @@ class _HomeState extends State<Home> {
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             backgroundColor: Colors.red,
             content: Text(
-              'Gagal Mendapatkan Promo Terbaru!',
+              'Gagal Mendapatkan Data!',
               textAlign: TextAlign.center,
             ),
           ),
@@ -246,7 +245,7 @@ class _HomeState extends State<Home> {
     if (await productProvider.getBestSellerProduct(
         cabangId: authProvider.user.data.cabangId.toString(),
         token: authProvider.user.token.toString(),
-        limit: 5,
+        limit: 6,
         page: bestSellerIndex)) {
       print(
           "Best seller : ${productProvider.bestSellerProduct?.data.toString()}");
@@ -258,41 +257,7 @@ class _HomeState extends State<Home> {
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
             backgroundColor: Colors.red,
             content: Text(
-              'Gagal Mendapatkan Produk Terlaris!',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-  void _getCategoryTree() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final productProvider =
-        Provider.of<ProductProvider>(context, listen: false);
-
-    // Get data from SharedPref
-    var data = await authProvider.getLoginData();
-    // Get Category By Tree
-    if (await productProvider.getCategoryTree(
-        bearerToken: data!.token.toString())) {
-      print("Category Tree : ${productProvider.categoryTree}");
-      setState(() {
-        _isInitLoading = false;
-      });
-    } else {
-      if (context.mounted) {
-        setState(() {
-          _isInitLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-            backgroundColor: Colors.red,
-            content: Text(
-              'Gagal Mendapatkan Kategori Produk!',
+              'Gagal Mendapatkan Data!',
               textAlign: TextAlign.center,
             ),
           ),
@@ -659,77 +624,76 @@ class _CardSectionHorizontalState extends State<CardSectionHorizontal> {
     final pageProvider = Provider.of<PageProvider>(context, listen: false);
 
     return SizedBox(
-        height: 340,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              margin: const EdgeInsets.only(top: 20, bottom: 10),
-              width: double.infinity,
-              child: Text(
-                widget.headerText,
-                style: poppins.copyWith(
-                    fontSize: 24,
-                    fontWeight: semiBold,
-                    color: backgroundColor1),
-              ),
+      height: 340,
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            margin: const EdgeInsets.only(top: 20, bottom: 10),
+            width: double.infinity,
+            child: Text(
+              widget.headerText,
+              style: poppins.copyWith(
+                  fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
             ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(left: 30, right: 30, bottom: 5),
-                scrollDirection: Axis.horizontal,
-                children: [
-                  if (widget.productItem?.data != null) ...[
-                    for (var i in widget.productItem!.data!) ...[
-                      DynamicCardHorizontal(
-                        data: i,
-                        isDiscount: i.diskon != 0 && i.diskon != null,
-                      )
-                    ],
-                    if (widget.productItem!.data!.length >= 5) ...[
-                      GestureDetector(
-                        onTap: () async {
-                          setState(() {
-                            pageProvider.currentIndex = 2;
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          width: 150,
-                          height: 300,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 0))
-                              ]),
-                          child: Center(
-                            child: Text(
-                              "Lihat \nSelengkapnya",
-                              style: poppins.copyWith(
-                                  overflow: TextOverflow.ellipsis,
-                                  fontWeight: semiBold,
-                                  color: backgroundColor1,
-                                  fontSize: 15),
-                              maxLines: 2,
-                            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.only(left: 30, right: 30, bottom: 5),
+              scrollDirection: Axis.horizontal,
+              children: [
+                if (widget.productItem?.data != null) ...[
+                  for (var i in widget.productItem!.data!) ...[
+                    DynamicCardHorizontal(
+                      data: i,
+                      isDiscount: i.diskon != 0 && i.diskon != null,
+                    )
+                  ],
+                  if (widget.productItem!.data!.length >= 5) ...[
+                    GestureDetector(
+                      onTap: () async {
+                        setState(() {
+                          pageProvider.currentIndex = 2;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        width: 150,
+                        height: 300,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 0))
+                            ]),
+                        child: Center(
+                          child: Text(
+                            "Lihat \nSelengkapnya",
+                            style: poppins.copyWith(
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: semiBold,
+                                color: backgroundColor1,
+                                fontSize: 15),
+                            maxLines: 2,
                           ),
                         ),
-                      )
-                    ],
-                  ] else ...[
-                    const SizedBox(),
+                      ),
+                    )
                   ],
+                ] else ...[
+                  const SizedBox(),
                 ],
-              ),
+              ],
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }
 

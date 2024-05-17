@@ -39,6 +39,12 @@ class Data {
   String? gambar4;
   String? gambar5;
   int? isAktiva;
+  String? kat1;
+  String? kat1Slug;
+  String? kat2;
+  String? kat2Slug;
+  String? kat3;
+  String? kat3Slug;
   String? createdAt;
   String? updatedAt;
   String? deletedAt;
@@ -67,6 +73,12 @@ class Data {
       this.gambar4,
       this.gambar5,
       this.isAktiva,
+      this.kat1,
+      this.kat1Slug,
+      this.kat2,
+      this.kat2Slug,
+      this.kat3,
+      this.kat3Slug,
       this.createdAt,
       this.updatedAt,
       this.deletedAt,
@@ -95,6 +107,12 @@ class Data {
     gambar4 = json['gambar4'];
     gambar5 = json['gambar5'];
     isAktiva = json['is_aktiva'];
+    kat1 = json['kat1'];
+    kat1Slug = json['kat1_slug'];
+    kat2 = json['kat2'];
+    kat2Slug = json['kat2_slug'];
+    kat3 = json['kat3'];
+    kat3Slug = json['kat3_slug'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     deletedAt = json['deleted_at'];
@@ -135,6 +153,12 @@ class Data {
     data['gambar4'] = this.gambar4;
     data['gambar5'] = this.gambar5;
     data['is_aktiva'] = this.isAktiva;
+    data['kat1'] = this.kat1;
+    data['kat1_slug'] = this.kat1Slug;
+    data['kat2'] = this.kat2;
+    data['kat2_slug'] = this.kat2Slug;
+    data['kat3'] = this.kat3;
+    data['kat3_slug'] = this.kat3Slug;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     data['deleted_at'] = this.deletedAt;

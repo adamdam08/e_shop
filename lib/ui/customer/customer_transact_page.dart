@@ -3,6 +3,7 @@ import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/ui/customer/customer_transact_detail_page.dart';
+import 'package:e_shop/ui/home/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -22,6 +23,7 @@ class CustomerTransactPage extends StatefulWidget {
 
 class _CustomerTransactPageState extends State<CustomerTransactPage> {
   bool isLoading = false;
+  String _indexStatus = "0";
 
   @override
   void initState() {
@@ -42,13 +44,18 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
     if (await productProvider.getListTransaction(
         customerId: widget.myCustomer["id"].toString(),
         token: data!.token.toString(),
-        status: "0")) {
-    } else {}
+        status: _indexStatus)) {
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
     ;
 
-    setState(() {
-      isLoading = false;
-    });
+    print("Index History ${_indexStatus}");
   }
 
   Widget transactionDynamicCard(ListTransaksi data) {
@@ -268,6 +275,19 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
+
+    var checkIsNotEmpty = 0;
+    if (productProvider.transactionHistory != null) {
+      for (int i = 0;
+          i < productProvider.transactionHistory!.listTransaksi!.length;
+          i++) {
+        if (productProvider
+            .transactionHistory!.listTransaksi![i].produk!.isNotEmpty) {
+          checkIsNotEmpty += 1;
+        }
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         top: true,
@@ -409,7 +429,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                                     child: Container(
                                       padding: const EdgeInsets.all(5),
                                       decoration: BoxDecoration(
-                                          color: backgroundColor1,
+                                          color: backgroundColor3,
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           boxShadow: [
@@ -470,6 +490,126 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                 maxLines: 1,
               ),
             ),
+            SizedBox(
+              height: 50,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: ListView(
+                      padding:
+                          const EdgeInsets.only(left: 30, right: 30, bottom: 5),
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indexStatus = "0";
+                              _getTransactionHistory();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: _indexStatus == "0"
+                                    ? backgroundColor1
+                                    : backgroundColor3),
+                            child: Text("Belum Dibayar",
+                                style: poppins.copyWith(color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indexStatus = "1";
+                              _getTransactionHistory();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: _indexStatus == "1"
+                                    ? backgroundColor1
+                                    : backgroundColor3),
+                            child: Text("Diproses",
+                                style: poppins.copyWith(color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indexStatus = "2";
+                              _getTransactionHistory();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: _indexStatus == "2"
+                                    ? backgroundColor1
+                                    : backgroundColor3),
+                            child: Text("Dikirim",
+                                style: poppins.copyWith(color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indexStatus = "3";
+                              _getTransactionHistory();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: _indexStatus == "3"
+                                    ? backgroundColor1
+                                    : backgroundColor3),
+                            child: Text("Selesai",
+                                style: poppins.copyWith(color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indexStatus = "4";
+                              _getTransactionHistory();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: _indexStatus == "4"
+                                    ? backgroundColor1
+                                    : backgroundColor3),
+                            child: Text("Dibatalkan",
+                                style: poppins.copyWith(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
             isLoading == true
                 ? Expanded(
                     child: Container(
@@ -497,9 +637,11 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                     ),
                   )
                 : Expanded(
-                    child: productProvider
-                            .transactionHistory!.listTransaksi!.isNotEmpty
+                    child: (productProvider.transactionHistory!.listTransaksi!
+                                .isNotEmpty &&
+                            checkIsNotEmpty != 0)
                         ? ListView(
+                            shrinkWrap: true,
                             children: [
                               if (productProvider.transactionHistory!
                                   .listTransaksi!.isNotEmpty) ...[
@@ -516,7 +658,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                                     transactionDynamicCard(productProvider
                                         .transactionHistory!.listTransaksi![i])
                                   ]
-                                ],
+                                ]
                               ] else ...[
                                 Center(
                                     child: Column(
@@ -545,7 +687,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                                 size: 48,
                               ),
                               Text(
-                                "Riwayat Transaksi Tidak Tersedia",
+                                "Riwayat Transaksi Tidak Tersesia",
                                 style: poppins.copyWith(
                                     fontWeight: regular, fontSize: 20),
                               ),

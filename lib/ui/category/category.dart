@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/home/search_list.dart';
@@ -16,13 +17,9 @@ class Category extends StatefulWidget {
 }
 
 class _CategoryState extends State<Category> {
-  final List<Map> myProducts =
-      List.generate(99, (index) => {"id": index, "name": "Product $index"})
-          .toList();
-
   List<String> myCategoryFiltered = [];
-  List<String> myCategory = ["Tepung", "Kecap", "Sambal", "Beras", "Mie"];
-
+  List<String> myCategory = [];
+  bool _isInitLoading = false;
   FocusNode searchBarFocusNode = FocusNode();
   TextEditingController searchTextController = TextEditingController();
 
@@ -31,6 +28,13 @@ class _CategoryState extends State<Category> {
     // TODO: implement initState
     super.initState();
     searchBarFocusNode.addListener(_onFocusChange);
+
+    setState(() {
+      _isInitLoading = true;
+    });
+
+    // Get Category
+    _getCategoryTree();
   }
 
   void _onFocusChange() {
@@ -38,6 +42,40 @@ class _CategoryState extends State<Category> {
       setState(() {
         print("Searchbar Clicked");
       });
+    }
+  }
+
+  void _getCategoryTree() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
+    // Get data from SharedPref
+    var data = await authProvider.getLoginData();
+    // Get Category By Tree
+    if (await productProvider.getCategoryTree(
+        bearerToken: data!.token.toString())) {
+      print("Category Tree : ${productProvider.categoryTree}");
+      setState(() {
+        _isInitLoading = false;
+      });
+    } else {
+      if (context.mounted) {
+        setState(() {
+          _isInitLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+            backgroundColor: Colors.red,
+            content: Text(
+              'Gagal Mendapatkan Kategori Produk!',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -50,33 +88,59 @@ class _CategoryState extends State<Category> {
       child: Column(
         children: [
           Container(
+            width: double.infinity,
             color: backgroundColor3,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Center(
-              child: Text(
-                "Kategori",
-                style: poppins.copyWith(
-                    fontSize: 24, fontWeight: semiBold, color: Colors.white),
-              ),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Text(
+              "Kategori",
+              style: poppins.copyWith(
+                  fontSize: 20, fontWeight: semiBold, color: Colors.white),
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              itemCount: productProvider.categoryTree!.data!.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    kat1ExpansionTile(
-                        title: productProvider.categoryTree?.data![index].kat1
-                                .toString() ??
-                            "",
-                        index: index),
-                  ],
-                );
-              },
-            ),
+            child: _isInitLoading
+                ? Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.transparent,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: backgroundColor1,
+                        ),
+                        Container(
+                          height: 30,
+                        ),
+                        Text(
+                          "Loading Data",
+                          style: poppins.copyWith(
+                            fontWeight: semiBold,
+                            color: backgroundColor1,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: productProvider.categoryTree!.data!.length,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          kat1ExpansionTile(
+                              title: productProvider
+                                      .categoryTree?.data![index].kat1
+                                      .toString() ??
+                                  "",
+                              index: index),
+                        ],
+                      );
+                    },
+                  ),
           ),
         ],
       ),

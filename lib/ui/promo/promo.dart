@@ -213,108 +213,113 @@ class _PromoState extends State<Promo> {
           return true;
         },
         child: Container(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: !_isInitLoading
-              ? Column(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      color: backgroundColor3,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Promo",
-                                  style: poppins.copyWith(
-                                      fontSize: 20,
-                                      fontWeight: semiBold,
-                                      color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
-                          searchbar()
-                        ],
-                      ),
-                    ),
-                    if (isKeyboardVisible) ...[
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: SuggestionListView(
-                            myCategory: myCategoryFiltered,
-                            searchTextController: searchTextController,
-                            isPromo: true,
-                          ),
-                        ),
-                      )
-                    ] else ...[
-                      Expanded(
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: productProvider.promoProduct!.data!.length,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 20),
-                          itemBuilder: (context, index) {
-                            return DynamicCardVertical(
-                              data: productProvider.promoProduct!.data![index],
-                              isDiscount: productProvider
-                                          .promoProduct!.data![index].diskon !=
-                                      0 &&
-                                  productProvider
-                                          .promoProduct!.data![index].diskon !=
-                                      null,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                    _isLoading
-                        ? Container(
-                            height: 15,
-                            width: 15,
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                        : Container(),
-                  ],
-                )
-              : Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.transparent,
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  color: backgroundColor3,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(
-                        color: backgroundColor1,
-                      ),
                       Container(
-                        height: 30,
-                      ),
-                      Text(
-                        "Loading Data",
-                        style: poppins.copyWith(
-                          fontWeight: semiBold,
-                          color: backgroundColor1,
-                          fontSize: 15,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Promo",
+                              style: poppins.copyWith(
+                                  fontSize: 20,
+                                  fontWeight: semiBold,
+                                  color: Colors.white),
+                            ),
+                          ],
                         ),
                       ),
+                      if (_isInitLoading) ...[
+                        Container()
+                      ] else ...[
+                        searchbar()
+                      ],
                     ],
                   ),
                 ),
-        ),
+                if (isKeyboardVisible) ...[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SuggestionListView(
+                        myCategory: myCategoryFiltered,
+                        searchTextController: searchTextController,
+                        isPromo: true,
+                      ),
+                    ),
+                  )
+                ] else ...[
+                  Expanded(
+                    child: _isInitLoading
+                        ? Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: Colors.transparent,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  color: backgroundColor1,
+                                ),
+                                Container(
+                                  height: 30,
+                                ),
+                                Text(
+                                  "Loading Data",
+                                  style: poppins.copyWith(
+                                    fontWeight: semiBold,
+                                    color: backgroundColor1,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: _scrollController,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount:
+                                productProvider.promoProduct!.data!.length,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 20),
+                            itemBuilder: (context, index) {
+                              return DynamicCardVertical(
+                                data:
+                                    productProvider.promoProduct!.data![index],
+                                isDiscount: productProvider.promoProduct!
+                                            .data![index].diskon !=
+                                        0 &&
+                                    productProvider.promoProduct!.data![index]
+                                            .diskon !=
+                                        null,
+                              );
+                            },
+                          ),
+                  ),
+                ],
+                _isLoading
+                    ? Container(
+                        height: 15,
+                        width: 15,
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : Container(),
+              ],
+            )),
       );
     });
   }

@@ -1,4 +1,3 @@
-
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/ui/customer/add_customer_page.dart';
@@ -23,7 +22,6 @@ class _CustomerState extends State<Customer> {
   TextEditingController searchTextController = TextEditingController();
   bool isLoading = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -33,7 +31,6 @@ class _CustomerState extends State<Customer> {
   }
 
   void _getCustomer() async {
-
     setState(() {
       isLoading = true;
     });
@@ -85,18 +82,12 @@ class _CustomerState extends State<Customer> {
       print("Update Customer ${myCustomer}");
       return GestureDetector(
         onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //       builder: (context) => CustomerInformation(
-          //             data: myCustomer,
-          //             isEditable: true,
-          //             isUpdate: true,
-          //           )),
-          // );
-          Navigator.push(context, MaterialPageRoute(builder: (context) => CustomerTransactPage(
-            myCustomer: myCustomer,
-          )));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CustomerTransactPage(
+                        myCustomer: myCustomer,
+                      )));
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -219,116 +210,119 @@ class _CustomerState extends State<Customer> {
     }
 
     return Container(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: isLoading == false
-          ? Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            color: backgroundColor3,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Pelanggan",
-                        style: poppins.copyWith(
-                            fontSize: 20,
-                            fontWeight: semiBold,
-                            color: Colors.white),
+        padding: const EdgeInsets.only(bottom: 10),
+        child: isLoading
+            ? Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: Colors.transparent,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: backgroundColor1,
+                    ),
+                    Container(
+                      height: 30,
+                    ),
+                    Text(
+                      "Loading Data",
+                      style: poppins.copyWith(
+                        fontWeight: semiBold,
+                        color: backgroundColor1,
+                        fontSize: 15,
                       ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            customerProvider.selectedCity = "-";
-                          });
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const CustomerInformation(
-                                      data: {},
-                                      isEditable: true,
-                                    )),
-                          ).then((value) => setState(() {
-                                _getCustomer();
-                              }));
-                        },
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.05,
-                          child: const Icon(
-                            SolarIconsOutline.userPlus,
-                            color: Colors.white,
+                    ),
+                  ],
+                ),
+              )
+            : Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    color: backgroundColor3,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Pelanggan",
+                                style: poppins.copyWith(
+                                    fontSize: 20,
+                                    fontWeight: semiBold,
+                                    color: Colors.white),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    customerProvider.selectedCity = "-";
+                                  });
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CustomerInformation(
+                                              data: {},
+                                              isEditable: true,
+                                            )),
+                                  ).then((value) => setState(() {
+                                        _getCustomer();
+                                      }));
+                                },
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                  child: const Icon(
+                                    SolarIconsOutline.userPlus,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        searchbar()
+                      ],
+                    ),
                   ),
-                ),
-                searchbar()
-              ],
-            ),
-          ),
-          if (customerListFiltered.isEmpty) ...[
-            Expanded(
-                child: Center(
-                    child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.account_circle_outlined,
-                  size: 48,
-                ),
-                Text(
-                  "Pelanggan tidak ditemukan",
-                  style: poppins.copyWith(fontWeight: regular, fontSize: 20),
-                ),
-              ],
-            )))
-          ] else ...[
-            Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                itemCount: customerListFiltered.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return customerDynamicCardVertical(
-                      customerListFiltered[index]);
-                },
-              ),
-            ),
-          ]
-        ],
-      ) : Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Colors.transparent,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              color: backgroundColor1,
-            ),
-            Container(
-              height: 30,
-            ),
-            Text(
-              "Loading Data",
-              style: poppins.copyWith(
-                fontWeight: semiBold,
-                color: backgroundColor1,
-                fontSize: 15,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                  if (customerListFiltered.isEmpty) ...[
+                    Expanded(
+                        child: Center(
+                            child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.account_circle_outlined,
+                          size: 48,
+                        ),
+                        Text(
+                          "Pelanggan tidak ditemukan",
+                          style: poppins.copyWith(
+                              fontWeight: regular, fontSize: 20),
+                        ),
+                      ],
+                    )))
+                  ] else ...[
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 20),
+                        itemCount: customerListFiltered.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return customerDynamicCardVertical(
+                              customerListFiltered[index]);
+                        },
+                      ),
+                    ),
+                  ]
+                ],
+              ));
   }
 }

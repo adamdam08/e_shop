@@ -262,7 +262,8 @@ class ProductService {
     required String status,
     required String token,
   }) async {
-    var url = Uri.parse("${baseURL}transaksi?customer_id=$customerId");
+    var url =
+        Uri.parse("${baseURL}transaksi?customer_id=$customerId&status=$status");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

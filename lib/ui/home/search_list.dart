@@ -29,6 +29,7 @@ class _SearchListState extends State<SearchList> {
 
   int searchIndex = 1;
   bool _isLoading = false;
+  bool _isInitLoading = false;
   bool _isLimit = false;
   final ScrollController _scrollController = ScrollController();
 
@@ -43,6 +44,10 @@ class _SearchListState extends State<SearchList> {
 
     // Add a listener to the scroll controller to detect when the user reaches the bottom of the list
     _scrollController.addListener(_scrollListener);
+
+    setState(() {
+      _isInitLoading = true;
+    });
 
     print("Promo : ${widget.isPromo}");
 
@@ -103,7 +108,7 @@ class _SearchListState extends State<SearchList> {
         if (await productProvider.getPromoProduct(
             cabangId: settingsProvider.storeLocation.data!.first.id.toString(),
             token: authProvider.user.token.toString(),
-            limit: 5,
+            limit: 6,
             page: searchIndex + 1,
             query: searchTextController.text.isEmpty
                 ? null
@@ -138,7 +143,7 @@ class _SearchListState extends State<SearchList> {
       if (await productProvider.getSearchProduct(
           cabangId: authProvider.user.data.cabangId.toString(),
           token: authProvider.user.token.toString(),
-          limit: 5,
+          limit: 6,
           page: searchIndex,
           sort: "",
           cat: "",
@@ -175,7 +180,7 @@ class _SearchListState extends State<SearchList> {
       if (await productProvider.getSearchProduct(
           cabangId: authProvider.user.data.cabangId.toString(),
           token: authProvider.user.token.toString(),
-          limit: 5,
+          limit: 6,
           page: searchIndex,
           sort: "",
           cat: widget.cat,
@@ -212,7 +217,7 @@ class _SearchListState extends State<SearchList> {
       if (await productProvider.getSearchProduct(
           cabangId: authProvider.user.data.cabangId.toString(),
           token: authProvider.user.token.toString(),
-          limit: 5,
+          limit: 6,
           page: searchIndex,
           sort: "promo",
           cat: widget.cat,
@@ -254,8 +259,14 @@ class _SearchListState extends State<SearchList> {
           _myCategory = productProvider.suggestionData!.data!;
         });
       }
+      setState(() {
+        _isInitLoading = false;
+      });
       print("Suggestion Data : ${_myCategory}");
     } else {
+      setState(() {
+        _isInitLoading = false;
+      });
       print("Suggestion Data Failed : ${_myCategory}");
     }
   }
@@ -371,114 +382,140 @@ class _SearchListState extends State<SearchList> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               color: Colors.white,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  searchBar(isKeyboardVisible),
-                  if (isKeyboardVisible) ...[
-                    Expanded(
-                      child: SuggestionListView(
-                          myCategory: myCategoryFiltered,
-                          searchTextController: searchTextController),
-                    )
-                  ] else ...[
-                    if (widget.isPromo) ...[
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: backgroundColor3),
-                        child: Text("Promo",
-                            style: poppins.copyWith(color: Colors.white)),
-                      )
-                    ],
-                    if (widget.cat != "") ...[
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: backgroundColor3),
-                        child: Text(widget.cat.replaceAll('_', ' '),
-                            style: poppins.copyWith(color: Colors.white)),
-                      )
-                    ],
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    if (widget.text.isNotEmpty) ...[
-                      RichText(
-                        text: TextSpan(
-                          text: 'Hasil Pencarian : ',
-                          style: poppins.copyWith(color: Colors.black),
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: widget.text,
-                                style:
-                                    poppins.copyWith(color: backgroundColor1)),
-                          ],
-                        ),
-                      ),
-                    ],
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    if (productProvider.searchProduct?.data == null) ...[
-                      Expanded(
-                        child: Center(
-                            child: Column(
+              child: _isInitLoading
+                  ? Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        color: Colors.transparent,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.report_problem,
-                              size: 48,
+                            CircularProgressIndicator(
+                              color: backgroundColor1,
+                            ),
+                            Container(
+                              height: 30,
                             ),
                             Text(
-                              "Produk Tidak Tersedia",
+                              "Loading Data",
                               style: poppins.copyWith(
-                                  fontWeight: regular, fontSize: 20),
+                                fontWeight: semiBold,
+                                color: backgroundColor1,
+                                fontSize: 15,
+                              ),
                             ),
                           ],
-                        )),
-                      )
-                    ] else ...[
-                      Expanded(
-                        child: GridView.builder(
-                          controller: _scrollController,
-                          gridDelegate:
-                              const SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent: 200,
-                                  mainAxisExtent: 300,
-                                  crossAxisSpacing: 25,
-                                  mainAxisSpacing: 10),
-                          itemCount:
-                              productProvider.searchProduct!.data!.length,
-                          itemBuilder: (BuildContext ctx, index) {
-                            return SearchDynamicCard(
-                                text: productProvider
-                                    .searchProduct!.data![index]);
-                          },
                         ),
                       ),
-                      SizedBox(
-                        height: _isLoading == false ? 40 : 0,
-                      ),
-                      _isLoading
-                          ? Center(
-                              child: Container(
-                                height: 15,
-                                width: 15,
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        searchBar(isKeyboardVisible),
+                        if (isKeyboardVisible) ...[
+                          Expanded(
+                            child: SuggestionListView(
+                                myCategory: myCategoryFiltered,
+                                searchTextController: searchTextController),
+                          )
+                        ] else ...[
+                          if (widget.isPromo) ...[
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: backgroundColor3),
+                              child: Text("Promo",
+                                  style: poppins.copyWith(color: Colors.white)),
                             )
-                          : Container(),
-                    ]
-                  ],
-                ],
-              ),
+                          ],
+                          if (widget.cat != "") ...[
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: backgroundColor3),
+                              child: Text(widget.cat.replaceAll('_', ' '),
+                                  style: poppins.copyWith(color: Colors.white)),
+                            )
+                          ],
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          if (widget.text.isNotEmpty) ...[
+                            RichText(
+                              text: TextSpan(
+                                text: 'Hasil Pencarian : ',
+                                style: poppins.copyWith(color: Colors.black),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: widget.text,
+                                      style: poppins.copyWith(
+                                          color: backgroundColor1)),
+                                ],
+                              ),
+                            ),
+                          ],
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          if (productProvider.searchProduct?.data == null) ...[
+                            Expanded(
+                              child: Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.report_problem,
+                                    size: 48,
+                                  ),
+                                  Text(
+                                    "Produk Tidak Tersedia",
+                                    style: poppins.copyWith(
+                                        fontWeight: regular, fontSize: 20),
+                                  ),
+                                ],
+                              )),
+                            )
+                          ] else ...[
+                            Expanded(
+                              child: GridView.builder(
+                                controller: _scrollController,
+                                gridDelegate:
+                                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                                        maxCrossAxisExtent: 200,
+                                        mainAxisExtent: 300,
+                                        crossAxisSpacing: 25,
+                                        mainAxisSpacing: 10),
+                                itemCount:
+                                    productProvider.searchProduct!.data!.length,
+                                itemBuilder: (BuildContext ctx, index) {
+                                  return SearchDynamicCard(
+                                      text: productProvider
+                                          .searchProduct!.data![index]);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            _isLoading
+                                ? Center(
+                                    child: Container(
+                                      height: _isLoading ? 15 : 0,
+                                      width: 15,
+                                      child: const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                          ]
+                        ],
+                      ],
+                    ),
             )),
       );
     });

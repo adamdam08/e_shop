@@ -66,6 +66,7 @@ class CartData {
   int? harga;
   int? hargaDiskon;
   int? diskon;
+  int? stok;
 
   CartData(
       {this.sId,
@@ -79,7 +80,8 @@ class CartData {
       this.imageUrl,
       this.harga,
       this.hargaDiskon,
-      this.diskon});
+      this.diskon,
+      this.stok});
 
   CartData.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -94,6 +96,7 @@ class CartData {
     harga = json['harga'];
     hargaDiskon = json['harga_diskon'];
     diskon = json['diskon'];
+    stok = json['stok'];
   }
 
   Map<String, dynamic> toJson() {
@@ -110,6 +113,7 @@ class CartData {
     data['harga'] = this.harga;
     data['harga_diskon'] = this.hargaDiskon;
     data['diskon'] = this.diskon;
+    data['stok'] = this.stok;
     return data;
   }
 }

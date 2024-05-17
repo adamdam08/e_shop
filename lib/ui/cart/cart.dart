@@ -705,8 +705,13 @@ class _CartState extends State<Cart> {
                                           listen: false);
                                   // Get data from SharedPref
                                   var data = await authProvider.getLoginData();
+                                  var jumlah = cartProduct.cartList.listData!
+                                      .first.cartData![index].jumlah;
 
-                                  if (data!.token != null) {
+                                  var stok = cartProduct.cartList.listData!
+                                      .first.cartData![index].stok;
+
+                                  if (data!.token != null && jumlah! < stok!) {
                                     print("Data : ${{
                                       "jumlah": cartProduct.cartTotal + 1,
                                       "catatan": cartProduct.cartNote,
@@ -739,6 +744,8 @@ class _CartState extends State<Cart> {
                                         _getCartList();
                                       });
                                     }
+                                  } else {
+                                    showToast("Stok Telah Habis");
                                   }
                                 },
                                 child: const Icon(

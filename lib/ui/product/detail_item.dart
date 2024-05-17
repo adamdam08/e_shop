@@ -277,7 +277,7 @@ class _DetailItemState extends State<DetailItem> {
                                           style: poppins.copyWith(
                                             fontWeight: semiBold,
                                             color: Colors.red,
-                                            fontSize: 20,
+                                            fontSize: 18,
                                           ),
                                         ),
                                         Row(
@@ -297,7 +297,7 @@ class _DetailItemState extends State<DetailItem> {
                                                   style: poppins.copyWith(
                                                       overflow:
                                                           TextOverflow.ellipsis,
-                                                      fontSize: 14,
+                                                      fontSize: 12,
                                                       color: Colors.grey,
                                                       decoration: TextDecoration
                                                           .lineThrough),
@@ -311,39 +311,43 @@ class _DetailItemState extends State<DetailItem> {
                                                     ?.harga
                                                     ?.first
                                                     .diskon !=
-                                                null)
+                                                null) ...[
                                               const SizedBox(
                                                 width: 5,
                                               ),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5,
-                                                      vertical: 3),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.red
-                                                      .withOpacity(0.4),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                        color: Colors.pink
-                                                            .withOpacity(0.2),
-                                                        blurRadius: 4,
-                                                        offset:
-                                                            const Offset(0, 0))
-                                                  ]),
-                                              child: Text(
-                                                "${productProvider.detailProduct?.data?.harga?.first.diskon}%",
-                                                style: poppins.copyWith(
-                                                    fontSize: 12,
-                                                    color: Colors.pink,
-                                                    fontWeight: bold),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 5,
+                                                        vertical: 3),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.red
+                                                        .withOpacity(0.4),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Colors.pink
+                                                              .withOpacity(0.2),
+                                                          blurRadius: 4,
+                                                          offset: const Offset(
+                                                              0, 0))
+                                                    ]),
+                                                child: Text(
+                                                  "${productProvider.detailProduct?.data?.harga?.first.diskon}%",
+                                                  style: poppins.copyWith(
+                                                      fontSize: 12,
+                                                      color: Colors.pink,
+                                                      fontWeight: bold),
+                                                ),
                                               ),
-                                            ),
+                                            ]
                                           ],
                                         ),
                                         Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             const Icon(
                                               Icons.star,
@@ -353,9 +357,9 @@ class _DetailItemState extends State<DetailItem> {
                                             Text(
                                               "${productProvider.detailProduct?.data?.rating}",
                                               style: poppins.copyWith(
-                                                  fontSize: 13,
+                                                  fontSize: 15,
                                                   color: Colors.black,
-                                                  fontWeight: semiBold),
+                                                  fontWeight: regular),
                                             ),
                                           ],
                                         ),
@@ -391,10 +395,12 @@ class _DetailItemState extends State<DetailItem> {
                                           ),
                                         ),
                                         Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               mainAxisSize: MainAxisSize.min,
@@ -441,7 +447,7 @@ class _DetailItemState extends State<DetailItem> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  "${productProvider.detailProduct?.data?.golonganProduk.toString()}",
+                                                  "${productProvider.detailProduct?.data?.kat1.toString()} \n${productProvider.detailProduct?.data?.kat2.toString()} \n${productProvider.detailProduct?.data?.kat3.toString()}",
                                                   style: poppins.copyWith(
                                                     color: backgroundColor1,
                                                   ),
@@ -468,7 +474,7 @@ class _DetailItemState extends State<DetailItem> {
                                           productProvider.detailProduct?.data
                                                       ?.deskripsiProduk ==
                                                   null
-                                              ? "Deskripsi Tidak Tersedia Deskripsi Tidak Tersedia Deskripsi Tidak Tersedia Deskripsi Tidak TersediaDeskripsi Tidak TersediaDeskripsi Tidak TersediaDeskripsi Tidak TersediavDeskripsi Tidak TersediaDeskripsi Tidak TersediavvDeskripsi Tidak TersediaDeskripsi Tidak Tersedia"
+                                              ? "Deskripsi Tidak Tersedia"
                                               : "${productProvider.detailProduct?.data?.deskripsiProduk}",
                                           style: poppins.copyWith(
                                             fontWeight: regular,
