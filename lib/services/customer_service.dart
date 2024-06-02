@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:e_shop/models/customer/customer_address_model.dart';
 import 'package:e_shop/models/customer/customer_data_model.dart';
 import 'package:e_shop/models/customer/customer_post_model.dart';
+import 'package:e_shop/models/customer/customer_request_update_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:e_shop/models/product_model.dart';
@@ -108,6 +109,7 @@ class CustomerService {
       return callbackData;
     } else {
       var data = jsonDecode(response.body);
+      print("List Customer Error : ${data['message']}");
       throw ErrorDescription('${data['message']}');
     }
   }
@@ -133,6 +135,55 @@ class CustomerService {
       return dataModel;
     } else {
       throw Exception("Gagal Mendapatkan List Alamat");
+    }
+  }
+
+  // Get List Customer
+  Future<CustomerRequestUpdateModel> getRequestDataChangeCustomer(
+      {required String userId, required String token}) async {
+    var url = Uri.parse("${baseURL}customer/requpdate?id=$userId");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    var response = await http.get(url, headers: header);
+    // ignore: avoid_print
+    print("Address: ${response.body}");
+
+    // **success melakukan login
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+
+      CustomerRequestUpdateModel dataModel =
+          CustomerRequestUpdateModel.fromJson(data);
+      return dataModel;
+    } else {
+      throw Exception("Request Perubahan Data tidak Ditemukan");
+    }
+  }
+
+  // Request edit data customer
+  Future<CustomerPostModel> addRequestDataChangeCustomer(
+      {required Map data, required String token}) async {
+    var url = Uri.parse("${baseURL}customer/requpdate");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+    var body = jsonEncode(data);
+    var response = await http.post(url, headers: header, body: body);
+    // ignore: avoid_print
+    print("Add Customer: ${response.body}");
+
+// **success melakukan login
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+      CustomerPostModel callbackData = CustomerPostModel.fromJson(data);
+      return callbackData;
+    } else {
+      var data = jsonDecode(response.body);
+      throw ErrorDescription('${data['message']}');
     }
   }
 }

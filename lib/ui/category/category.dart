@@ -156,9 +156,24 @@ class _CategoryState extends State<Category> {
         child: ExpandablePanel(
             header: Padding(
               padding: const EdgeInsets.all(10),
-              child: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w500),
+              child: GestureDetector(
+                onTap: () {
+                  var kat1 = productProvider.categoryTree?.data![index].kat1Slug
+                      .toString();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchList(
+                        text: "",
+                        cat: kat1.toString(),
+                      ),
+                    ),
+                  );
+                },
+                child: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
               ),
             ),
             collapsed: const Divider(),
@@ -195,9 +210,28 @@ class _CategoryState extends State<Category> {
         child: ExpandablePanel(
           header: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.w400),
+            child: GestureDetector(
+              onTap: () {
+                var kat1 = productProvider
+                    .categoryTree?.data![kat1index].kat1Slug
+                    .toString();
+                var kat2 = productProvider
+                    .categoryTree?.data![kat1index].child![kat2index].kat2Slug
+                    .toString();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchList(
+                      text: "",
+                      cat: "$kat1,$kat2",
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w400),
+              ),
             ),
           ),
           collapsed: const Divider(),
@@ -423,10 +457,9 @@ class SuggestionListView extends StatelessWidget {
                                       child: Text(
                                         data,
                                         style: poppins.copyWith(
-                                            fontWeight: light,
-                                            color: Colors.black,
-                                            overflow: TextOverflow.ellipsis),
-                                        maxLines: 1,
+                                          fontWeight: light,
+                                          color: Colors.black,
+                                        ),
                                       ),
                                     ),
                                   ),

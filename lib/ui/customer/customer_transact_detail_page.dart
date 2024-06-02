@@ -17,6 +17,22 @@ class CustomerTransactionDetailPage extends StatefulWidget {
 class _CustomerTransactionDetailPageState
     extends State<CustomerTransactionDetailPage> {
   Widget cartDynamicCard(Produk data) {
+    // Pack State
+    var packString = "";
+    if (data.jumlahMultisatuan!.isNotEmpty) {
+      for (var i = 0; i < data.jumlahMultisatuan!.length; i++) {
+        var jumlah = data.jumlahMultisatuan?[i];
+        var unit = data.multisatuanUnit?[i];
+
+        print("PackString : $jumlah");
+        print("PackString : $unit");
+
+        if (jumlah! > 0) {
+          packString += "(${jumlah} ${unit}) ".toUpperCase();
+        }
+      }
+    }
+
     return GestureDetector(
       onTap: () {},
       child: Container(
@@ -41,10 +57,22 @@ class _CustomerTransactionDetailPageState
               // borderRadius: BorderRadius.circular(8),
               child: FadeInImage.memoryNetwork(
                 placeholder: kTransparentImage,
-                image: data.imageUrl.toString(),
+                image: data.imageUrl.toString().replaceAll(
+                    "https://tokosm.online", "http://103.127.132.116"),
                 fit: BoxFit.cover,
                 height: 125,
                 width: 125,
+                imageErrorBuilder: (BuildContext context, Object error,
+                    StackTrace? stackTrace) {
+                  return Container(
+                    height: 125,
+                    width: 125,
+                    color: Colors.grey,
+                    child: const Center(
+                      child: Icon(Icons.error),
+                    ),
+                  );
+                },
               ),
             ),
             Expanded(
@@ -85,6 +113,17 @@ class _CustomerTransactionDetailPageState
                           overflow: TextOverflow.ellipsis),
                       maxLines: 2,
                     ),
+                    if (data.multisatuanUnit!.isNotEmpty) ...[
+                      Text(
+                        packString,
+                        style: poppins.copyWith(
+                            fontSize: 10,
+                            fontWeight: regular,
+                            color: Colors.grey,
+                            overflow: TextOverflow.ellipsis),
+                        maxLines: 2,
+                      ),
+                    ],
                     if (data.catatan != "")
                       Text(
                         "Catatan : ' ${data.catatan} '",

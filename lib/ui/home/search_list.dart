@@ -27,6 +27,7 @@ class _SearchListState extends State<SearchList> {
   List<String> myCategoryFiltered = [];
   List<String> _myCategory = [];
 
+  String sort = "";
   int searchIndex = 1;
   bool _isLoading = false;
   bool _isInitLoading = false;
@@ -51,17 +52,11 @@ class _SearchListState extends State<SearchList> {
 
     print("Promo : ${widget.isPromo}");
 
-    if (widget.cat != "") {
-      // Get Promo
-      _getByCategory();
-    } else {
-      if (widget.isPromo) {
-        // Get Promo
-        _getPromoList();
-      } else {
-        _getBySearch();
-      }
+    if (widget.isPromo) {
+      sort = "promo";
     }
+
+    _getBySearch();
 
     // Get Suggestion
     _getSuggestionList();
@@ -105,17 +100,18 @@ class _SearchListState extends State<SearchList> {
       if (data!.token != null &&
           settingsProvider.storeLocation.data != null &&
           _isLimit != true) {
-        if (await productProvider.getPromoProduct(
-            cabangId: settingsProvider.storeLocation.data!.first.id.toString(),
+        if (await productProvider.getSearchProduct(
+            cabangId: authProvider.user.data.cabangId.toString(),
             token: authProvider.user.token.toString(),
             limit: 6,
-            page: searchIndex + 1,
-            query: searchTextController.text.isEmpty
-                ? null
-                : searchTextController.text)) {
-          setState(() {
-            searchIndex = searchIndex + 1;
-          });
+            page: searchIndex,
+            sort: sort,
+            cat: widget.cat,
+            query: widget.text)) {
+          searchIndex = searchIndex + 1;
+          // setState(() {
+
+          // });
         } else {
           setState(() {
             _isLimit = true;
@@ -145,8 +141,8 @@ class _SearchListState extends State<SearchList> {
           token: authProvider.user.token.toString(),
           limit: 6,
           page: searchIndex,
-          sort: "",
-          cat: "",
+          sort: sort,
+          cat: widget.cat,
           query: widget.text)) {
         print("Search Result ${productProvider.searchProduct}");
         setState(() {});
@@ -421,26 +417,182 @@ class _SearchListState extends State<SearchList> {
                                 searchTextController: searchTextController),
                           )
                         ] else ...[
-                          if (widget.isPromo) ...[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: backgroundColor3),
-                              child: Text("Promo",
-                                  style: poppins.copyWith(color: Colors.white)),
-                            )
-                          ],
-                          if (widget.cat != "") ...[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: backgroundColor3),
-                              child: Text(widget.cat.replaceAll('_', ' '),
-                                  style: poppins.copyWith(color: Colors.white)),
-                            )
-                          ],
+                          SizedBox(
+                            height: 45,
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                  child: ListView(
+                                    padding: const EdgeInsets.only(
+                                        right: 30, bottom: 5),
+                                    scrollDirection: Axis.horizontal,
+                                    children: [
+                                      if (widget.cat != "") ...[
+                                        Container(
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: backgroundColor1),
+                                          child: Text(
+                                              widget.cat.replaceAll('_', ' '),
+                                              style: poppins.copyWith(
+                                                  color: Colors.white)),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                      ],
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            sort = "";
+                                            _isInitLoading = true;
+                                            searchIndex = 1;
+                                            print(sort);
+                                          });
+
+                                          _getBySearch();
+
+                                          _getSuggestionList();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: sort == ""
+                                                  ? backgroundColor1
+                                                  : backgroundColor3),
+                                          child: Text("Paling Sesuai",
+                                              style: poppins.copyWith(
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            sort = "promo";
+                                            _isInitLoading = true;
+                                            searchIndex = 1;
+                                            print(sort);
+                                          });
+
+                                          _getBySearch();
+
+                                          _getSuggestionList();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: sort == "promo"
+                                                  ? backgroundColor1
+                                                  : backgroundColor3),
+                                          child: Text("Promo",
+                                              style: poppins.copyWith(
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            sort = "terlaris";
+                                            _isInitLoading = true;
+                                            searchIndex = 1;
+                                            print(sort);
+                                          });
+
+                                          _getBySearch();
+
+                                          _getSuggestionList();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: sort == "terlaris"
+                                                  ? backgroundColor1
+                                                  : backgroundColor3),
+                                          child: Text("Terlaris",
+                                              style: poppins.copyWith(
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            sort = "hargatertinggi";
+                                            _isInitLoading = true;
+                                            searchIndex = 1;
+                                            print(sort);
+                                          });
+
+                                          _getBySearch();
+
+                                          _getSuggestionList();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: sort == "hargatertinggi"
+                                                  ? backgroundColor1
+                                                  : backgroundColor3),
+                                          child: Text("Harga Tertinggi",
+                                              style: poppins.copyWith(
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            sort = "hargaterendah";
+                                            _isInitLoading = true;
+                                            searchIndex = 1;
+                                            print(sort);
+                                          });
+
+                                          _getBySearch();
+
+                                          _getSuggestionList();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              color: sort == "hargaterendah"
+                                                  ? backgroundColor1
+                                                  : backgroundColor3),
+                                          child: Text("Harga Terendah",
+                                              style: poppins.copyWith(
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           const SizedBox(
                             height: 10,
                           ),
@@ -498,7 +650,7 @@ class _SearchListState extends State<SearchList> {
                                 },
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             _isLoading
@@ -566,6 +718,17 @@ class SearchDynamicCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 height: 175,
                 width: 175,
+                imageErrorBuilder: (BuildContext context, Object error,
+                    StackTrace? stackTrace) {
+                  return Container(
+                    height: 175,
+                    width: 175,
+                    color: Colors.grey,
+                    child: const Center(
+                      child: Icon(Icons.error),
+                    ),
+                  );
+                },
               ),
             ),
             Expanded(
@@ -615,25 +778,23 @@ class SearchDynamicCard extends StatelessWidget {
                       ),
                     ],
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.location_city,
-                          color: Colors.orange,
-                          size: 12,
+                          Icons.star,
+                          size: 20,
+                          color: Colors.yellow,
                         ),
                         Text(
-                          " Cab. ${settingsProvider.storeLocation.data?.first.namaCabang}",
+                          "${text.rating}",
                           style: poppins.copyWith(
-                            fontSize: 12,
-                            fontWeight: semiBold,
-                            color: backgroundColor2,
-                          ),
+                              fontSize: 15,
+                              color: Colors.black,
+                              fontWeight: semiBold),
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                   ],

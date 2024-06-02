@@ -84,6 +84,17 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
                   fit: BoxFit.fitHeight,
                   height: 75,
                   width: 100,
+                  imageErrorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return Container(
+                      height: 75,
+                      width: 100,
+                      color: Colors.grey,
+                      child: const Center(
+                        child: Icon(Icons.error),
+                      ),
+                    );
+                  },
                 ),
               ),
               Expanded(

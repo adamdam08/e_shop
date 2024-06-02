@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:e_shop/models/customer/customer_address_model.dart';
 import 'package:e_shop/models/customer/customer_data_model.dart';
+import 'package:e_shop/models/customer/customer_request_update_model.dart';
 import 'package:e_shop/services/customer_service.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -67,6 +68,8 @@ class CustomerProvider with ChangeNotifier {
                     e.jenisKelaminPelanggan, // Laki-laki / Perempuan
                 "alamat": e.alamatPelanggan,
                 "telp": e.telpPelanggan,
+                "lat": e.lat.toString(),
+                "lon": e.lon.toString(),
               })
           .toList();
 
@@ -80,6 +83,8 @@ class CustomerProvider with ChangeNotifier {
             "jenis_kelamin": e.jenisKelaminPelanggan, // Laki-laki / Perempuan
             "alamat": e.alamatPelanggan,
             "telp": e.telpPelanggan,
+            "lat": e.lat.toString(),
+            "lon": e.lon.toString(),
           }.toString())}");
       return true;
     } catch (e) {
@@ -124,5 +129,44 @@ class CustomerProvider with ChangeNotifier {
   set selectAddress(int? selectAddress) {
     _selectAddress = selectAddress;
     notifyListeners();
+  }
+
+  // Update Request Data
+  CustomerRequestUpdateModel? _customerRequestUpdateData;
+  CustomerRequestUpdateModel? get customerRequestUpdateData =>
+      _customerRequestUpdateData;
+
+  set customerRequestUpdateData(
+      CustomerRequestUpdateModel? customerRequestUpdateData) {
+    _customerRequestUpdateData = customerRequestUpdateData;
+    notifyListeners();
+  }
+
+  Future<bool> getRequestUpdateData({
+    required String id,
+    required String token,
+  }) async {
+    try {
+      CustomerRequestUpdateModel data = await CustomerService()
+          .getRequestDataChangeCustomer(userId: id, token: token);
+      _customerRequestUpdateData = data;
+      return true;
+    } catch (e) {
+      _customerRequestUpdateData = CustomerRequestUpdateModel();
+      return false;
+    }
+  }
+
+  Future<String> addRequestUpdateData({
+    required Map data,
+    required String token,
+  }) async {
+    try {
+      await CustomerService()
+          .addRequestDataChangeCustomer(data: data, token: token);
+      return "";
+    } catch (e) {
+      return "$e";
+    }
   }
 }

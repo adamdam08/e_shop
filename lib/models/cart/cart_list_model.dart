@@ -59,6 +59,9 @@ class CartData {
   int? cabangId;
   dynamic produkId;
   int? jumlah;
+  List<int>? jumlahMultisatuan;
+  List<String>? multisatuanJumlah;
+  List<String>? multisatuanUnit;
   String? catatan;
   String? createdAt;
   String? namaProduk;
@@ -74,6 +77,9 @@ class CartData {
       this.cabangId,
       this.produkId,
       this.jumlah,
+      this.jumlahMultisatuan,
+      this.multisatuanJumlah,
+      this.multisatuanUnit,
       this.catatan,
       this.createdAt,
       this.namaProduk,
@@ -89,6 +95,15 @@ class CartData {
     cabangId = json['cabang_id'];
     produkId = json['produk_id'];
     jumlah = json['jumlah'];
+    jumlahMultisatuan = json['jumlah_multisatuan'] == null
+        ? []
+        : json['jumlah_multisatuan'].cast<int>();
+    multisatuanJumlah = json['multisatuan_jumlah'] == null
+        ? []
+        : json['multisatuan_jumlah'].cast<String>();
+    multisatuanUnit = json['multisatuan_unit'] == null
+        ? []
+        : json['multisatuan_unit'].cast<String>();
     catatan = json['catatan'];
     createdAt = json['created_at'];
     namaProduk = json['nama_produk'];
@@ -106,6 +121,9 @@ class CartData {
     data['cabang_id'] = this.cabangId;
     data['produk_id'] = this.produkId;
     data['jumlah'] = this.jumlah;
+    data['jumlah_multisatuan'] = this.jumlahMultisatuan;
+    data['multisatuan_jumlah'] = this.multisatuanJumlah;
+    data['multisatuan_unit'] = this.multisatuanUnit;
     data['catatan'] = this.catatan;
     data['created_at'] = this.createdAt;
     data['nama_produk'] = this.namaProduk;

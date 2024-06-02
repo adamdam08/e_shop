@@ -181,7 +181,7 @@ class _HomeState extends State<Home> {
     // Get Store Location
     if (await settingsProvider.getStoreLocation(
       lat: _latitude,
-      long: _latitude,
+      long: _longitude,
       token: authProvider.user.token.toString(),
       cabangId: authProvider.user.data.cabangId.toString(),
     )) {
@@ -801,25 +801,26 @@ class DynamicCardHorizontal extends StatelessWidget {
                           ),
                         ],
                       ),
+                    const SizedBox(
+                      height: 5,
+                    ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.location_city,
-                          color: Colors.orange,
-                          size: 12,
+                          Icons.star,
+                          size: 20,
+                          color: Colors.yellow,
                         ),
                         Text(
-                          " Cab. ${settingsProvider.storeLocation.data?.first.namaCabang}",
+                          "${data.rating}",
                           style: poppins.copyWith(
-                            fontSize: 12,
-                            fontWeight: semiBold,
-                            color: backgroundColor2,
-                          ),
+                              fontSize: 15,
+                              color: Colors.black,
+                              fontWeight: semiBold),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -972,24 +973,22 @@ class DynamicCardVertical extends StatelessWidget {
                         ],
                       ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.location_city,
-                          color: Colors.orange,
-                          size: 12,
+                          Icons.star,
+                          size: 20,
+                          color: Colors.yellow,
                         ),
                         Text(
-                          " Cab. ${settingsProvider.storeLocation.data?.first.namaCabang}",
+                          "${data.rating}",
                           style: poppins.copyWith(
-                            fontSize: 12,
-                            fontWeight: semiBold,
-                            color: backgroundColor2,
-                          ),
+                              fontSize: 15,
+                              color: Colors.black,
+                              fontWeight: semiBold),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

@@ -194,6 +194,31 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     Widget cartDynamicCard(int index) {
       var data = cartProduct.selectedProducts[index];
+      print(
+          "Notes : ${cartProduct.cartList.listData!.first.cartData![index].namaProduk}");
+      print(
+          "Notes : ${cartProduct.cartList.listData!.first.cartData![index].catatan}");
+
+      // Pack State
+      var packString = "";
+      for (var i = 0;
+          i <
+              cartProduct.cartList.listData!.first.cartData![index]
+                  .jumlahMultisatuan!.length;
+          i++) {
+        var jumlah = cartProduct
+            .cartList.listData!.first.cartData![index].jumlahMultisatuan?[i];
+        var unit = cartProduct
+            .cartList.listData!.first.cartData![index].multisatuanUnit?[i];
+
+        print("PackString : $jumlah");
+        print("PackString : $unit");
+
+        if (jumlah! > 0) {
+          packString += "(${jumlah} ${unit}) ".toUpperCase();
+        }
+      }
+
       return GestureDetector(
         onTap: () {},
         child: Container(
@@ -222,6 +247,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   fit: BoxFit.cover,
                   height: 125,
                   width: 125,
+                  imageErrorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return Container(
+                      height: 125,
+                      width: 125,
+                      color: Colors.grey,
+                      child: const Center(
+                        child: Icon(Icons.error),
+                      ),
+                    );
+                  },
                 ),
               ),
               Expanded(
@@ -262,9 +298,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             overflow: TextOverflow.ellipsis),
                         maxLines: 2,
                       ),
+                      if (packString.isNotEmpty || packString != "") ...[
+                        Text(
+                          packString,
+                          style: poppins.copyWith(
+                              fontSize: 10,
+                              fontWeight: regular,
+                              color: Colors.grey,
+                              overflow: TextOverflow.ellipsis),
+                          maxLines: 2,
+                        ),
+                      ],
                       if (data["catatan"] != "")
                         Text(
-                          "Catatan : ' ${cartProduct.cartList.listData!.first.cartData![index].catatan} '",
+                          "Catatan : ' ${data["catatan"]} '",
                           style: poppins.copyWith(
                               fontSize: 10,
                               fontWeight: regular,
@@ -292,22 +339,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
           if (await customerProvider.getListCustomerAddress(
               id: customerProvider.selectCustomer.toString(),
               token: data!.token.toString())) {
-                if(customerProvider.customerAddressList!.addressData!.isNotEmpty){
-                  if(context.mounted){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AddressSearch()),
-                    ).then((value) {
-                      _setCustomerData();
-                      _setShipData();
-                    });
-                  }
-                }else{
-                  showToast("Alamat Pelanggan Tidak Tersedia");
-                }
-          } else {
-
-          }
+            if (customerProvider.customerAddressList!.addressData!.isNotEmpty) {
+              if (context.mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AddressSearch()),
+                ).then((value) {
+                  _setCustomerData();
+                  _setShipData();
+                });
+              }
+            } else {
+              showToast("Alamat Pelanggan Tidak Tersedia");
+            }
+          } else {}
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

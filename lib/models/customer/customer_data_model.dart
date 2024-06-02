@@ -27,6 +27,7 @@ class CustomerDataModel {
 class Data {
   int? id;
   int? cabangId;
+  int? cabangAktif;
   int? salesId;
   int? kategoriPelangganId;
   String? username;
@@ -34,15 +35,20 @@ class Data {
   String? namaPelanggan;
   String? tglLahirPelanggan;
   String? jenisKelaminPelanggan;
-  String? alamatPelanggan;
   String? telpPelanggan;
   String? emailPelanggan;
-  String? lat;
-  String? lon;
+  String? alamatPelanggan;
+  String? provinsi;
+  String? kabkota;
+  String? kecamatan;
+  String? kelurahan;
+  double? lat;
+  double? lon;
 
   Data(
       {this.id,
       this.cabangId,
+      this.cabangAktif,
       this.salesId,
       this.kategoriPelangganId,
       this.username,
@@ -50,15 +56,20 @@ class Data {
       this.namaPelanggan,
       this.tglLahirPelanggan,
       this.jenisKelaminPelanggan,
-      this.alamatPelanggan,
       this.telpPelanggan,
       this.emailPelanggan,
+      this.alamatPelanggan,
+      this.provinsi,
+      this.kabkota,
+      this.kecamatan,
+      this.kelurahan,
       this.lat,
       this.lon});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     cabangId = json['cabang_id'];
+    cabangAktif = json['cabang_aktif'];
     salesId = json['sales_id'];
     kategoriPelangganId = json['kategori_pelanggan_id'];
     username = json['username'];
@@ -66,9 +77,13 @@ class Data {
     namaPelanggan = json['nama_pelanggan'];
     tglLahirPelanggan = json['tgl_lahir_pelanggan'];
     jenisKelaminPelanggan = json['jenis_kelamin_pelanggan'];
-    alamatPelanggan = json['alamat_pelanggan'];
     telpPelanggan = json['telp_pelanggan'];
     emailPelanggan = json['email_pelanggan'];
+    alamatPelanggan = json['alamat_pelanggan'];
+    provinsi = json['provinsi'];
+    kabkota = json['kabkota'];
+    kecamatan = json['kecamatan'];
+    kelurahan = json['kelurahan'];
     lat = json['lat'];
     lon = json['lon'];
   }
@@ -77,6 +92,7 @@ class Data {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['cabang_id'] = this.cabangId;
+    data['cabang_aktif'] = this.cabangAktif;
     data['sales_id'] = this.salesId;
     data['kategori_pelanggan_id'] = this.kategoriPelangganId;
     data['username'] = this.username;
@@ -84,9 +100,13 @@ class Data {
     data['nama_pelanggan'] = this.namaPelanggan;
     data['tgl_lahir_pelanggan'] = this.tglLahirPelanggan;
     data['jenis_kelamin_pelanggan'] = this.jenisKelaminPelanggan;
-    data['alamat_pelanggan'] = this.alamatPelanggan;
     data['telp_pelanggan'] = this.telpPelanggan;
     data['email_pelanggan'] = this.emailPelanggan;
+    data['alamat_pelanggan'] = this.alamatPelanggan;
+    data['provinsi'] = this.provinsi;
+    data['kabkota'] = this.kabkota;
+    data['kecamatan'] = this.kecamatan;
+    data['kelurahan'] = this.kelurahan;
     data['lat'] = this.lat;
     data['lon'] = this.lon;
     return data;

@@ -8,8 +8,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/theme.dart';
 
@@ -24,10 +26,13 @@ class CustomerTransactPage extends StatefulWidget {
 class _CustomerTransactPageState extends State<CustomerTransactPage> {
   bool isLoading = false;
   String _indexStatus = "0";
+  TextEditingController descriptionTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+
+    _getRequestUpdate();
 
     _getTransactionHistory();
   }
@@ -54,8 +59,50 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
       });
     }
     ;
-
     print("Index History ${_indexStatus}");
+  }
+
+  void _getRequestUpdate() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+    var data = await authProvider.getLoginData();
+
+    if (await customerProvider.getRequestUpdateData(
+        id: widget.myCustomer["id"].toString(),
+        token: data!.token.toString())) {
+      descriptionTextController.text =
+          customerProvider.customerRequestUpdateData?.requestData?.keterangan ??
+              "";
+      // setState(() {
+      //   isLoading = false;
+      // });
+      print(
+          "Request Update Success ${customerProvider.customerRequestUpdateData!.requestData.toString()}");
+    } else {
+      print("Request Update Failed");
+      // setState(() {
+      //   isLoading = false;
+      // });
+    }
+    ;
+    print(
+        "Request Update Loaded ${customerProvider.customerRequestUpdateData?.requestData?.keterangan}");
+    print("Request Update Loaded ${descriptionTextController.text}");
+  }
+
+  static Future<void> openMap(String latitude, String longitude) async {
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    if (await canLaunch(googleUrl) != null) {
+      await launch(googleUrl);
+    } else {
+      throw 'Could not open the map.';
+    }
   }
 
   Widget transactionDynamicCard(ListTransaksi data) {
@@ -163,11 +210,26 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                   // borderRadius: BorderRadius.circular(8),
                   child: FadeInImage.memoryNetwork(
                     placeholder: kTransparentImage,
-                    image: data.produk!.first.imageUrl.toString(),
+                    image: data.produk!.first.imageUrl.toString().replaceAll(
+                        "https://tokosm.online", "http://103.127.132.116"),
                     fit: BoxFit.cover,
                     height: 75,
                     width: 75,
+                    imageErrorBuilder: (BuildContext context, Object error,
+                        StackTrace? stackTrace) {
+                      return Container(
+                        height: 75,
+                        width: 75,
+                        color: Colors.grey,
+                        child: const Center(
+                          child: Icon(Icons.error),
+                        ),
+                      );
+                    },
                   ),
+                ),
+                const SizedBox(
+                  width: 10,
                 ),
                 Expanded(
                   child: Column(
@@ -192,15 +254,17 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                             overflow: TextOverflow.ellipsis),
                         maxLines: 1,
                       ),
-                      Text(
-                        "+ ${data.produk!.length - 1} Produk Lainnya",
-                        style: poppins.copyWith(
-                            fontWeight: light,
-                            color: Colors.black,
-                            fontSize: 10,
-                            overflow: TextOverflow.ellipsis),
-                        maxLines: 1,
-                      ),
+                      if ((data.produk!.length - 1) > 0) ...[
+                        Text(
+                          "+ ${data.produk!.length - 1} Produk Lainnya",
+                          style: poppins.copyWith(
+                              fontWeight: light,
+                              color: Colors.black,
+                              fontSize: 10,
+                              overflow: TextOverflow.ellipsis),
+                          maxLines: 1,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -275,6 +339,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
+    final customerProvider = Provider.of<CustomerProvider>(context);
 
     var checkIsNotEmpty = 0;
     if (productProvider.transactionHistory != null) {
@@ -334,6 +399,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                     height: 10,
                   ),
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -440,7 +506,13 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                                                 offset: const Offset(0, 0))
                                           ]),
                                       child: Text(
-                                        "Ajukan Perubahan Data",
+                                        (customerProvider
+                                                    .customerRequestUpdateData
+                                                    ?.requestData
+                                                    ?.keterangan ==
+                                                "")
+                                            ? "Edit Perubahan Data"
+                                            : "Ajukan Perubahan Data",
                                         style: poppins.copyWith(
                                             fontSize: 13,
                                             color: Colors.white,
@@ -448,22 +520,41 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                        color: backgroundColor3,
-                                        borderRadius: BorderRadius.circular(5),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.5),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 0))
-                                        ]),
-                                    child: const Icon(
-                                      Icons.map,
-                                      size: 20,
-                                      color: Colors.white,
+                                  GestureDetector(
+                                    onTap: () async {
+                                      print(
+                                          "Lat : ${widget.myCustomer["lat"]}");
+                                      print(
+                                          "Lon : ${widget.myCustomer["lon"]}");
+                                      if (widget.myCustomer["lat"] != "" &&
+                                          widget.myCustomer["lon"] != "") {
+                                        await openMap(widget.myCustomer["lat"],
+                                            widget.myCustomer["lon"]);
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                          color: (widget.myCustomer["lat"] !=
+                                                      "" &&
+                                                  widget.myCustomer["lon"] !=
+                                                      "")
+                                              ? backgroundColor3
+                                              : Colors.grey,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 0))
+                                          ]),
+                                      child: const Icon(
+                                        Icons.map,
+                                        size: 20,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -491,7 +582,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
               ),
             ),
             SizedBox(
-              height: 50,
+              height: 45,
               width: double.infinity,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -709,9 +800,6 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
       color: Colors.white,
       child: StatefulBuilder(
           builder: (BuildContext context, StateSetter stateSetter) {
-        TextEditingController descriptionTextController =
-            TextEditingController();
-
         descriptionTextController.selection = TextSelection.collapsed(
             offset: descriptionTextController.text.length);
 
@@ -801,6 +889,42 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                             isLoading = true;
                           });
 
+                          if (descriptionTextController.text == "") {
+                            showToast("Catatan Kosong");
+                          } else {
+                            final authProvider = Provider.of<AuthProvider>(
+                                context,
+                                listen: false);
+                            final customerProvider =
+                                Provider.of<CustomerProvider>(context,
+                                    listen: false);
+                            // Get data from SharedPref
+                            var data = await authProvider.getLoginData();
+
+                            // Get Best Seller
+                            if (data!.token != null) {
+                              var message = await customerProvider
+                                  .addRequestUpdateData(data: {
+                                "pelanggan_id":
+                                    widget.myCustomer["id"].toString(),
+                                "keterangan": descriptionTextController.text,
+                              }, token: data.token.toString());
+
+                              if (message != "") {
+                                showToast(message);
+                              } else {
+                                showToast("Berhasil menambahkan request");
+                                if (context.mounted) {
+                                  setState(() {
+                                    print("Berhasil memperbarui");
+                                    _getRequestUpdate();
+                                  });
+                                  Navigator.pop(context);
+                                }
+                              }
+                            }
+                          }
+
                           stateSetter(() {
                             isLoading = false;
                           });
@@ -820,7 +944,9 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                               color: Colors.white,
                             ),
                             Text(
-                              ' Ajukan Perubahan Data',
+                              descriptionTextController.text != ""
+                                  ? "Edit Perubahan Data"
+                                  : ' Ajukan Perubahan Data',
                               style: poppins.copyWith(
                                   fontWeight: semiBold, color: Colors.white),
                             ),
@@ -836,6 +962,17 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
         });
       }),
     );
+  }
+
+  void showToast(String text) {
+    Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 
   String getInitials(String name) {

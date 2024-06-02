@@ -1,15 +1,12 @@
-import 'dart:ffi';
-
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:e_shop/models/user_model.dart';
 import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/theme/theme.dart';
-import 'package:e_shop/ui/cart/customer_search.dart';
 import 'package:e_shop/ui/customer/district_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -49,6 +46,54 @@ class _CustomerInformationState extends State<CustomerInformation> {
   final TextEditingController genderTextEditingController =
       TextEditingController();
 
+  // Location Coordinate
+  late LocationPermission permission;
+  String _latitude = '';
+  String _longitude = '';
+  Position? _currentPosition;
+
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _getCurrentPosition() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      setState(() => _currentPosition = position);
+      print(_currentPosition);
+      setState(() {});
+    }).catchError((e) {
+      debugPrint(e);
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -62,6 +107,12 @@ class _CustomerInformationState extends State<CustomerInformation> {
       addressTextEditingController.text = widget.data["alamat"] ?? "";
       phoneTextEditingController.text = widget.data["telp"] ?? "";
     }
+
+    _getLocation();
+  }
+
+  void _getLocation() async {
+    await _getCurrentPosition();
   }
 
   // List of items in our dropdown menu
@@ -247,6 +298,20 @@ class _CustomerInformationState extends State<CustomerInformation> {
                         ),
                       ),
                     ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        "Lokasi saat ini : ${_currentPosition?.latitude.toString()}, ${_currentPosition?.longitude.toString()}",
+                        style:
+                            poppins.copyWith(fontWeight: regular, fontSize: 12),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     textFormBuilder(
                         searchBoxController: phoneTextEditingController,
                         headerText: "Nomor Telefon",
@@ -265,6 +330,8 @@ class _CustomerInformationState extends State<CustomerInformation> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
+                        final authProvider =
+                            Provider.of<AuthProvider>(context, listen: false);
                         bool isempty = false;
                         String username = usernameTextEditingController.text;
                         if (username.isEmpty && isempty == false) {
@@ -349,7 +416,11 @@ class _CustomerInformationState extends State<CustomerInformation> {
                                       dropdownvalue, // Laki-laki / Perempuan
                                   "alamat": address,
                                   "telp": phone,
-                                  "wilayah": customerProvider.selectedCity
+                                  "wilayah": customerProvider.selectedCity,
+                                  "lat": _currentPosition?.latitude.toString(),
+                                  "lon": _currentPosition?.longitude.toString(),
+                                  // "cabang_aktif":
+                                  //     authProvider.user.data.cabangId
                                 };
 
                           var loginData = await authProvider.getLoginData();
@@ -370,9 +441,9 @@ class _CustomerInformationState extends State<CustomerInformation> {
                           if (message != "") {
                             showToast(message);
                           } else {
-                            if(widget.isUpdate == false){
+                            if (widget.isUpdate == false) {
                               showToast("Berhasil menambahkan pelanggan baru");
-                            }else{
+                            } else {
                               showToast("Berhasil memperbarui data pelanggan");
                             }
 

@@ -5,8 +5,10 @@ import 'package:e_shop/provider/cart_provider.dart';
 import 'package:e_shop/provider/page_provider.dart';
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/provider/settings_provider.dart';
+import 'package:e_shop/ui/cart/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -114,6 +116,302 @@ class _DetailItemState extends State<DetailItem> {
     PageProvider pageProvider = Provider.of<PageProvider>(context);
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
     SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
+
+    Widget showMultiSatuan(
+        int index, String? multisatuanUnit, String? multisatuanJumlah) {
+      var multisatuanList = multisatuanUnit!.split("/");
+      var multisatuanJumlahList = multisatuanJumlah!.split("/");
+      var jumlahItemSelected = [];
+
+      for (var i = 0; i < multisatuanJumlahList.length; i++) {
+        jumlahItemSelected.add(0);
+      }
+
+      bool isLoading = false;
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        color: Colors.white,
+        child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter stateSetter) {
+          TextEditingController descriptionTextController =
+              TextEditingController();
+
+          CartProvider cartProduct = Provider.of<CartProvider>(context);
+          print("Catatan : ${descriptionTextController.text}");
+          // print("Total Item : ${totalItem}");
+
+          descriptionTextController.text = cartProduct.cartNote;
+          descriptionTextController.selection = TextSelection.collapsed(
+              offset: descriptionTextController.text.length);
+
+          return KeyboardVisibilityBuilder(
+              builder: (context, isKeyboardVisible) {
+            // Keyboard Dismiss
+            if (isKeyboardVisible == false) {
+              Future.delayed(Duration.zero, () async {
+                cartProduct.cartUpdate = parameterCart(
+                    note: descriptionTextController.text, total: 0);
+              });
+            }
+
+            return ListView(
+              shrinkWrap: true,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "Pilih Satuan",
+                        style: poppins.copyWith(
+                            fontSize: 18,
+                            fontWeight: semiBold,
+                            color: backgroundColor1),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      for (var i = 0;
+                          i < multisatuanJumlahList.length;
+                          i++) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "${multisatuanList[i]} (${multisatuanJumlahList[i]} Pcs)",
+                              style: poppins.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: regular,
+                                  color: backgroundColor1),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ClipOval(
+                                  child: Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor3,
+                                    ),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        stateSetter(() {
+                                          jumlahItemSelected[i] += 1;
+                                        });
+                                        print(
+                                            "${multisatuanList[i]} : ${jumlahItemSelected[i]}");
+                                      },
+                                      child: const Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Text(
+                                    jumlahItemSelected[i].toString(),
+                                    style: poppins.copyWith(
+                                        fontWeight: bold,
+                                        color: backgroundColor3,
+                                        overflow: TextOverflow.ellipsis),
+                                    maxLines: 2,
+                                  ),
+                                ),
+                                ClipOval(
+                                  child: Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor2,
+                                    ),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        if (jumlahItemSelected[i] >= 1) {
+                                          stateSetter(() {
+                                            jumlahItemSelected[i] -= 1;
+                                          });
+                                          print(
+                                              "${multisatuanList[i]} : ${jumlahItemSelected[i]}");
+                                        }
+                                      },
+                                      child: const Icon(
+                                        Icons.remove,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                      if (isLoading) ...[
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                    width: 1, color: backgroundColor3),
+                              ),
+                              backgroundColor: backgroundColor1),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              isLoading
+                                  ? Container(
+                                      width: 15,
+                                      height: 15,
+                                      margin: const EdgeInsets.only(
+                                          top: 10, bottom: 10),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
+                        ),
+                      ] else ...[
+                        ElevatedButton(
+                          onPressed: () async {
+                            stateSetter(() {
+                              isLoading = true;
+                            });
+
+                            // var stok = productProvider
+                            //     .detailProduct!.data!.stok?.first.stok;
+                            // // Convert the string elements to integers and sum corresponding elements
+                            // List<int> sumList = List.generate(
+                            //     multisatuanList.length,
+                            //     (index) =>
+                            //         int.parse(multisatuanList[index]) +
+                            //         int.parse(jumlahItemSelected[index]));
+
+                            // // Calculate the total sum of the resulting list
+                            // int jumlah = sumList.reduce((a, b) => a + b);
+
+                            // print("Stok terpilih : ${jumlah}");
+                            // print("Stok : ${stok}");
+                            print("Stok : ${multisatuanList}");
+                            print("Stok : ${jumlahItemSelected}");
+
+                            // if (jumlah < stok!) {
+
+                            var checkJumlah =
+                                jumlahItemSelected.reduce((a, b) => a + b);
+                            print("Check Jumlah : ${checkJumlah}");
+                            print("Check Jumlah : ${checkJumlah == 0}");
+                            if (checkJumlah != 0) {
+                              var data = {
+                                "cabang_id":
+                                    authProvider.user.data.cabangId?.toInt(),
+                                "produk_id": int.tryParse(widget.id),
+                                "multisatuan_jumlah": multisatuanJumlahList,
+                                "multisatuan_unit": multisatuanList,
+                                "jumlah_multisatuan": jumlahItemSelected
+                              };
+
+                              print("Multi Data Send : $data");
+
+                              var message = await cartProduct.addCart(
+                                data: data,
+                                token: authProvider.user.token.toString(),
+                              );
+
+                              if (message != "") {
+                                showToast("Gagal Menambahkan Barang");
+                              } else {
+                                final snackBar = SnackBar(
+                                  backgroundColor: backgroundColor1,
+                                  showCloseIcon: true,
+                                  content: const Text(
+                                      'Berhasil menambahkan item ke keranjang!'),
+                                  duration: const Duration(seconds: 1),
+                                  action: SnackBarAction(
+                                    label: 'Menuju Keranjang',
+                                    textColor: Colors.white,
+                                    backgroundColor: backgroundColor2,
+                                    onPressed: () {
+                                      if (context.mounted) {
+                                        Navigator.pushNamed(context, '/cart');
+                                      }
+                                    },
+                                  ),
+                                );
+
+                                // Find the ScaffoldMessenger in the widget tree
+                                // and use it to show a SnackBar.
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              }
+                            } else {
+                              showToast("Barang belum terpilih");
+                            }
+
+                            // } else {
+                            //   showToast("Melebihi batas stok tersedia");
+                            // }
+
+                            stateSetter(() {
+                              isLoading = false;
+                            });
+
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                    width: 1, color: backgroundColor3),
+                              ),
+                              backgroundColor: backgroundColor1),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.shopping_cart,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                ' Tambahkan ke keranjang',
+                                style: poppins.copyWith(
+                                    fontWeight: semiBold, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            );
+          });
+        }),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -441,7 +739,13 @@ class _DetailItemState extends State<DetailItem> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  "${productProvider.detailProduct?.data?.satuanProduk.toString()}",
+                                                  productProvider
+                                                              .detailProduct
+                                                              ?.data
+                                                              ?.multisatuanUnit !=
+                                                          null
+                                                      ? "${productProvider.detailProduct?.data?.multisatuanUnit.toString()}"
+                                                      : "${productProvider.detailProduct?.data?.satuanProduk.toString()}",
                                                   style: poppins.copyWith(
                                                     color: backgroundColor1,
                                                   ),
@@ -524,42 +828,70 @@ class _DetailItemState extends State<DetailItem> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () async {
-                            var data = {
-                              "cabang_id":
-                                  authProvider.user.data.cabangId?.toInt(),
-                              "produk_id": int.tryParse(widget.id),
-                            };
-
-                            var message = await cartProduct.addCart(
-                              data: data,
-                              token: authProvider.user.token.toString(),
-                            );
-
-                            if (message != "") {
-                              showToast("Gagal Menambahkan Barang");
+                            if (productProvider
+                                    .detailProduct!.data!.multisatuanJumlah !=
+                                null) {
+                              showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20))),
+                                  backgroundColor: Colors.white,
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                      padding:
+                                          MediaQuery.of(context).viewInsets,
+                                      child: showMultiSatuan(
+                                          int.parse(widget.id),
+                                          productProvider.detailProduct!.data!
+                                              .multisatuanUnit,
+                                          productProvider.detailProduct!.data!
+                                              .multisatuanJumlah),
+                                    );
+                                  }).then((value) => setState(() {
+                                    // _getCartList();
+                                  }));
+                              // showToast("Multisatuan");
                             } else {
-                              final snackBar = SnackBar(
-                                backgroundColor: backgroundColor1,
-                                showCloseIcon: true,
-                                content: const Text(
-                                    'Berhasil menambahkan item ke keranjang!'),
-                                duration: const Duration(seconds: 1),
-                                action: SnackBarAction(
-                                  label: 'Menuju Keranjang',
-                                  textColor: Colors.white,
-                                  backgroundColor: backgroundColor2,
-                                  onPressed: () {
-                                    if (context.mounted) {
-                                      Navigator.pushNamed(context, '/cart');
-                                    }
-                                  },
-                                ),
+                              var data = {
+                                "cabang_id":
+                                    authProvider.user.data.cabangId?.toInt(),
+                                "produk_id": int.tryParse(widget.id),
+                              };
+
+                              var message = await cartProduct.addCart(
+                                data: data,
+                                token: authProvider.user.token.toString(),
                               );
 
-                              // Find the ScaffoldMessenger in the widget tree
-                              // and use it to show a SnackBar.
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
+                              if (message != "") {
+                                showToast("Gagal Menambahkan Barang");
+                              } else {
+                                final snackBar = SnackBar(
+                                  backgroundColor: backgroundColor1,
+                                  showCloseIcon: true,
+                                  content: const Text(
+                                      'Berhasil menambahkan item ke keranjang!'),
+                                  duration: const Duration(seconds: 1),
+                                  action: SnackBarAction(
+                                    label: 'Menuju Keranjang',
+                                    textColor: Colors.white,
+                                    backgroundColor: backgroundColor2,
+                                    onPressed: () {
+                                      if (context.mounted) {
+                                        Navigator.pushNamed(context, '/cart');
+                                      }
+                                    },
+                                  ),
+                                );
+
+                                // Find the ScaffoldMessenger in the widget tree
+                                // and use it to show a SnackBar.
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(

@@ -129,6 +129,9 @@ class Produk {
   String? imageUrl;
   int? harga;
   int? jumlah;
+  List<int>? jumlahMultisatuan;
+  List<String>? multisatuanJumlah;
+  List<String>? multisatuanUnit;
   int? totalHarga;
   String? catatan;
   String? createdAt;
@@ -142,6 +145,9 @@ class Produk {
       this.imageUrl,
       this.harga,
       this.jumlah,
+      this.jumlahMultisatuan,
+      this.multisatuanJumlah,
+      this.multisatuanUnit,
       this.totalHarga,
       this.catatan,
       this.createdAt});
@@ -155,6 +161,15 @@ class Produk {
     imageUrl = json['image_url'];
     harga = json['harga'];
     jumlah = json['jumlah'];
+    jumlahMultisatuan = json['jumlah_multisatuan'] == null
+        ? []
+        : json['jumlah_multisatuan'].cast<int>();
+    multisatuanJumlah = json['multisatuan_jumlah'] == null
+        ? []
+        : json['multisatuan_jumlah'].cast<String>();
+    multisatuanUnit = json['multisatuan_unit'] == null
+        ? []
+        : json['multisatuan_unit'].cast<String>();
     totalHarga = json['total_harga'];
     catatan = json['catatan'];
     createdAt = json['created_at'];
@@ -170,6 +185,9 @@ class Produk {
     data['image_url'] = this.imageUrl;
     data['harga'] = this.harga;
     data['jumlah'] = this.jumlah;
+    data['jumlah_multisatuan'] = this.jumlahMultisatuan;
+    data['multisatuan_jumlah'] = this.multisatuanJumlah;
+    data['multisatuan_unit'] = this.multisatuanUnit;
     data['total_harga'] = this.totalHarga;
     data['catatan'] = this.catatan;
     data['created_at'] = this.createdAt;

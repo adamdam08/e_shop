@@ -82,6 +82,7 @@ class _CustomerState extends State<Customer> {
       print("Update Customer ${myCustomer}");
       return GestureDetector(
         onTap: () {
+          print("Data Customer clicked : ${myCustomer}");
           Navigator.push(
               context,
               MaterialPageRoute(

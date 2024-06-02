@@ -55,8 +55,10 @@ class _CartState extends State<Cart> {
         token: authProvider.user.token.toString())) {
       if (mounted) {
         setState(() {});
+        if (cartProvider.cartList.listData!.isNotEmpty) {
+          print("${cartProvider.cartList.listData!.first.cartData!.length}");
+        }
       }
-      print("${cartProvider.cartList.listData!.first.cartData!.length}");
     }
 
     setState(() {
@@ -181,10 +183,21 @@ class _CartState extends State<Cart> {
                               child: FadeInImage.memoryNetwork(
                                 placeholder: kTransparentImage,
                                 image:
-                                    "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                                    "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
                                 fit: BoxFit.cover,
                                 height: 125,
                                 width: 125,
+                                imageErrorBuilder: (BuildContext context,
+                                    Object error, StackTrace? stackTrace) {
+                                  return Container(
+                                    height: 125,
+                                    width: 125,
+                                    color: Colors.grey,
+                                    child: const Center(
+                                      child: Icon(Icons.error),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             Expanded(
@@ -440,14 +453,342 @@ class _CartState extends State<Cart> {
       );
     }
 
+    Widget showMultiSatuan(
+      int index,
+      List<String>? multisatuanUnit,
+      List<String>? multisatuanJumlah,
+      List<int>? jumlahMultisatuan,
+    ) {
+      var multisatuanList = multisatuanUnit!;
+      var multisatuanJumlahList = multisatuanJumlah!;
+      var jumlahItemSelected = jumlahMultisatuan;
+
+      bool isLoading = false;
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        color: Colors.white,
+        child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter stateSetter) {
+          TextEditingController descriptionTextController =
+              TextEditingController();
+
+          CartProvider cartProduct = Provider.of<CartProvider>(context);
+          print("Catatan : ${descriptionTextController.text}");
+          // print("Total Item : ${totalItem}");
+
+          descriptionTextController.text = cartProduct.cartNote;
+          descriptionTextController.selection = TextSelection.collapsed(
+              offset: descriptionTextController.text.length);
+
+          return KeyboardVisibilityBuilder(
+              builder: (context, isKeyboardVisible) {
+            // Keyboard Dismiss
+            if (isKeyboardVisible == false) {
+              Future.delayed(Duration.zero, () async {
+                cartProduct.cartUpdate = parameterCart(
+                    note: descriptionTextController.text, total: 0);
+              });
+            }
+
+            return ListView(
+              shrinkWrap: true,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "Pilih Satuan",
+                        style: poppins.copyWith(
+                            fontSize: 18,
+                            fontWeight: semiBold,
+                            color: backgroundColor1),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      for (var i = 0;
+                          i < multisatuanJumlahList.length;
+                          i++) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "${multisatuanList[i]} (${multisatuanJumlahList[i]} Pcs)",
+                              style: poppins.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: regular,
+                                  color: backgroundColor1),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ClipOval(
+                                  child: Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor3,
+                                    ),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        stateSetter(() {
+                                          jumlahItemSelected?[i] += 1;
+                                        });
+                                        print(
+                                            "${multisatuanList[i]} : ${jumlahItemSelected![i]}");
+                                      },
+                                      child: const Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Text(
+                                    jumlahItemSelected![i].toString(),
+                                    style: poppins.copyWith(
+                                        fontWeight: bold,
+                                        color: backgroundColor3,
+                                        overflow: TextOverflow.ellipsis),
+                                    maxLines: 2,
+                                  ),
+                                ),
+                                ClipOval(
+                                  child: Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor2,
+                                    ),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        if (jumlahItemSelected[i] >= 1) {
+                                          stateSetter(() {
+                                            jumlahItemSelected[i] -= 1;
+                                          });
+                                          print(
+                                              "${multisatuanList[i]} : ${jumlahItemSelected[i]}");
+                                        }
+                                      },
+                                      child: const Icon(
+                                        Icons.remove,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                      if (isLoading) ...[
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                    width: 1, color: backgroundColor3),
+                              ),
+                              backgroundColor: backgroundColor1),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              isLoading
+                                  ? Container(
+                                      width: 15,
+                                      height: 15,
+                                      margin: const EdgeInsets.only(
+                                          top: 10, bottom: 10),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
+                        ),
+                      ] else ...[
+                        ElevatedButton(
+                          onPressed: () async {
+                            stateSetter(() {
+                              isLoading = true;
+                            });
+
+                            final authProvider = Provider.of<AuthProvider>(
+                                context,
+                                listen: false);
+                            // Get data from SharedPref
+                            var data = await authProvider.getLoginData();
+                            var jumlah = cartProduct.cartList.listData!.first
+                                .cartData![index].jumlah;
+
+                            var stok = cartProduct
+                                .cartList.listData!.first.cartData![index].stok;
+
+                            print("Stok : ${stok}");
+                            // && jumlah! < stok!
+
+                            if (data!.token != null) {
+                              print("Data : ${{
+                                "jumlah": cartProduct.cartTotal + 1,
+                                "catatan": cartProduct.cartNote,
+                              }}");
+
+                              var checkJumlah =
+                                  jumlahItemSelected.reduce((a, b) => a + b);
+                              print("Check Jumlah : ${checkJumlah}");
+                              print("Check Jumlah : ${checkJumlah == 0}");
+                              if (checkJumlah == 0) {
+                                var message = await cartProduct.deleteCart(
+                                    cuid: cartProduct.cartList.listData!.first
+                                        .cartData![index].sId
+                                        .toString(),
+                                    token: data.token.toString());
+                                if (message != "") {
+                                  showToast(message);
+                                } else {
+                                  if (cartProduct.selectedProducts
+                                      .where((element) =>
+                                          element["id"].toString() ==
+                                          cartProduct.cartList.listData!.first
+                                              .cartData![index].produkId
+                                              .toString())
+                                      .isNotEmpty) {
+                                    //Remove data
+                                    cartProduct.selectedProducts.removeWhere(
+                                        (element) =>
+                                            element["id"].toString() ==
+                                            cartProduct.cartList.listData!.first
+                                                .cartData![index].produkId
+                                                .toString());
+                                  }
+                                  setState(() {
+                                    _getCartList();
+                                  });
+                                }
+                              } else {
+                                var message = await cartProduct.updateCart(
+                                    cuid: cartProduct.cartList.listData!.first
+                                        .cartData![index].sId
+                                        .toString(),
+                                    data: {
+                                      "multisatuan_jumlah":
+                                          multisatuanJumlahList,
+                                      "multisatuan_unit": multisatuanList,
+                                      "jumlah_multisatuan": jumlahItemSelected,
+                                      "catatan": cartProduct.cartList.listData!
+                                          .first.cartData![index].catatan,
+                                    },
+                                    token: data.token.toString());
+
+                                if (message != "") {
+                                  showToast(message);
+                                } else {
+                                  showToast("Berhasil Memperbarui Pesanan");
+                                  setState(() {
+                                    _getCartList();
+                                  });
+                                }
+                              }
+
+                              // Find the ScaffoldMessenger in the widget tree
+                              // and use it to show a SnackBar.
+
+                              stateSetter(() {
+                                isLoading = false;
+                              });
+
+                              Navigator.pop(context);
+                            } else {
+                              stateSetter(() {
+                                isLoading = false;
+                              });
+                              showToast("Melebihi batas stok tersedia : $stok");
+                              Navigator.pop(context);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                    width: 1,
+                                    color: (jumlahItemSelected!
+                                                .reduce((a, b) => a + b)) ==
+                                            0
+                                        ? Colors.red
+                                        : backgroundColor3),
+                              ),
+                              backgroundColor: (jumlahItemSelected!
+                                          .reduce((a, b) => a + b)) ==
+                                      0
+                                  ? Colors.red
+                                  : backgroundColor1),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                (jumlahItemSelected!.reduce((a, b) => a + b)) ==
+                                        0
+                                    ? Icons.delete
+                                    : Icons.shopping_cart,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                (jumlahItemSelected!.reduce((a, b) => a + b)) ==
+                                        0
+                                    ? ' Hapus dari keranjang'
+                                    : ' Perbarui keranjang',
+                                style: poppins.copyWith(
+                                    fontWeight: semiBold, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            );
+          });
+        }),
+      );
+    }
+
     Widget cartDynamicCard(int index) {
+      print(
+          "Multi Satuan : ${cartProduct.cartList.listData!.first.cartData![index].jumlahMultisatuan!.length}");
+      print(
+          "Multi Satuan : ${cartProduct.cartList.listData!.first.cartData![index].multisatuanUnit!.length}");
+
       if (cartProduct.selectedProducts
           .where((element) =>
               element["id"].toString() ==
               cartProduct.cartList.listData!.first.cartData![index].produkId
                   .toString())
           .isNotEmpty) {
-        print("Data Before : ${cartProduct.selectedProducts.toString()}");
         for (int i = 0; i < cartProduct.selectedProducts.length; i++) {
           if (cartProduct.selectedProducts[i]["id"].toString() ==
               cartProduct.cartList.listData!.first.cartData![index].produkId
@@ -462,22 +803,62 @@ class _CartState extends State<Cart> {
             } else {
               totalHarga = data.harga!.toInt() * data.jumlah!.toInt();
             }
-            cartProduct.selectedProducts[i] = {
-              "id": data.produkId,
-              "nama_produk": data.namaProduk.toString(),
-              "image_url":
-                  "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
-              "harga": data.diskon != null ? data.hargaDiskon : data.harga,
-              "jumlah": data.jumlah,
-              "total_harga": totalHarga,
-              "catatan": data.catatan,
-            };
+
+            if (cartProduct.cartList.listData!.first.cartData![index]
+                .multisatuanUnit!.isNotEmpty) {
+              print("Data After : Multilist");
+              cartProduct.selectedProducts[i] = {
+                "id": data.produkId,
+                "nama_produk": data.namaProduk.toString(),
+                "image_url":
+                    "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                "harga": data.diskon != null ? data.hargaDiskon : data.harga,
+                "jumlah": data.jumlah,
+                "total_harga": totalHarga,
+                "catatan": data.catatan,
+                "jumlah_multisatuan": data.jumlahMultisatuan,
+                "multisatuan_jumlah": data.multisatuanJumlah,
+                "multisatuan_unit": data.multisatuanUnit,
+              };
+            } else {
+              cartProduct.selectedProducts[i] = {
+                "id": data.produkId,
+                "nama_produk": data.namaProduk.toString(),
+                "image_url":
+                    "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                "harga": data.diskon != null ? data.hargaDiskon : data.harga,
+                "jumlah": data.jumlah,
+                "total_harga": totalHarga,
+                "catatan": data.catatan,
+              };
+            }
 
             print("Data After : ${cartProduct.selectedProducts.toString()}");
             break;
           }
         }
       }
+
+      // Pack State
+      var packString = "";
+      for (var i = 0;
+          i <
+              cartProduct.cartList.listData!.first.cartData![index]
+                  .jumlahMultisatuan!.length;
+          i++) {
+        var jumlah = cartProduct
+            .cartList.listData!.first.cartData![index].jumlahMultisatuan?[i];
+        var unit = cartProduct
+            .cartList.listData!.first.cartData![index].multisatuanUnit?[i];
+
+        print("PackString : $jumlah");
+        print("PackString : $unit");
+
+        if (jumlah! > 0) {
+          packString += "(${jumlah} ${unit}) ".toUpperCase();
+        }
+      }
+
       return GestureDetector(
         onTap: () {
           Navigator.push(
@@ -531,17 +912,48 @@ class _CartState extends State<Cart> {
                     } else {
                       totalHarga = data.harga!.toInt() * data.jumlah!.toInt();
                     }
-                    cartProduct.selectedProducts.add({
-                      "id": data.produkId,
-                      "nama_produk": data.namaProduk.toString(),
-                      "image_url":
-                          "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
-                      "harga":
-                          data.diskon != null ? data.hargaDiskon : data.harga,
-                      "jumlah": data.jumlah,
-                      "total_harga": totalHarga,
-                      "catatan": data.catatan,
-                    });
+
+                    print(
+                        "Checkbox tapped ${cartProduct.cartList.listData!.first.cartData![index].multisatuanUnit}");
+                    print(
+                        "Checkbox tappped ${cartProduct.cartList.listData!.first.cartData![index].multisatuanUnit != null}");
+
+                    if (cartProduct.cartList.listData!.first.cartData![index]
+                            .multisatuanUnit !=
+                        null) {
+                      cartProduct.selectedProducts.add({
+                        "id": data.produkId,
+                        "nama_produk": data.namaProduk.toString(),
+                        "image_url":
+                            "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                        "harga":
+                            data.diskon != null ? data.hargaDiskon : data.harga,
+                        "jumlah": data.jumlah,
+                        "total_harga": totalHarga,
+                        "catatan": data.catatan,
+                        "jumlah_multisatuan": cartProduct.cartList.listData!
+                            .first.cartData![index].jumlahMultisatuan,
+                        "multisatuan_jumlah": cartProduct.cartList.listData!
+                            .first.cartData![index].multisatuanJumlah,
+                        "multisatuan_unit": cartProduct.cartList.listData!.first
+                            .cartData![index].multisatuanUnit,
+                      });
+                    } else {
+                      cartProduct.selectedProducts.add({
+                        "id": data.produkId,
+                        "nama_produk": data.namaProduk.toString(),
+                        "image_url":
+                            "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                        "harga":
+                            data.diskon != null ? data.hargaDiskon : data.harga,
+                        "jumlah": data.jumlah,
+                        "total_harga": totalHarga,
+                        "catatan": data.catatan,
+                      });
+                    }
+
+                    print(
+                        "Data After : ${cartProduct.selectedProducts.last.toString()}");
                   } else {
                     cartProduct.selectedProducts.removeWhere((element) =>
                         element["id"].toString() ==
@@ -561,10 +973,21 @@ class _CartState extends State<Cart> {
                 child: FadeInImage.memoryNetwork(
                   placeholder: kTransparentImage,
                   image:
-                      "https://tokosm.online/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                      "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
                   fit: BoxFit.cover,
                   height: 125,
                   width: 125,
+                  imageErrorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return Container(
+                      height: 125,
+                      width: 125,
+                      color: Colors.grey,
+                      child: const Center(
+                        child: Icon(Icons.error),
+                      ),
+                    );
+                  },
                 ),
               ),
               Expanded(
@@ -640,6 +1063,21 @@ class _CartState extends State<Cart> {
                       const SizedBox(
                         height: 5,
                       ),
+                      if (cartProduct.cartList.listData!.first.cartData![index]
+                          .multisatuanUnit!.isNotEmpty) ...[
+                        Text(
+                          packString,
+                          style: poppins.copyWith(
+                              fontSize: 10,
+                              fontWeight: regular,
+                              color: Colors.grey,
+                              overflow: TextOverflow.ellipsis),
+                          maxLines: 2,
+                        ),
+                      ],
+                      const SizedBox(
+                        height: 5,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -700,52 +1138,90 @@ class _CartState extends State<Cart> {
                               ),
                               child: InkWell(
                                 onTap: () async {
-                                  final authProvider =
-                                      Provider.of<AuthProvider>(context,
-                                          listen: false);
-                                  // Get data from SharedPref
-                                  var data = await authProvider.getLoginData();
-                                  var jumlah = cartProduct.cartList.listData!
-                                      .first.cartData![index].jumlah;
+                                  var dataCart = cartProduct.cartList.listData!
+                                      .first.cartData![index];
+                                  print(
+                                      "Datacart : ${dataCart.jumlahMultisatuan.toString()}");
+                                  if (cartProduct.cartList.listData!.first
+                                          .cartData![index].jumlahMultisatuan !=
+                                      null) {
+                                    showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(20))),
+                                        backgroundColor: Colors.white,
+                                        clipBehavior:
+                                            Clip.antiAliasWithSaveLayer,
+                                        builder: (BuildContext context) {
+                                          return Padding(
+                                            padding: MediaQuery.of(context)
+                                                .viewInsets,
+                                            child: showMultiSatuan(
+                                                index,
+                                                dataCart.multisatuanUnit,
+                                                dataCart.multisatuanJumlah,
+                                                dataCart.jumlahMultisatuan),
+                                          );
+                                        }).then((value) => setState(() {
+                                          _getCartList();
+                                        }));
+                                  } else {
+                                    final authProvider =
+                                        Provider.of<AuthProvider>(context,
+                                            listen: false);
+                                    // Get data from SharedPref
+                                    var data =
+                                        await authProvider.getLoginData();
+                                    var jumlah = cartProduct.cartList.listData!
+                                        .first.cartData![index].jumlah;
 
-                                  var stok = cartProduct.cartList.listData!
-                                      .first.cartData![index].stok;
+                                    var stok = cartProduct.cartList.listData!
+                                        .first.cartData![index].stok;
 
-                                  if (data!.token != null && jumlah! < stok!) {
-                                    print("Data : ${{
-                                      "jumlah": cartProduct.cartTotal + 1,
-                                      "catatan": cartProduct.cartNote,
-                                    }}");
-                                    var message = await cartProduct.updateCart(
-                                        cuid: cartProduct.cartList.listData!
-                                            .first.cartData![index].sId
-                                            .toString(),
-                                        data: {
-                                          "jumlah": (cartProduct
+// && jumlah! < stok!
+                                    if (data!.token != null) {
+                                      print("Data : ${{
+                                        "jumlah": cartProduct.cartTotal + 1,
+                                        "catatan": cartProduct.cartNote,
+                                      }}");
+                                      var message =
+                                          await cartProduct.updateCart(
+                                              cuid: cartProduct
                                                   .cartList
                                                   .listData!
                                                   .first
                                                   .cartData![index]
-                                                  .jumlah)! +
-                                              1,
-                                          "catatan": cartProduct
-                                              .cartList
-                                              .listData!
-                                              .first
-                                              .cartData![index]
-                                              .catatan,
-                                        },
-                                        token: data.token.toString());
+                                                  .sId
+                                                  .toString(),
+                                              data: {
+                                                "jumlah": (cartProduct
+                                                        .cartList
+                                                        .listData!
+                                                        .first
+                                                        .cartData![index]
+                                                        .jumlah)! +
+                                                    1,
+                                                "catatan": cartProduct
+                                                    .cartList
+                                                    .listData!
+                                                    .first
+                                                    .cartData![index]
+                                                    .catatan,
+                                              },
+                                              token: data.token.toString());
 
-                                    if (message != "") {
-                                      showToast(message);
+                                      if (message != "") {
+                                        showToast(message);
+                                      } else {
+                                        setState(() {
+                                          _getCartList();
+                                        });
+                                      }
                                     } else {
-                                      setState(() {
-                                        _getCartList();
-                                      });
+                                      showToast("Stok Telah Habis");
                                     }
-                                  } else {
-                                    showToast("Stok Telah Habis");
                                   }
                                 },
                                 child: const Icon(
@@ -784,77 +1260,103 @@ class _CartState extends State<Cart> {
                               ),
                               child: InkWell(
                                 onTap: () async {
-                                  final authProvider =
-                                      Provider.of<AuthProvider>(context,
-                                          listen: false);
-                                  // Get data from SharedPref
-                                  var data = await authProvider.getLoginData();
-
-                                  if (data!.token != null) {
-                                    if ((cartProduct.cartList.listData!.first
-                                            .cartData![index].jumlah!) >
-                                        1) {
-                                      var message =
-                                          await cartProduct.updateCart(
-                                              cuid: cartProduct
-                                                  .cartList
-                                                  .listData!
-                                                  .first
-                                                  .cartData![index]
-                                                  .sId
-                                                  .toString(),
-                                              data: {
-                                                "jumlah": (cartProduct
-                                                        .cartList
-                                                        .listData!
-                                                        .first
-                                                        .cartData![index]
-                                                        .jumlah!) -
-                                                    1,
-                                                "catatan": cartProduct
-                                                    .cartList
-                                                    .listData!
-                                                    .first
-                                                    .cartData![index]
-                                                    .catatan,
-                                              },
-                                              token: data.token.toString());
-
-                                      if (message != "") {
-                                        showToast(message);
-                                      } else {
-                                        setState(() {
+                                  if (cartProduct
+                                              .cartList
+                                              .listData!
+                                              .first
+                                              .cartData![index]
+                                              .jumlahMultisatuan !=
+                                          null &&
+                                      (cartProduct.cartList.listData!.first
+                                              .cartData![index].jumlah!) >
+                                          1) {
+                                    var dataCart = cartProduct.cartList
+                                        .listData!.first.cartData![index];
+                                    print(
+                                        "Datacart : ${dataCart.jumlahMultisatuan.toString()}");
+                                    showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(20))),
+                                        backgroundColor: Colors.white,
+                                        clipBehavior:
+                                            Clip.antiAliasWithSaveLayer,
+                                        builder: (BuildContext context) {
+                                          return Padding(
+                                            padding: MediaQuery.of(context)
+                                                .viewInsets,
+                                            child: showMultiSatuan(
+                                                index,
+                                                dataCart.multisatuanUnit,
+                                                dataCart.multisatuanJumlah,
+                                                dataCart.jumlahMultisatuan),
+                                          );
+                                        }).then((value) => setState(() {
                                           _getCartList();
-                                        });
-                                      }
-                                    } else {
-                                      var message =
-                                          await cartProduct.deleteCart(
-                                              cuid: cartProduct
-                                                  .cartList
-                                                  .listData!
-                                                  .first
-                                                  .cartData![index]
-                                                  .sId
-                                                  .toString(),
-                                              token: data.token.toString());
-                                      if (message != "") {
-                                        showToast(message);
-                                      } else {
-                                        if (cartProduct.selectedProducts
-                                            .where((element) =>
-                                                element["id"].toString() ==
-                                                cartProduct
+                                        }));
+                                  } else {
+                                    final authProvider =
+                                        Provider.of<AuthProvider>(context,
+                                            listen: false);
+                                    // Get data from SharedPref
+                                    var data =
+                                        await authProvider.getLoginData();
+
+                                    if (data!.token != null) {
+                                      if ((cartProduct.cartList.listData!.first
+                                              .cartData![index].jumlah!) >
+                                          1) {
+                                        var message =
+                                            await cartProduct.updateCart(
+                                                cuid: cartProduct
                                                     .cartList
                                                     .listData!
                                                     .first
                                                     .cartData![index]
-                                                    .produkId
-                                                    .toString())
-                                            .isNotEmpty) {
-                                          //Remove data
-                                          cartProduct.selectedProducts
-                                              .removeWhere((element) =>
+                                                    .sId
+                                                    .toString(),
+                                                data: {
+                                                  "jumlah": (cartProduct
+                                                          .cartList
+                                                          .listData!
+                                                          .first
+                                                          .cartData![index]
+                                                          .jumlah!) -
+                                                      1,
+                                                  "catatan": cartProduct
+                                                      .cartList
+                                                      .listData!
+                                                      .first
+                                                      .cartData![index]
+                                                      .catatan,
+                                                },
+                                                token: data.token.toString());
+
+                                        if (message != "") {
+                                          showToast(message);
+                                        } else {
+                                          setState(() {
+                                            _getCartList();
+                                          });
+                                        }
+                                      } else {
+                                        var message =
+                                            await cartProduct.deleteCart(
+                                                cuid: cartProduct
+                                                    .cartList
+                                                    .listData!
+                                                    .first
+                                                    .cartData![index]
+                                                    .sId
+                                                    .toString(),
+                                                token: data.token.toString());
+                                        if (message != "") {
+                                          showToast(message);
+                                        } else {
+                                          if (cartProduct.selectedProducts
+                                              .where((element) =>
                                                   element["id"].toString() ==
                                                   cartProduct
                                                       .cartList
@@ -862,11 +1364,24 @@ class _CartState extends State<Cart> {
                                                       .first
                                                       .cartData![index]
                                                       .produkId
-                                                      .toString());
+                                                      .toString())
+                                              .isNotEmpty) {
+                                            //Remove data
+                                            cartProduct.selectedProducts
+                                                .removeWhere((element) =>
+                                                    element["id"].toString() ==
+                                                    cartProduct
+                                                        .cartList
+                                                        .listData!
+                                                        .first
+                                                        .cartData![index]
+                                                        .produkId
+                                                        .toString());
+                                          }
+                                          setState(() {
+                                            _getCartList();
+                                          });
                                         }
-                                        setState(() {
-                                          _getCartList();
-                                        });
                                       }
                                     }
                                   }
