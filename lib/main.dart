@@ -158,46 +158,50 @@ class _BottomNavigationBarExampleState
             items: [
               BottomNavigationBarItem(
                 icon: Container(
-                  height: 14,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  height: 10,
                   child: const Icon(
                     Icons.home,
                   ),
                 ),
-                label: '',
+                label: 'Home',
               ),
               BottomNavigationBarItem(
                 icon: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
                   height: 10,
                   child: const Icon(
                     Icons.menu,
                   ),
                 ),
-                label: '',
+                label: 'Kategori',
               ),
               BottomNavigationBarItem(
                 icon: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
                   height: 10,
                   child: const Icon(
                     Icons.percent,
                   ),
                 ),
-                label: '',
+                label: 'Diskon',
               ),
               BottomNavigationBarItem(
                 icon: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
                   height: 10,
                   child: const Icon(
                     SolarIconsBold.usersGroupRounded,
                   ),
                 ),
-                label: '',
+                label: 'Pelanggan',
               ),
             ],
             currentIndex: pageProvider.currentIndex,
             selectedItemColor: Colors.white,
             unselectedItemColor: Colors.black,
-            showUnselectedLabels: false,
-            showSelectedLabels: false,
+            showUnselectedLabels: true,
+            showSelectedLabels: true,
             backgroundColor: Colors.transparent,
             onTap: (index) {
               if (context.mounted) {

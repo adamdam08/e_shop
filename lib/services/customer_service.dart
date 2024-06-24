@@ -91,6 +91,31 @@ class CustomerService {
     }
   }
 
+  // Add data customer
+  Future<CustomerPostModel> updatePasswordSales({
+    required Map data,
+    required String token,
+  }) async {
+    var url = Uri.parse("${baseURL}akun/password");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+    var body = jsonEncode(data);
+    var response = await http.post(url, headers: header, body: body);
+
+    print("Update Password ${response.body}");
+
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+      CustomerPostModel callbackData = CustomerPostModel.fromJson(data);
+      return callbackData;
+    } else {
+      var data = jsonDecode(response.body);
+      throw ErrorDescription('${data['message']}');
+    }
+  }
+
   // Get List Customer
   Future<CustomerDataModel> getListCustomer({required String token}) async {
     var url = Uri.parse("${baseURL}customer");

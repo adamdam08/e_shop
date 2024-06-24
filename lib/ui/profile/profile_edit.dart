@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilEdit extends StatefulWidget {
   final Map<dynamic, dynamic> data;
@@ -100,17 +101,17 @@ class ProfilEditState extends State<ProfilEdit> {
                     if (widget.isPassword == true) ...[
                       textFormBuilder(
                           searchBoxController: passwordTextEditingController,
-                          headerText: "Password",
+                          headerText: "Password Lama",
                           icon: Icons.password,
                           isEditable: true,
-                          keyboardType: TextInputType.name),
+                          keyboardType: TextInputType.visiblePassword),
                       textFormBuilder(
                           searchBoxController:
                               confirmPasswordTextEditingController,
-                          headerText: "Konfirmasi Password",
+                          headerText: "Password Baru",
                           icon: Icons.password,
                           isEditable: true,
-                          keyboardType: TextInputType.name)
+                          keyboardType: TextInputType.visiblePassword)
                     ] else ...[
                       const SizedBox()
                     ],
@@ -180,10 +181,7 @@ class ProfilEditState extends State<ProfilEdit> {
                           if (password.isNotEmpty) {
                             if (confirmPassword.isEmpty) {
                               isempty = true;
-                              showToast("Konfirmasi password wajib diisi");
-                            } else if (password != confirmPassword) {
-                              isempty = true;
-                              showToast("Password tidak sama");
+                              showToast("Password baru wajib diisi");
                             }
                           }
                         }
@@ -217,7 +215,10 @@ class ProfilEditState extends State<ProfilEdit> {
 
                         if (!isempty) {
                           var jsonData = widget.isPassword
-                              ? {"password": password}
+                              ? {
+                                  "oldpassword": password,
+                                  "newpassword": confirmPassword
+                                }
                               : {
                                   "username": username,
                                   "nama_lengkap": name,
@@ -226,21 +227,45 @@ class ProfilEditState extends State<ProfilEdit> {
                                   "telp": phone,
                                   "wilayah": ""
                                 };
+                          if (widget.isPassword) {
+                            var loginData = await authProvider.getLoginData();
+                            var message =
+                                await customerProvider.updateCustomerPassword(
+                              data: jsonData,
+                              token: loginData!.token.toString(),
+                            );
 
-                          var loginData = await authProvider.getLoginData();
-                          var message =
-                              await customerProvider.updateCustomerData(
-                                  isSales: true,
-                                  data: jsonData,
-                                  id: widget.data["id"],
-                                  token: loginData!.token.toString());
+                            if (message != "") {
+                              showToast(message);
+                            } else {
+                              if (await authProvider.salesLogin(
+                                email: authProvider.user.data.email.toString(),
+                                password: confirmPassword,
+                              )) {
+                                showToast(
+                                    "Berhasil memperbarui password sales");
+                              }
 
-                          if (message != "") {
-                            showToast(message);
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                              }
+                            }
                           } else {
-                            showToast("Berhasil memperbarui profil sales");
-                            if (context.mounted) {
-                              Navigator.pop(context);
+                            var loginData = await authProvider.getLoginData();
+                            var message =
+                                await customerProvider.updateCustomerData(
+                                    isSales: true,
+                                    data: jsonData,
+                                    id: widget.data["id"],
+                                    token: loginData!.token.toString());
+
+                            if (message != "") {
+                              showToast(message);
+                            } else {
+                              showToast("Berhasil memperbarui profil sales");
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                              }
                             }
                           }
                         } else {}
@@ -404,15 +429,15 @@ class ProfilEditState extends State<ProfilEdit> {
             ),
             child: TextField(
               controller: searchBoxController,
-              obscureText: (headerText == "Password") ||
-                      (headerText == "Konfirmasi Password")
+              obscureText: (headerText == "Password Lama") ||
+                      (headerText == "Password Baru")
                   ? true
                   : false,
               cursorColor: Colors.grey,
               enabled: isEditable,
               keyboardType: keyboardType,
-              maxLines: (headerText == "Password") ||
-                      (headerText == "Konfirmasi Password")
+              maxLines: (headerText == "Password Lama") ||
+                      (headerText == "Password Baru")
                   ? 1
                   : 5,
               minLines: 1,

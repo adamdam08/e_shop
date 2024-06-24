@@ -50,6 +50,18 @@ class CustomerProvider with ChangeNotifier {
     }
   }
 
+  Future<String> updateCustomerPassword({
+    required Map data,
+    required String token,
+  }) async {
+    try {
+      await CustomerService().updatePasswordSales(data: data, token: token);
+      return "";
+    } catch (e) {
+      return "$e";
+    }
+  }
+
   Future<bool> getListCustomerData({
     required String token,
   }) async {

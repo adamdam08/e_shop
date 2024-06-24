@@ -332,10 +332,6 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
                                     ?.where((element) =>
                                         element.id ==
                                         settingsProvider.selectedPayment);
-                                print(
-                                    "bankData : ${settingsProvider.selectedPayment}");
-                                print(
-                                    "bankData : ${settingsProvider.paymentList!.paymentData?.first.id}");
 
                                 if (bankData != null || bankData!.isNotEmpty) {
                                   widget.mapData?["metode_pembayaran"] =
@@ -382,10 +378,11 @@ class _CheckoutPaymentState extends State<CheckoutPayment> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 isLoading == true
-                                    ? const SizedBox(
+                                    ? Container(
+                                        margin: EdgeInsets.only(right: 10),
                                         width: 20,
                                         height: 20,
-                                        child: CircularProgressIndicator(
+                                        child: const CircularProgressIndicator(
                                           color: Colors.white,
                                         ),
                                       )

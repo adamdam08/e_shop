@@ -200,18 +200,20 @@ class _DetailItemState extends State<DetailItem> {
                                     height: 30,
                                     width: 30,
                                     decoration: BoxDecoration(
-                                      color: backgroundColor3,
+                                      color: backgroundColor2,
                                     ),
                                     child: InkWell(
                                       onTap: () async {
-                                        stateSetter(() {
-                                          jumlahItemSelected[i] += 1;
-                                        });
-                                        print(
-                                            "${multisatuanList[i]} : ${jumlahItemSelected[i]}");
+                                        if (jumlahItemSelected[i] >= 1) {
+                                          stateSetter(() {
+                                            jumlahItemSelected[i] -= 1;
+                                          });
+                                          print(
+                                              "${multisatuanList[i]} : ${jumlahItemSelected[i]}");
+                                        }
                                       },
                                       child: const Icon(
-                                        Icons.add,
+                                        Icons.remove,
                                         color: Colors.white,
                                         size: 20,
                                       ),
@@ -236,20 +238,53 @@ class _DetailItemState extends State<DetailItem> {
                                     height: 30,
                                     width: 30,
                                     decoration: BoxDecoration(
-                                      color: backgroundColor2,
+                                      color: backgroundColor3,
                                     ),
                                     child: InkWell(
                                       onTap: () async {
-                                        if (jumlahItemSelected[i] >= 1) {
-                                          stateSetter(() {
-                                            jumlahItemSelected[i] -= 1;
-                                          });
-                                          print(
-                                              "${multisatuanList[i]} : ${jumlahItemSelected[i]}");
+                                        var jumlahTemp = 0;
+
+                                        for (var x = 0;
+                                            x < jumlahItemSelected.length;
+                                            x++) {
+                                          if (i == x) {
+                                            var total = ((jumlahItemSelected[x]
+                                                    as int?)! +
+                                                1);
+                                            jumlahTemp += (total *
+                                                int.parse(
+                                                    multisatuanJumlahList[x]));
+                                          } else {
+                                            var total = ((jumlahItemSelected[x]
+                                                as int?)!);
+                                            jumlahTemp += (total *
+                                                int.parse(
+                                                    multisatuanJumlahList[x]));
+                                          }
                                         }
+
+                                        var stok = int.parse(productProvider
+                                            .detailProduct!
+                                            .data!
+                                            .stok!
+                                            .first
+                                            .stok
+                                            .toString());
+
+                                        print(
+                                            "Stok Total: ${jumlahTemp} ${stok}");
+
+                                        stateSetter(() {
+                                          if (jumlahTemp <= (stok)) {
+                                            jumlahItemSelected[i] += 1;
+                                          } else {
+                                            showToast(
+                                                "Melebihi batas stok tersedia");
+                                          }
+                                        });
                                       },
                                       child: const Icon(
-                                        Icons.remove,
+                                        Icons.add,
                                         color: Colors.white,
                                         size: 20,
                                       ),
@@ -300,29 +335,8 @@ class _DetailItemState extends State<DetailItem> {
                               isLoading = true;
                             });
 
-                            // var stok = productProvider
-                            //     .detailProduct!.data!.stok?.first.stok;
-                            // // Convert the string elements to integers and sum corresponding elements
-                            // List<int> sumList = List.generate(
-                            //     multisatuanList.length,
-                            //     (index) =>
-                            //         int.parse(multisatuanList[index]) +
-                            //         int.parse(jumlahItemSelected[index]));
-
-                            // // Calculate the total sum of the resulting list
-                            // int jumlah = sumList.reduce((a, b) => a + b);
-
-                            // print("Stok terpilih : ${jumlah}");
-                            // print("Stok : ${stok}");
-                            print("Stok : ${multisatuanList}");
-                            print("Stok : ${jumlahItemSelected}");
-
-                            // if (jumlah < stok!) {
-
                             var checkJumlah =
                                 jumlahItemSelected.reduce((a, b) => a + b);
-                            print("Check Jumlah : ${checkJumlah}");
-                            print("Check Jumlah : ${checkJumlah == 0}");
                             if (checkJumlah != 0) {
                               var data = {
                                 "cabang_id":
@@ -332,8 +346,6 @@ class _DetailItemState extends State<DetailItem> {
                                 "multisatuan_unit": multisatuanList,
                                 "jumlah_multisatuan": jumlahItemSelected
                               };
-
-                              print("Multi Data Send : $data");
 
                               var message = await cartProduct.addCart(
                                 data: data,
@@ -369,10 +381,6 @@ class _DetailItemState extends State<DetailItem> {
                             } else {
                               showToast("Barang belum terpilih");
                             }
-
-                            // } else {
-                            //   showToast("Melebihi batas stok tersedia");
-                            // }
 
                             stateSetter(() {
                               isLoading = false;

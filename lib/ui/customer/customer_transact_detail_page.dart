@@ -1,8 +1,13 @@
+import 'dart:ffi';
+
+import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:e_shop/models/product/transaction_history_model.dart';
 import 'package:e_shop/theme/theme.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class CustomerTransactionDetailPage extends StatefulWidget {
@@ -16,6 +21,122 @@ class CustomerTransactionDetailPage extends StatefulWidget {
 
 class _CustomerTransactionDetailPageState
     extends State<CustomerTransactionDetailPage> {
+  // Printer Thermal
+  bool connected = false;
+  List availableBluetoothDevices = [];
+
+  Future<void> getBluetooth() async {
+    connected = false;
+    final List? bluetooths = await BluetoothThermalPrinter.getBluetooths;
+    print("Print $bluetooths");
+    setState(() {
+      availableBluetoothDevices = bluetooths!;
+    });
+  }
+
+  Future<bool> setConnect(String mac) async {
+    final String? result = await BluetoothThermalPrinter.connect(mac);
+    print("state connected $result");
+    if (result == "true") {
+      setState(() {
+        showToast("Cetak resi dimulai");
+        connected = true;
+        printTicket();
+        print("Printer connected : ${connected}");
+      });
+      return true;
+    } else {
+      showToast("Cetak resi gagal, cek kembali perangkat anda");
+      return false;
+    }
+  }
+
+  Future<void> printTicket() async {
+    String? isConnected = await BluetoothThermalPrinter.connectionStatus;
+    if (isConnected == "true") {
+      List<int> bytes = await getTicket();
+      final result = await BluetoothThermalPrinter.writeBytes(bytes);
+      print("Print $result");
+    } else {
+      //Hadnle Not Connected Senario
+    }
+  }
+
+  Future<List<int>> getTicket() async {
+    List<int> bytes = [];
+    CapabilityProfile profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm58, profile);
+
+    bytes += generator.text("Toko SM",
+        styles: const PosStyles(
+          align: PosAlign.center,
+          height: PosTextSize.size2,
+          width: PosTextSize.size2,
+        ),
+        linesAfter: 1);
+
+    bytes += generator.text("Cabang Pusat",
+        styles: const PosStyles(align: PosAlign.center));
+
+    bytes += generator.text("No. Invoice",
+        styles: const PosStyles(align: PosAlign.center));
+
+    bytes += generator.text(widget.data!.noInvoice.toString(),
+        styles: const PosStyles(align: PosAlign.center));
+
+    bytes += generator.hr();
+
+    for (int i = 0; i < widget.data!.produk!.length; i++) {
+      var produkData = widget.data!.produk![i];
+      bytes += generator.text("${produkData.namaProduk}");
+      bytes += generator.row([
+        PosColumn(
+            text: "${produkData.jumlah} x Rp.${produkData.harga}",
+            width: 6,
+            styles: const PosStyles(
+              align: PosAlign.center,
+            )),
+        PosColumn(
+            text: "Rp.${produkData.totalHarga}",
+            width: 6,
+            styles: const PosStyles(align: PosAlign.right)),
+      ]);
+      bytes += generator.emptyLines(1);
+    }
+
+    bytes += generator.hr();
+
+    bytes += generator.text("Total Belanja",
+        styles: PosStyles(align: PosAlign.left, bold: true));
+    bytes += generator.text("Rp.${widget.data!.totalHarga}",
+        styles: PosStyles(align: PosAlign.right, bold: true));
+
+    bytes += generator.text("Total Ongkir",
+        styles: PosStyles(align: PosAlign.left, bold: true));
+    bytes += generator.text("Rp.${widget.data!.totalOngkosKirim}",
+        styles: PosStyles(align: PosAlign.right, bold: true));
+
+    bytes += generator.hr();
+
+    bytes += generator.text("Total Keseluruhan",
+        styles: PosStyles(align: PosAlign.left, bold: true));
+    bytes += generator.text("Rp.${widget.data!.totalBelanja}",
+        styles: PosStyles(align: PosAlign.right, bold: true));
+
+    bytes += generator.hr(ch: '=', linesAfter: 1);
+
+    // ticket.feed(2);
+    bytes += generator.text('Terimakasih!',
+        styles: PosStyles(align: PosAlign.center, bold: true));
+
+    bytes += generator.text("TOKO SM ONLINE",
+        styles: PosStyles(align: PosAlign.center), linesAfter: 1);
+
+    bytes += generator.cut();
+
+    return bytes;
+  }
+
   Widget cartDynamicCard(Produk data) {
     // Pack State
     var packString = "";
@@ -497,6 +618,165 @@ class _CustomerTransactionDetailPageState
     );
   }
 
+  Widget showPrintOption() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      color: Colors.white,
+      child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter stateSetter) {
+        return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+          // Keyboard Dismiss
+          if (isKeyboardVisible == false) {}
+
+          return ListView(
+            shrinkWrap: true,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Pilih Printer",
+                          style: poppins.copyWith(
+                              fontSize: 18,
+                              fontWeight: semiBold,
+                              color: backgroundColor1),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          color: backgroundColor3,
+                          iconSize: 18.0, // You can adjust the size if needed
+                          onPressed: () async {
+                            await getBluetooth();
+                            stateSetter(() {});
+                          },
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    if (availableBluetoothDevices.isNotEmpty) ...[
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        height: 200,
+                        child: ListView.builder(
+                          itemCount: availableBluetoothDevices.isNotEmpty
+                              ? availableBluetoothDevices.length
+                              : 0,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              onTap: () async {
+                                if (availableBluetoothDevices.isNotEmpty) {
+                                  String select =
+                                      availableBluetoothDevices[index];
+                                  List list = select.split("#");
+                                  // String name = list[0];
+                                  String mac = list[1];
+                                  setConnect(mac);
+                                  Navigator.pop(context);
+                                  showToast(
+                                      "Membuat koneksi ke ${availableBluetoothDevices[index]}");
+                                }
+                              },
+                              title:
+                                  Text('${availableBluetoothDevices[index]}'),
+                              subtitle: const Text("Klik untuk cetak resi"),
+                            );
+                          },
+                        ),
+                      ),
+                    ] else ...[
+                      Center(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                'Tidak ada perangkat terkoneksi, hidupkan bluetooth untuk melakukan koneksi dengan printer.',
+                                style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: semiBold,
+                                    color: Colors.grey),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: backgroundColor3,
+                              ),
+                              onPressed: () async {
+                                await getBluetooth();
+                                stateSetter(() {});
+                              },
+                              child: const Text(
+                                'Refresh',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        });
+      }),
+    );
+  }
+
+  void _showPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Izin diperlukan'),
+          content: Text(
+              'Aplikasi ini perlu mengakses fitur nearby devices untuk melakukan koneksi dengan printer. Izinkan aplikasi untuk mengakses nearby devices.'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await openAppSettings();
+              },
+              child: Text('Buka Pengaturan'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Batalkan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showToast(String text) {
+    Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.lightGreen,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -575,6 +855,70 @@ class _CustomerTransactionDetailPageState
                     ),
                   ),
                   cartSummaryCard(widget.data),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    child: Center(
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (await Permission.bluetoothScan
+                                    .request()
+                                    .isGranted &&
+                                await Permission.bluetoothConnect
+                                    .request()
+                                    .isGranted) {
+                              // Permissions are granted, proceed with your Bluetooth operations
+                              await getBluetooth();
+                              showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20))),
+                                  backgroundColor: Colors.white,
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                      padding:
+                                          MediaQuery.of(context).viewInsets,
+                                      child: showPrintOption(),
+                                    );
+                                  }).then((value) => setState(() {
+                                    // _getCartList();
+                                  }));
+                            } else {
+                              // Handle the case where permissions are denied
+                              print("Bluetooth permission denied");
+                              _showPermissionDialog();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              shape: StadiumBorder(
+                                  side: BorderSide(
+                                      width: 1, color: backgroundColor3)),
+                              backgroundColor: backgroundColor3),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.print,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                ' Cetak Resi',
+                                style: poppins.copyWith(
+                                    fontWeight: semiBold, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

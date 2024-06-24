@@ -12,6 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 import '../../theme/theme.dart';
 
@@ -27,6 +28,39 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
   bool isLoading = false;
   String _indexStatus = "0";
   TextEditingController descriptionTextController = TextEditingController();
+
+  // Date Time
+  DateTimeRange? _selectedDateRange;
+
+  // Date Format
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
+  Future<void> _selectDateRange(BuildContext context) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      helpText: "Pilih tanggal untuk filter",
+      saveText: "Simpan sebagai filter",
+      fieldStartLabelText: "Tanggal awal",
+      fieldStartHintText: "Tanggal awal",
+      fieldEndLabelText: "Tanggal akhir",
+      fieldEndHintText: "Tanggal akhir",
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      initialDateRange: _selectedDateRange,
+    );
+
+    if (picked != null && picked != _selectedDateRange) {
+      setState(() {
+        _selectedDateRange = picked;
+        _getTransactionHistory();
+      });
+    } else {
+      setState(() {
+        _selectedDateRange = null;
+        _getTransactionHistory();
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -47,9 +81,16 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
         Provider.of<ProductProvider>(context, listen: false);
     var data = await authProvider.getLoginData();
     if (await productProvider.getListTransaction(
-        customerId: widget.myCustomer["id"].toString(),
-        token: data!.token.toString(),
-        status: _indexStatus)) {
+      customerId: widget.myCustomer["id"].toString(),
+      token: data!.token.toString(),
+      status: _indexStatus,
+      tglAwal: _selectedDateRange == null
+          ? ""
+          : formatter.format(_selectedDateRange!.start),
+      tglAkhir: _selectedDateRange == null
+          ? ""
+          : formatter.format(_selectedDateRange!.end),
+    )) {
       setState(() {
         isLoading = false;
       });
@@ -329,7 +370,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -593,6 +634,29 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                           const EdgeInsets.only(left: 30, right: 30, bottom: 5),
                       scrollDirection: Axis.horizontal,
                       children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectDateRange(context);
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: _selectedDateRange == null
+                                    ? backgroundColor3
+                                    : backgroundColor1),
+                            child: Text(
+                                _selectedDateRange == null
+                                    ? "Filter Tanggal : -"
+                                    : "Filter Tanggal : (${formatter.format(_selectedDateRange!.start)}) -> ( ${formatter.format(_selectedDateRange!.end)})",
+                                style: poppins.copyWith(color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
                         GestureDetector(
                           onTap: () {
                             setState(() {

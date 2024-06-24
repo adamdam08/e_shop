@@ -281,11 +281,19 @@ class ProductProvider with ChangeNotifier {
     required String customerId,
     required String token,
     required String status,
+    required String tglAwal,
+    required String tglAkhir,
   }) async {
+    print("List Transact : tgl awal : ${tglAwal}");
+    print("List Transact : tgl akhir  : ${tglAkhir}");
     try {
       TransactionHistoryModel callback = await ProductService()
           .getListTransaction(
-              token: token, customerId: customerId, status: status);
+              token: token,
+              customerId: customerId,
+              status: status,
+              tglAwal: tglAwal,
+              tglAkhir: tglAkhir);
       _transactionHistory = callback;
       return true;
     } catch (e) {

@@ -29,6 +29,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String selectedCustomer = "Pilih customer";
   String selectedAddress = "Pilih Alamat";
   String? customerID;
+  String? customerName;
   int _totalData = 0;
   String selectedShip = "Pilih Metode Pengiriman";
   String selectedShipPrice = "-";
@@ -70,6 +71,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
             id: customerID.toString(),
             token: authProvider.user.token.toString())) {
           customerID = customerListFiltered.first["id"]; // Set Customer ID
+          customerName = customerListFiltered.first["nama_lengkap"];
+
+          print("data Customer terpilih : ${customerListFiltered.first}");
 
           if (customerProvider.customerAddressList!.addressData!.isEmpty) {
             selectedAddress = "Pilih Alamat";
@@ -754,6 +758,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               var data = {
                                 "pelanggan_id":
                                     int.tryParse(customerID.toString()),
+                                "nama_pelanggan": customerName,
                                 "cabang_id": authProvider.user.data.cabangId,
                                 "kurir_id": int.tryParse(shipId.toString()),
                                 "pengiriman_id": customerProvider
@@ -770,7 +775,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     selectedAddress, // alamat dari id alamat pengiriman
                                 "produk": cartProduct.selectedProducts
                               };
-                              print(data);
+                              print("Pilih pembayaran data : ${data}");
 
                               // Context Checker
                               if (!context.mounted) return;

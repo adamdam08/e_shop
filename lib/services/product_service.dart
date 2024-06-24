@@ -260,10 +260,12 @@ class ProductService {
   Future<TransactionHistoryModel> getListTransaction({
     required String customerId,
     required String status,
+    required String tglAwal,
+    required String tglAkhir,
     required String token,
   }) async {
-    var url =
-        Uri.parse("${baseURL}transaksi?customer_id=$customerId&status=$status");
+    var url = Uri.parse(
+        "${baseURL}transaksi?customer_id=$customerId&status=$status&tanggal_awal=$tglAwal&tanggal_akhir=$tglAkhir");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
