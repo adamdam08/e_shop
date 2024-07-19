@@ -4,6 +4,7 @@ import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/ui/cart/cart.dart';
 import 'package:e_shop/ui/cart/checkout_page.dart';
 import 'package:e_shop/ui/category/category.dart';
+import 'package:e_shop/ui/customer/payment_information_page.dart';
 import 'package:e_shop/ui/home/home.dart';
 import 'package:e_shop/ui/login/login.dart';
 import 'package:e_shop/ui/profile/profile_page.dart';
@@ -91,6 +92,10 @@ class MyApp extends StatelessWidget {
               case '/checkout_summary':
                 return PageTransition(
                     child: CheckoutPage(), type: PageTransitionType.fade);
+              case '/payment_tutorial':
+                return PageTransition(
+                    child: PaymentInformationPage(),
+                    type: PageTransitionType.fade);
               default:
                 return null;
             }

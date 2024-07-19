@@ -617,6 +617,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         top: true,
         bottom: true,
@@ -693,136 +694,134 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           fontSize: 18),
                     ),
                   ),
-                  cartSummaryCard(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    child: Center(
-                      child: SizedBox(
-                        height: 50,
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            var data = await authProvider.getLoginData();
-                            if (await settingsProvider.getPaymentList(
-                                token: data!.token.toString(),
-                                cabangId: authProvider.user.data.cabangId
-                                    .toString())) {
-                              print(
-                                  "Payment List : ${settingsProvider.paymentList.toString()}");
-
-                              String? selectedName;
-                              String? selectedAddress;
-
-                              if (customerProvider.selectAddress != null) {
-                                var selectedData = customerProvider
-                                    .customerAddressList!.addressData!
-                                    .where((element) =>
-                                        element.id ==
-                                        customerProvider.selectAddress);
-                                selectedAddress =
-                                    selectedData.first.alamatLengkap.toString();
-                                selectedName =
-                                    selectedData.first.namaPenerima.toString();
-                              } else {
-                                customerProvider.selectAddress =
-                                    customerProvider.customerAddressList!
-                                        .addressData!.first.id;
-                                selectedAddress = customerProvider
-                                    .customerAddressList!
-                                    .addressData!
-                                    .first
-                                    .alamatLengkap
-                                    .toString();
-                                selectedName = customerProvider
-                                    .customerAddressList!
-                                    .addressData!
-                                    .first
-                                    .namaPenerima
-                                    .toString();
-                              }
-
-                              // Ship ID
-                              List<ShipData>? checkShipData = settingsProvider
-                                  .shippingList?.shipData
-                                  ?.where((element) =>
-                                      element.id.toString() ==
-                                      settingsProvider.selectedShip.toString())
-                                  .toList();
-
-                              print(
-                                  "Ship Data Selected ${checkShipData.toString()}");
-
-                              print("Ship Data Selected ${shipId.toString()}");
-
-                              var data = {
-                                "pelanggan_id":
-                                    int.tryParse(customerID.toString()),
-                                "nama_pelanggan": customerName,
-                                "cabang_id": authProvider.user.data.cabangId,
-                                "kurir_id": int.tryParse(shipId.toString()),
-                                "pengiriman_id": customerProvider
-                                    .selectAddress, // id alamat pengiriman
-                                "nama_kurir":
-                                    checkShipData!.first.namaKurir.toString(),
-                                "total_harga": _totalData,
-                                "total_ongkos_kirim": 15000,
-                                "total_belanja": _totalData + 15000,
-                                "metode_pembayaran": "cash",
-                                "nama_penerima":
-                                    selectedName, // nama dari id alamat pengiriman
-                                "alamat_penerima":
-                                    selectedAddress, // alamat dari id alamat pengiriman
-                                "produk": cartProduct.selectedProducts
-                              };
-                              print("Pilih pembayaran data : ${data}");
-
-                              // Context Checker
-                              if (!context.mounted) return;
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CheckoutPayment(
-                                          mapData: data,
-                                        )),
-                              ).then((value) => {
-                                    _setShipData(),
-                                  });
-                            } else {}
-                          },
-                          style: ElevatedButton.styleFrom(
-                              shape: StadiumBorder(
-                                  side: BorderSide(
-                                      width: 1, color: backgroundColor3)),
-                              backgroundColor:
-                                  (customerProvider.selectAddress != null &&
-                                          customerProvider.customerAddressList!
-                                              .addressData!.isNotEmpty &&
-                                          settingsProvider.selectedShip != null)
-                                      ? backgroundColor3
-                                      : Colors.grey),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.shopping_cart_outlined,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                ' Pilih Pembayaran',
-                                style: poppins.copyWith(
-                                    fontWeight: semiBold, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  cartSummaryCard()
                 ],
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Center(
+                child: SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      var data = await authProvider.getLoginData();
+                      if (await settingsProvider.getPaymentList(
+                          token: data!.token.toString(),
+                          cabangId:
+                              authProvider.user.data.cabangId.toString())) {
+                        print(
+                            "Payment List : ${settingsProvider.paymentList!.paymentData?.first.kategori.toString()}");
+
+                        String? selectedName;
+                        String? selectedAddress;
+
+                        if (customerProvider.selectAddress != null) {
+                          var selectedData = customerProvider
+                              .customerAddressList!.addressData!
+                              .where((element) =>
+                                  element.id == customerProvider.selectAddress);
+                          selectedAddress =
+                              selectedData.first.alamatLengkap.toString();
+                          selectedName =
+                              selectedData.first.namaPenerima.toString();
+                        } else {
+                          customerProvider.selectAddress = customerProvider
+                              .customerAddressList!.addressData!.first.id;
+                          selectedAddress = customerProvider
+                              .customerAddressList!
+                              .addressData!
+                              .first
+                              .alamatLengkap
+                              .toString();
+                          selectedName = customerProvider.customerAddressList!
+                              .addressData!.first.namaPenerima
+                              .toString();
+                        }
+
+                        // Ship ID
+                        List<ShipData>? checkShipData = settingsProvider
+                            .shippingList?.shipData
+                            ?.where((element) =>
+                                element.id.toString() ==
+                                settingsProvider.selectedShip.toString())
+                            .toList();
+
+                        print("Ship Data Selected ${checkShipData.toString()}");
+
+                        print("Ship Data Selected ${shipId.toString()}");
+
+                        var data = {
+                          "pelanggan_id": int.tryParse(customerID.toString()),
+                          "nama_pelanggan": customerName,
+                          "cabang_id": authProvider.user.data.cabangId,
+                          "kurir_id": int.tryParse(shipId.toString()),
+                          "pengiriman_id": customerProvider
+                              .selectAddress, // id alamat pengiriman
+                          "nama_kurir":
+                              checkShipData!.first.namaKurir.toString(),
+                          "total_harga": _totalData,
+                          "total_ongkos_kirim": 15000,
+                          "total_belanja": _totalData + 15000,
+                          "metode_pembayaran": "cash",
+                          "nama_penerima":
+                              selectedName, // nama dari id alamat pengiriman
+                          "alamat_penerima":
+                              selectedAddress, // alamat dari id alamat pengiriman
+                          "produk": cartProduct.selectedProducts,
+                        };
+                        print("Pilih pembayaran data : ${data}");
+
+                        print(
+                            "Selected product : ${cartProduct.selectedProducts}");
+
+                        // Context Checker
+                        if (!context.mounted) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CheckoutPayment(
+                                    mapData: data,
+                                  )),
+                        ).then((value) => {
+                              _setShipData(),
+                            });
+                      } else {}
+                    },
+                    style: ElevatedButton.styleFrom(
+                        shape: StadiumBorder(
+                            side:
+                                BorderSide(width: 1, color: backgroundColor3)),
+                        backgroundColor:
+                            (customerProvider.selectAddress != null &&
+                                    customerProvider.customerAddressList!
+                                        .addressData!.isNotEmpty &&
+                                    settingsProvider.selectedShip != null)
+                                ? backgroundColor3
+                                : Colors.grey),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.shopping_cart_outlined,
+                          color: Colors.white,
+                        ),
+                        Text(
+                          ' Pilih Pembayaran',
+                          style: poppins.copyWith(
+                              fontWeight: semiBold, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
           ],
         ),
       ),

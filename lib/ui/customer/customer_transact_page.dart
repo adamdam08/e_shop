@@ -358,7 +358,8 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                         maxLines: 1,
                       ),
                       Text(
-                        "${data.metodePembayaran.toString()} : ${data.bankTransfer} (${data.norekeningTransfer})",
+                        "${data.metodePembayaran.toString()}"
+                            .toUpperCase(), //: ${data.bankTransfer} (${data.norekeningTransfer}
                         style: poppins.copyWith(
                             fontWeight: semiBold,
                             color: Colors.black,
@@ -395,6 +396,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         top: true,
         left: true,

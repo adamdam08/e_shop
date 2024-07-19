@@ -422,6 +422,7 @@ class _DetailItemState extends State<DetailItem> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         top: true,
         left: true,
@@ -525,6 +526,7 @@ class _DetailItemState extends State<DetailItem> {
                               ),
                             ),
                             Container(
+                              color: Colors.white,
                               margin: const EdgeInsets.only(left: 10),
                               child: Row(
                                 children: [

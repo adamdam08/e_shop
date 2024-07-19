@@ -862,7 +862,10 @@ class _CartState extends State<Cart> {
                 "jumlah_multisatuan": data.jumlahMultisatuan,
                 "multisatuan_jumlah": data.multisatuanJumlah,
                 "multisatuan_unit": data.multisatuanUnit,
-                "golongan_produk": data.golonganProduk
+                "golongan_produk": data.golonganProduk,
+                "kategori": data.kategori,
+                "kategori_slug": data.kategoriSlug,
+                "satuan_produk": data.satuanProduk
               };
             } else {
               cartProduct.selectedProducts[i] = {
@@ -874,7 +877,10 @@ class _CartState extends State<Cart> {
                 "jumlah": data.jumlah,
                 "total_harga": totalHarga,
                 "catatan": data.catatan,
-                "golongan_produk": data.golonganProduk
+                "golongan_produk": data.golonganProduk,
+                "kategori": data.kategori,
+                "kategori_slug": data.kategoriSlug,
+                "satuan_produk": data.satuanProduk
               };
             }
 
@@ -943,6 +949,12 @@ class _CartState extends State<Cart> {
                     print(
                         "Checkbox tappped ${cartProduct.cartList.listData!.first.cartData![index].multisatuanUnit != null}");
 
+                    print(
+                        "Checkbox tapped ${cartProduct.cartList.listData!.first.cartData![index].kategori}");
+
+                    print(
+                        "Checkbox tapped ${cartProduct.cartList.listData!.first.cartData![index].kategoriSlug}");
+
                     if (cartProduct.cartList.listData!.first.cartData![index]
                             .multisatuanUnit !=
                         null) {
@@ -964,7 +976,13 @@ class _CartState extends State<Cart> {
                             .cartData![index].multisatuanUnit,
                         "golongan_produk": cartProduct.cartList.listData!.first
                             .cartData![index].golonganProduk
-                            .toString()
+                            .toString(),
+                        "kategori": cartProduct
+                            .cartList.listData!.first.cartData![index].kategori,
+                        "kategori_slug": cartProduct.cartList.listData!.first
+                            .cartData![index].kategoriSlug,
+                        "satuan_produk": cartProduct.cartList.listData!.first
+                            .cartData![index].satuanProduk,
                       });
                     } else {
                       cartProduct.selectedProducts.add({
@@ -978,12 +996,17 @@ class _CartState extends State<Cart> {
                         "total_harga": totalHarga,
                         "catatan": data.catatan,
                         "golongan_produk": cartProduct.cartList.listData!.first
-                            .cartData![index].golonganProduk
+                            .cartData![index].golonganProduk,
+                        "kategori": cartProduct
+                            .cartList.listData!.first.cartData![index].kategori,
+                        "kategori_slug": cartProduct.cartList.listData!.first
+                            .cartData![index].kategoriSlug,
+                        "satuan_produk": cartProduct.cartList.listData!.first
+                            .cartData![index].satuanProduk,
                       });
                     }
-
                     print(
-                        "Data After : ${cartProduct.selectedProducts.last.toString()}");
+                        "Data After : ${cartProduct.selectedProducts.toString()}");
                   } else {
                     cartProduct.selectedProducts.removeWhere((element) =>
                         element["id"].toString() ==
@@ -991,9 +1014,6 @@ class _CartState extends State<Cart> {
                             .cartList.listData!.first.cartData![index].produkId
                             .toString());
                   }
-
-                  print(
-                      "Golongan Produk : ${cartProduct.cartList.listData!.first.cartData![index].golonganProduk}");
 
                   setState(() {
                     isSelected = value;
@@ -1105,10 +1125,13 @@ class _CartState extends State<Cart> {
                                     .cartData![index].jumlahMultisatuan!.length;
                             i++) ...[
                           if (cartProduct.cartList.listData!.first
-                                  .cartData![index].jumlahMultisatuan![i] >
-                              0)
+                                      .cartData![index].jumlahMultisatuan![i] >
+                                  0 &&
+                              cartProduct.cartList.listData!.first
+                                      .cartData![index].multisatuanUnit?[i] !=
+                                  "pcs")
                             Text(
-                              "${cartProduct.cartList.listData!.first.cartData![index].jumlahMultisatuan?[i]} ${cartProduct.cartList.listData!.first.cartData![index].multisatuanUnit?[i]} (1 ${cartProduct.cartList.listData!.first.cartData![index].multisatuanUnit?[i]} : ${cartProduct.cartList.listData!.first.cartData![index].multisatuanJumlah?[i]} pcs)",
+                              "${cartProduct.cartList.listData!.first.cartData![index].jumlahMultisatuan?[i]} ${cartProduct.cartList.listData!.first.cartData![index].multisatuanUnit?[i]} (Isi ${cartProduct.cartList.listData!.first.cartData![index].multisatuanJumlah?[i]})",
                               style: poppins.copyWith(
                                   fontSize: 10,
                                   fontWeight: regular,
@@ -1476,6 +1499,7 @@ class _CartState extends State<Cart> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         top: true,
         left: true,

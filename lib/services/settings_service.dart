@@ -163,7 +163,7 @@ class SettingsService {
     required String token,
     required String cabang,
   }) async {
-    var url = Uri.parse("${baseURL}pengaturan/bank?cabang=$cabang");
+    var url = Uri.parse("${baseURL}pengaturan/pembayaran?cabang=$cabang");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

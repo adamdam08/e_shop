@@ -86,9 +86,10 @@ class SettingsProvider with ChangeNotifier {
     required String cabangId,
   }) async {
     try {
-      PaymentModel data = await SettingsService().getListPayment(token: token, cabang: cabangId);
+      PaymentModel data = await SettingsService()
+          .getListPayment(token: token, cabang: cabangId);
       _paymentList = data;
-      print("Store Location :  ${storeLocation.data?.length}");
+      print("Store Location :  ${_paymentList}");
       return true;
     } catch (e) {
       print("Error : $e");
@@ -96,10 +97,10 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
-  int? _selectedPayment;
-  int? get selectedPayment => _selectedPayment;
+  String? _selectedPayment;
+  String? get selectedPayment => _selectedPayment;
 
-  set selectedPayment(int? selectedPayment) {
+  set selectedPayment(String? selectedPayment) {
     _selectedPayment = selectedPayment;
     notifyListeners();
   }

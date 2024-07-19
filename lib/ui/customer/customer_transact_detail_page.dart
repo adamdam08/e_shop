@@ -1,13 +1,13 @@
-import 'dart:ffi';
-
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:e_shop/models/product/transaction_history_model.dart';
 import 'package:e_shop/theme/theme.dart';
-import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:e_shop/ui/customer/payment_information_page.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class CustomerTransactionDetailPage extends StatefulWidget {
@@ -25,40 +25,50 @@ class _CustomerTransactionDetailPageState
   bool connected = false;
   List availableBluetoothDevices = [];
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   Future<void> getBluetooth() async {
     connected = false;
     final List? bluetooths = await BluetoothThermalPrinter.getBluetooths;
-    print("Print $bluetooths");
+    print("List Bluetooth : $bluetooths");
     setState(() {
       availableBluetoothDevices = bluetooths!;
     });
   }
 
   Future<bool> setConnect(String mac) async {
-    final String? result = await BluetoothThermalPrinter.connect(mac);
-    print("state connected $result");
-    if (result == "true") {
-      setState(() {
-        showToast("Cetak resi dimulai");
-        connected = true;
-        printTicket();
-        print("Printer connected : ${connected}");
-      });
-      return true;
-    } else {
-      showToast("Cetak resi gagal, cek kembali perangkat anda");
-      return false;
-    }
-  }
+    try {
+      await PrintBluetoothThermal.disconnect;
+      print("state connected $mac");
+      final bool results =
+          await PrintBluetoothThermal.connect(macPrinterAddress: mac);
 
-  Future<void> printTicket() async {
-    String? isConnected = await BluetoothThermalPrinter.connectionStatus;
-    if (isConnected == "true") {
-      List<int> bytes = await getTicket();
-      final result = await BluetoothThermalPrinter.writeBytes(bytes);
-      print("Print $result");
-    } else {
-      //Hadnle Not Connected Senario
+      print("state connected $results pbt");
+
+      if (results) {
+        Navigator.pop(context);
+        setState(() {
+          showToast("Cetak resi dimulai");
+          connected = true;
+          printTicket();
+          print("Printer connected : ${connected}");
+        });
+        return true;
+      } else {
+        showToast("Cetak resi gagal, cek kembali perangkat anda");
+        await getBluetooth();
+        setState(() {});
+        return false;
+      }
+    } catch (e) {
+      setConnect("");
+      print("Error : ${e}");
+      showToast("Cetak resi gagal, cek kembali perangkat anda");
+      setState(() {});
+      return false;
     }
   }
 
@@ -88,6 +98,23 @@ class _CustomerTransactionDetailPageState
 
     for (int i = 0; i < widget.data!.produk!.length; i++) {
       var produkData = widget.data!.produk![i];
+
+      // Pack State
+      var packString = "";
+      if (produkData.jumlahMultisatuan!.isNotEmpty) {
+        for (var i = 0; i < produkData.jumlahMultisatuan!.length; i++) {
+          var jumlah = produkData.jumlahMultisatuan?[i];
+          var unit = produkData.multisatuanUnit?[i];
+
+          print("PackString : $jumlah");
+          print("PackString : $unit");
+
+          if (jumlah! > 0) {
+            packString += "(${jumlah} ${unit})".toUpperCase();
+          }
+        }
+      }
+
       bytes += generator.text("${produkData.namaProduk}");
       bytes += generator.row([
         PosColumn(
@@ -97,16 +124,21 @@ class _CustomerTransactionDetailPageState
               align: PosAlign.center,
             )),
         PosColumn(
-            text: "Rp.${produkData.totalHarga}",
-            width: 6,
-            styles: const PosStyles(align: PosAlign.right)),
+          text: "Rp.${produkData.totalHarga}",
+          width: 6,
+          styles: const PosStyles(align: PosAlign.right),
+        ),
       ]);
+      if (produkData.jumlahMultisatuan!.isNotEmpty) {
+        bytes += generator.text("${packString}");
+      }
+
       bytes += generator.emptyLines(1);
     }
 
     bytes += generator.hr();
 
-    bytes += generator.text("Total Belanja",
+    bytes += generator.text("Total Harga",
         styles: PosStyles(align: PosAlign.left, bold: true));
     bytes += generator.text("Rp.${widget.data!.totalHarga}",
         styles: PosStyles(align: PosAlign.right, bold: true));
@@ -118,7 +150,7 @@ class _CustomerTransactionDetailPageState
 
     bytes += generator.hr();
 
-    bytes += generator.text("Total Keseluruhan",
+    bytes += generator.text("Total Belanja",
         styles: PosStyles(align: PosAlign.left, bold: true));
     bytes += generator.text("Rp.${widget.data!.totalBelanja}",
         styles: PosStyles(align: PosAlign.right, bold: true));
@@ -137,6 +169,19 @@ class _CustomerTransactionDetailPageState
     return bytes;
   }
 
+  Future<void> printTicket() async {
+    bool isConnected = await PrintBluetoothThermal
+        .connectionStatus; //BluetoothThermalPrinter.connectionStatus;
+    if (isConnected) {
+      List<int> bytes = await getTicket();
+      final result = await PrintBluetoothThermal.writeBytes(
+          bytes); // BluetoothThermalPrinter.writeBytes(bytes);
+      print("Print $result");
+    } else {
+      //Hadnle Not Connected Senario
+    }
+  }
+
   Widget cartDynamicCard(Produk data) {
     // Pack State
     var packString = "";
@@ -149,7 +194,7 @@ class _CustomerTransactionDetailPageState
         print("PackString : $unit");
 
         if (jumlah! > 0) {
-          packString += "(${jumlah} ${unit}) ".toUpperCase();
+          packString += "(${jumlah} ${unit})".toUpperCase();
         }
       }
     }
@@ -292,55 +337,91 @@ class _CustomerTransactionDetailPageState
                 ),
               ),
               Text(
-                "${data!.metodePembayaran}",
+                "${data!.metodePembayaran}".toUpperCase(),
                 style: poppins.copyWith(
                   color: backgroundColor1,
                 ),
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Bank",
-                style: poppins.copyWith(
-                  color: Colors.black,
+
+          if ("${data.bankTransfer}" != "") ...[
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Bank",
+                  style: poppins.copyWith(
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  "${data!.bankTransfer}",
+                  style: poppins.copyWith(
+                    color: backgroundColor1,
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Container(
+                width: double.infinity,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PaymentInformationPage()));
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Icon(
+                        Icons.info_rounded,
+                        color: Colors.grey,
+                        size: 15,
+                      ),
+                      Text(
+                        ' Lihat Cara Bayar',
+                        style: poppins.copyWith(
+                            fontSize: 12,
+                            fontWeight: semiBold,
+                            color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Text(
-                "${data!.bankTransfer}",
-                style: poppins.copyWith(
-                  color: backgroundColor1,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "No Rekening",
-                style: poppins.copyWith(
-                  color: Colors.black,
-                ),
-              ),
-              Text(
-                "${data!.norekeningTransfer}",
-                style: poppins.copyWith(
-                  color: backgroundColor1,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
+
+          // const SizedBox(
+          //   height: 10,
+          // ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Text(
+          //       "No Rekening",
+          //       style: poppins.copyWith(
+          //         color: Colors.black,
+          //       ),
+          //     ),
+          //     Text(
+          //       "${data!.norekeningTransfer}",
+          //       style: poppins.copyWith(
+          //         color: backgroundColor1,
+          //       ),
+          //     ),
+          //   ],
+          // ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(
@@ -681,10 +762,11 @@ class _CustomerTransactionDetailPageState
                                   String select =
                                       availableBluetoothDevices[index];
                                   List list = select.split("#");
-                                  // String name = list[0];
+                                  String name = list[0];
                                   String mac = list[1];
+                                  print("mac address BLE : ${mac} : ${name}");
                                   setConnect(mac);
-                                  Navigator.pop(context);
+                                  // Navigator.pop(context);
                                   showToast(
                                       "Membuat koneksi ke ${availableBluetoothDevices[index]}");
                                 }
@@ -780,6 +862,7 @@ class _CustomerTransactionDetailPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         top: true,
         bottom: true,
@@ -870,7 +953,7 @@ class _CustomerTransactionDetailPageState
                                 await Permission.bluetoothConnect
                                     .request()
                                     .isGranted) {
-                              // Permissions are granted, proceed with your Bluetooth operations
+                              print("Bluetooth permission Ok");
                               await getBluetooth();
                               showModalBottomSheet(
                                   context: context,

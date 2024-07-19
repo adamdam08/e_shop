@@ -25,30 +25,49 @@ class PaymentModel {
 }
 
 class PaymentData {
-  int? id;
-  int? cabangId;
-  String? namaBank;
-  String? logoBank;
-  String? noRekening;
+  String? kategori;
+  List<ChildData>? child;
 
-  PaymentData(
-      {this.id, this.cabangId, this.namaBank, this.logoBank, this.noRekening});
+  PaymentData({this.kategori, this.child});
 
   PaymentData.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    cabangId = json['cabang_id'];
-    namaBank = json['nama_bank'];
-    logoBank = json['logo_bank'];
-    noRekening = json['no_rekening'];
+    kategori = json['kategori'];
+    if (json['child'] != null) {
+      child = <ChildData>[];
+      json['child'].forEach((v) {
+        child!.add(new ChildData.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['cabang_id'] = this.cabangId;
-    data['nama_bank'] = this.namaBank;
-    data['logo_bank'] = this.logoBank;
-    data['no_rekening'] = this.noRekening;
+    data['kategori'] = this.kategori;
+    if (this.child != null) {
+      data['child'] = this.child!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class ChildData {
+  String? metode;
+  String? nama;
+  String? image;
+
+  ChildData({this.metode, this.nama, this.image});
+
+  ChildData.fromJson(Map<String, dynamic> json) {
+    metode = json['metode'];
+    nama = json['nama'];
+    image = json['image'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['metode'] = this.metode;
+    data['nama'] = this.nama;
+    data['image'] = this.image;
     return data;
   }
 }
