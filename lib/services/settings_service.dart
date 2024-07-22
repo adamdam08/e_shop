@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:e_shop/models/cart/cart_list_model.dart';
 import 'package:e_shop/models/customer/customer_post_model.dart';
+import 'package:e_shop/models/customer/success_model.dart';
 import 'package:e_shop/models/settings/district_model.dart';
 import 'package:e_shop/models/settings/payment_model.dart';
 import 'package:e_shop/models/settings/shipping_model.dart';
@@ -181,6 +182,62 @@ class SettingsService {
     } else {
       var data = jsonDecode(response.body);
       throw ErrorDescription('${data['message']}');
+    }
+  }
+
+  // List Ship
+  Future<SuccessModel> getPaymentInfo({
+    required String token,
+    required String cabang,
+    required String kode,
+  }) async {
+    var url = Uri.parse(
+        "${baseURL}pengaturan/carapembayaran?cabang=$cabang&kode=$kode");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    var response = await http.get(url, headers: header);
+    // ignore: avoid_print
+    print("Shipping: ${url}");
+    print("Shipping: ${response.body}");
+
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+      SuccessModel callbackData = SuccessModel.fromJson(data);
+      return callbackData;
+    } else {
+      var data = jsonDecode(response.body);
+      throw ErrorDescription('${data['message']}');
+    }
+  }
+
+  // Update Transaksi
+  Future<SuccessModel> updateTransaksi({
+    required String noinvoice,
+    required String status,
+    required String token,
+  }) async {
+    var url = Uri.parse("${baseURL}transaksi/status");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+    Map data = {"no_invoice": noinvoice, "status": status};
+    var body = jsonEncode(data);
+    var response = await http.post(url, headers: header, body: body);
+    // ignore: avoid_print
+    print("Login: ${response.body}");
+
+    // **success melakukan login
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+
+      SuccessModel storeLocateModel = SuccessModel.fromJson(data);
+      return storeLocateModel;
+    } else {
+      throw Exception("Gagal Mendapatkan Promo");
     }
   }
 }

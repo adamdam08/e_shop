@@ -14,6 +14,7 @@ import 'package:e_shop/ui/home/search_list.dart';
 import 'package:e_shop/ui/product/detail_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -302,6 +303,20 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    // Simulate network fetch or database query
+    // await Future.delayed(Duration(seconds: 2));
+    // Update the list of items and refresh the UI
+    setState(() {
+      _isInitLoading = true;
+    });
+
+    _getLocationSettings();
+
+    // List Banner
+    _getListBanner();
+  }
+
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
@@ -442,160 +457,170 @@ class _HomeState extends State<Home> {
                         ],
                       ),
                     )
-                  : ListView(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      controller: _scrollController,
-                      children: [
-                        if (isKeyboardVisible) ...[
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: SuggestionListView(
-                                myCategory: myCategoryFiltered,
-                                searchTextController: searchTextController),
-                          )
-                        ] else ...[
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 30),
-                            child: ((productProvider.bannerData ?? [])
-                                    .isNotEmpty)
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Stack(
-                                      children: [
-                                        CarouselSlider(
-                                          items: [
-                                            for (var sliderItem
-                                                in productProvider.bannerData ??
-                                                    [])
-                                              FadeInImage.memoryNetwork(
-                                                placeholder: kTransparentImage,
-                                                image: sliderItem,
-                                                fit: BoxFit.cover,
-                                                imageErrorBuilder: (BuildContext
-                                                        context,
-                                                    Object error,
-                                                    StackTrace? stackTrace) {
-                                                  return Container(
-                                                    color: Colors.grey,
-                                                    child: const Center(
-                                                      child: Icon(Icons.error),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                          ],
-                                          options: CarouselOptions(
-                                            viewportFraction: 1,
-                                            autoPlay: true,
-                                            autoPlayCurve: Curves.linear,
-                                            reverse: false,
-                                            autoPlayInterval:
-                                                const Duration(seconds: 5),
-                                            initialPage: carouselIndex,
-                                            scrollDirection: Axis.horizontal,
-                                            onPageChanged: (index, reason) {
-                                              if (context.mounted) {
-                                                setState(() {
-                                                  carouselIndex = index;
-                                                });
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                        Positioned(
-                                          bottom: 5,
-                                          left: 0,
-                                          right: 0,
-                                          child: DotsIndicator(
-                                            dotsCount:
-                                                (productProvider.bannerData ??
-                                                        [""])
-                                                    .length,
-                                            position: carouselIndex,
-                                            decorator: DotsDecorator(
-                                              color: Colors
-                                                  .black38, // Inactive color
-                                              activeColor: backgroundColor2,
+                  : RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        controller: _scrollController,
+                        children: [
+                          if (isKeyboardVisible) ...[
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: SuggestionListView(
+                                  myCategory: myCategoryFiltered,
+                                  searchTextController: searchTextController),
+                            )
+                          ] else ...[
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 30),
+                              child: ((productProvider.bannerData ?? [])
+                                      .isNotEmpty)
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Stack(
+                                        children: [
+                                          CarouselSlider(
+                                            items: [
+                                              for (var sliderItem
+                                                  in productProvider
+                                                          .bannerData ??
+                                                      [])
+                                                FadeInImage.memoryNetwork(
+                                                  placeholder:
+                                                      kTransparentImage,
+                                                  image: sliderItem,
+                                                  fit: BoxFit.cover,
+                                                  imageErrorBuilder:
+                                                      (BuildContext context,
+                                                          Object error,
+                                                          StackTrace?
+                                                              stackTrace) {
+                                                    return Container(
+                                                      color: Colors.grey,
+                                                      child: const Center(
+                                                        child:
+                                                            Icon(Icons.error),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                            ],
+                                            options: CarouselOptions(
+                                              viewportFraction: 1,
+                                              autoPlay: true,
+                                              autoPlayCurve: Curves.linear,
+                                              reverse: false,
+                                              autoPlayInterval:
+                                                  const Duration(seconds: 5),
+                                              initialPage: carouselIndex,
+                                              scrollDirection: Axis.horizontal,
+                                              onPageChanged: (index, reason) {
+                                                if (context.mounted) {
+                                                  setState(() {
+                                                    carouselIndex = index;
+                                                  });
+                                                }
+                                              },
                                             ),
                                           ),
+                                          Positioned(
+                                            bottom: 5,
+                                            left: 0,
+                                            right: 0,
+                                            child: DotsIndicator(
+                                              dotsCount:
+                                                  (productProvider.bannerData ??
+                                                          [""])
+                                                      .length,
+                                              position: carouselIndex,
+                                              decorator: DotsDecorator(
+                                                color: Colors
+                                                    .black38, // Inactive color
+                                                activeColor: backgroundColor2,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                            ),
+                            if (productProvider.promoProduct != null) ...[
+                              CardSectionHorizontal(
+                                headerText: "Promo",
+                                productItem: productProvider.promoProduct,
+                              ),
+                            ] else
+                              ...[],
+                            if (productProvider.bestSellerProduct != null) ...[
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
+                                width: double.infinity,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (productProvider.bestSellerProduct!.data!
+                                        .isNotEmpty) ...[
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 10),
+                                        width: double.infinity,
+                                        child: Text(
+                                          "Produk Terlaku",
+                                          style: poppins.copyWith(
+                                              fontSize: 24,
+                                              fontWeight: semiBold,
+                                              color: backgroundColor1),
                                         ),
-                                      ],
+                                      ),
+                                      GridView.builder(
+                                        gridDelegate:
+                                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                                                maxCrossAxisExtent: 200,
+                                                mainAxisExtent: 300,
+                                                crossAxisSpacing: 15,
+                                                mainAxisSpacing: 10),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: productProvider
+                                            .bestSellerProduct!.data!.length,
+                                        itemBuilder: (context, index) {
+                                          return SearchDynamicCard(
+                                            text: productProvider
+                                                .bestSellerProduct!
+                                                .data![index],
+                                          );
+                                        },
+                                      ),
+                                    ] else ...[
+                                      const SizedBox()
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ] else
+                              ...[],
+                            _isLoading
+                                ? Container(
+                                    width: 10,
+                                    margin: const EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
                                     ),
                                   )
-                                : const SizedBox(),
-                          ),
-                          if (productProvider.promoProduct != null) ...[
-                            CardSectionHorizontal(
-                              headerText: "Promo",
-                              productItem: productProvider.promoProduct,
-                            ),
-                          ] else
-                            ...[],
-                          if (productProvider.bestSellerProduct != null) ...[
-                            Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 30),
-                              width: double.infinity,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (productProvider
-                                      .bestSellerProduct!.data!.isNotEmpty) ...[
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 10),
-                                      width: double.infinity,
-                                      child: Text(
-                                        "Produk Terlaku",
-                                        style: poppins.copyWith(
-                                            fontSize: 24,
-                                            fontWeight: semiBold,
-                                            color: backgroundColor1),
-                                      ),
-                                    ),
-                                    GridView.builder(
-                                      gridDelegate:
-                                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                                              maxCrossAxisExtent: 200,
-                                              mainAxisExtent: 300,
-                                              crossAxisSpacing: 15,
-                                              mainAxisSpacing: 10),
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: productProvider
-                                          .bestSellerProduct!.data!.length,
-                                      itemBuilder: (context, index) {
-                                        return SearchDynamicCard(
-                                          text: productProvider
-                                              .bestSellerProduct!.data![index],
-                                        );
-                                      },
-                                    ),
-                                  ] else ...[
-                                    const SizedBox()
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ] else
-                            ...[],
-                          _isLoading
-                              ? Container(
-                                  width: 10,
-                                  margin: const EdgeInsets.only(
-                                      top: 10, bottom: 10),
-                                  child: const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                )
-                              : Container(),
-                          SizedBox(
-                            height: _isLimit == false ? 40 : 0,
-                          )
+                                : Container(),
+                            SizedBox(
+                              height: _isLimit == false ? 40 : 0,
+                            )
+                          ],
                         ],
-                      ],
+                      ),
                     ),
             ),
           ],
@@ -623,75 +648,99 @@ class _CardSectionHorizontalState extends State<CardSectionHorizontal> {
   Widget build(BuildContext context) {
     final pageProvider = Provider.of<PageProvider>(context, listen: false);
 
-    return SizedBox(
-      height: 340,
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            margin: const EdgeInsets.only(top: 20, bottom: 10),
-            width: double.infinity,
-            child: Text(
-              widget.headerText,
-              style: poppins.copyWith(
-                  fontSize: 24, fontWeight: semiBold, color: backgroundColor1),
+    DateTime? lastPressed;
+    Future<bool> onWillPop() async {
+      final now = DateTime.now();
+      final maxDuration = Duration(seconds: 2);
+
+      if (lastPressed == null || now.difference(lastPressed!) > maxDuration) {
+        lastPressed = now;
+        Fluttertoast.showToast(
+          msg: 'Tekan sekali lagi untuk keluar',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.black54,
+          textColor: Colors.white,
+        );
+        return Future.value(false);
+      }
+      return Future.value(true);
+    }
+
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SizedBox(
+        height: 340,
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              margin: const EdgeInsets.only(top: 20, bottom: 10),
+              width: double.infinity,
+              child: Text(
+                widget.headerText,
+                style: poppins.copyWith(
+                    fontSize: 24,
+                    fontWeight: semiBold,
+                    color: backgroundColor1),
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(left: 30, right: 30, bottom: 5),
-              scrollDirection: Axis.horizontal,
-              children: [
-                if (widget.productItem?.data != null) ...[
-                  for (var i in widget.productItem!.data!) ...[
-                    DynamicCardHorizontal(
-                      data: i,
-                      isDiscount: i.diskon != 0 && i.diskon != null,
-                    )
-                  ],
-                  if (widget.productItem!.data!.length >= 5) ...[
-                    GestureDetector(
-                      onTap: () async {
-                        setState(() {
-                          pageProvider.currentIndex = 2;
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        width: 150,
-                        height: 300,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 0))
-                            ]),
-                        child: Center(
-                          child: Text(
-                            "Lihat \nSelengkapnya",
-                            style: poppins.copyWith(
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: semiBold,
-                                color: backgroundColor1,
-                                fontSize: 15),
-                            maxLines: 2,
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(left: 30, right: 30, bottom: 5),
+                scrollDirection: Axis.horizontal,
+                children: [
+                  if (widget.productItem?.data != null) ...[
+                    for (var i in widget.productItem!.data!) ...[
+                      DynamicCardHorizontal(
+                        data: i,
+                        isDiscount: i.diskon != 0 && i.diskon != null,
+                      )
+                    ],
+                    if (widget.productItem!.data!.length >= 5) ...[
+                      GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            pageProvider.currentIndex = 2;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          width: 150,
+                          height: 300,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 0))
+                              ]),
+                          child: Center(
+                            child: Text(
+                              "Lihat \nSelengkapnya",
+                              style: poppins.copyWith(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontWeight: semiBold,
+                                  color: backgroundColor1,
+                                  fontSize: 15),
+                              maxLines: 2,
+                            ),
                           ),
                         ),
-                      ),
-                    )
+                      )
+                    ],
+                  ] else ...[
+                    const SizedBox(),
                   ],
-                ] else ...[
-                  const SizedBox(),
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -278,6 +278,26 @@ class _SearchListState extends State<SearchList> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    // Simulate network fetch or database query
+    // await Future.delayed(Duration(seconds: 2));
+    // Update the list of items and refresh the UI
+    setState(() {
+      _isInitLoading = true;
+    });
+
+    print("Promo : ${widget.isPromo}");
+
+    if (widget.isPromo) {
+      sort = "promo";
+    }
+
+    _getBySearch();
+
+    // Get Suggestion
+    _getSuggestionList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final productProvider =

@@ -7,6 +7,7 @@ import 'package:e_shop/ui/home/search_list.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class Category extends StatefulWidget {
@@ -79,70 +80,107 @@ class _CategoryState extends State<Category> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    // Simulate network fetch or database query
+    // await Future.delayed(Duration(seconds: 2));
+    // Update the list of items and refresh the UI
+    setState(() {
+      _isInitLoading = true;
+    });
+
+    // Get Category
+    _getCategoryTree();
+  }
+
+  DateTime? lastPressed;
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    final maxDuration = Duration(seconds: 2);
+
+    if (lastPressed == null || now.difference(lastPressed!) > maxDuration) {
+      lastPressed = now;
+      Fluttertoast.showToast(
+        msg: 'Tekan sekali lagi untuk keluar',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+      );
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            color: backgroundColor3,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Text(
-              "Kategori",
-              style: poppins.copyWith(
-                  fontSize: 20, fontWeight: semiBold, color: Colors.white),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              color: backgroundColor3,
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Text(
+                "Kategori",
+                style: poppins.copyWith(
+                    fontSize: 20, fontWeight: semiBold, color: Colors.white),
+              ),
             ),
-          ),
-          Expanded(
-            child: _isInitLoading
-                ? Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.transparent,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          color: backgroundColor1,
-                        ),
-                        Container(
-                          height: 30,
-                        ),
-                        Text(
-                          "Loading Data",
-                          style: poppins.copyWith(
-                            fontWeight: semiBold,
-                            color: backgroundColor1,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemCount: productProvider.categoryTree!.data!.length,
-                    itemBuilder: (context, index) {
-                      return Column(
+            Expanded(
+              child: _isInitLoading
+                  ? Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          kat1ExpansionTile(
-                              title: productProvider
-                                      .categoryTree?.data![index].kat1
-                                      .toString() ??
-                                  "",
-                              index: index),
+                          CircularProgressIndicator(
+                            color: backgroundColor1,
+                          ),
+                          Container(
+                            height: 30,
+                          ),
+                          Text(
+                            "Loading Data",
+                            style: poppins.copyWith(
+                              fontWeight: semiBold,
+                              color: backgroundColor1,
+                              fontSize: 15,
+                            ),
+                          ),
                         ],
-                      );
-                    },
-                  ),
-          ),
-        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                      child: ListView.builder(
+                        shrinkWrap: false,
+                        scrollDirection: Axis.vertical,
+                        itemCount: productProvider.categoryTree!.data!.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              kat1ExpansionTile(
+                                  title: productProvider
+                                          .categoryTree?.data![index].kat1
+                                          .toString() ??
+                                      "",
+                                  index: index),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -178,19 +216,51 @@ class _CategoryState extends State<Category> {
             ),
             collapsed: const Divider(),
             expanded: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (var i = 0;
                     i <
                         productProvider
                             .categoryTree!.data![index].child!.length;
-                    i++)
-                  kat2ExpansionTile(
-                    title: productProvider
-                        .categoryTree!.data![index].child![i].kat2
-                        .toString(),
-                    kat1index: index,
-                    kat2index: i,
+                    i++) ...[
+                  GestureDetector(
+                    onTap: () {
+                      var kat1 = productProvider
+                          .categoryTree?.data![index].kat1Slug
+                          .toString();
+                      var kat2 = productProvider
+                          .categoryTree?.data![index].child![i].kat2Slug
+                          .toString();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchList(
+                            text: "",
+                            cat: "$kat1,$kat2",
+                          ),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        "${productProvider.categoryTree?.data![index].child![i].kat2}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                   ),
+                  const Divider(),
+                ],
+
+                // kat2ExpansionTile(
+                //   title: productProvider
+                //       .categoryTree!.data![index].child![i].kat2
+                //       .toString(),
+                //   kat1index: index,
+                //   kat2index: i,
+                // ),
               ],
             )),
       )),
@@ -209,31 +279,8 @@ class _CategoryState extends State<Category> {
           child: ScrollOnExpand(
         child: ExpandablePanel(
           header: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: GestureDetector(
-              onTap: () {
-                var kat1 = productProvider
-                    .categoryTree?.data![kat1index].kat1Slug
-                    .toString();
-                var kat2 = productProvider
-                    .categoryTree?.data![kat1index].child![kat2index].kat2Slug
-                    .toString();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchList(
-                      text: "",
-                      cat: "$kat1,$kat2",
-                    ),
-                  ),
-                );
-              },
-              child: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w400),
-              ),
-            ),
-          ),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Container()),
           collapsed: const Divider(),
           expanded: Column(
             children: [

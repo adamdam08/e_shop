@@ -3,7 +3,6 @@ import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/provider/product_provider.dart';
 import 'package:e_shop/ui/customer/customer_transact_detail_page.dart';
-import 'package:e_shop/ui/home/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -119,16 +118,10 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
       descriptionTextController.text =
           customerProvider.customerRequestUpdateData?.requestData?.keterangan ??
               "";
-      // setState(() {
-      //   isLoading = false;
-      // });
       print(
           "Request Update Success ${customerProvider.customerRequestUpdateData!.requestData.toString()}");
     } else {
       print("Request Update Failed");
-      // setState(() {
-      //   isLoading = false;
-      // });
     }
     ;
     print(
@@ -139,21 +132,21 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
   static Future<void> openMap(String latitude, String longitude) async {
     String googleUrl =
         'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-    if (await canLaunch(googleUrl) != null) {
-      await launch(googleUrl);
-    } else {
-      throw 'Could not open the map.';
-    }
+    await launch(googleUrl);
   }
 
   Widget transactionDynamicCard(ListTransaksi data) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    CustomerTransactionDetailPage(data: data)));
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        CustomerTransactionDetailPage(data: data)))
+            .then((value) => setState(() {
+                  print("Then executed");
+                  _getTransactionHistory();
+                }));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -222,7 +215,11 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                             offset: const Offset(0, 0))
                       ]),
                   child: Text(
-                    data.status == 0 ? "Belum Dibayar" : "Selesai",
+                    data.pembatalan == 1
+                        ? "${data.keteranganStatus}"
+                        : data.status == 0
+                            ? "Belum Dibayar"
+                            : "Selesai",
                     style: poppins.copyWith(
                         fontWeight: regular,
                         color: Colors.white,

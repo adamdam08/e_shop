@@ -1,3 +1,4 @@
+import 'package:e_shop/models/customer/success_model.dart';
 import 'package:e_shop/models/settings/payment_model.dart';
 import 'package:e_shop/models/settings/shipping_model.dart';
 import 'package:e_shop/models/store_location_model.dart';
@@ -103,5 +104,50 @@ class SettingsProvider with ChangeNotifier {
   set selectedPayment(String? selectedPayment) {
     _selectedPayment = selectedPayment;
     notifyListeners();
+  }
+
+  // Payment info
+  // Payment List
+  SuccessModel? _paymentInfo;
+
+  SuccessModel? get paymentInfo => _paymentInfo;
+
+  set paymentInfo(SuccessModel? paymentInfo) {
+    _paymentInfo = paymentInfo;
+    notifyListeners();
+  }
+
+  Future<bool> getPaymentInfo({
+    required String token,
+    required String cabangId,
+    required String kode,
+  }) async {
+    try {
+      SuccessModel data = await SettingsService()
+          .getPaymentInfo(token: token, cabang: cabangId, kode: kode);
+      _paymentInfo = data;
+      print("Store Location :  ${_paymentInfo}");
+      return true;
+    } catch (e) {
+      print("Error : $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateTransaksi({
+    required String noinvoice,
+    required String status,
+    required String token,
+  }) async {
+    try {
+      await SettingsService()
+          .updateTransaksi(noinvoice: noinvoice, status: status, token: token);
+      // _paymentInfo = data;
+      // print("Store Location :  ${_paymentInfo}");
+      return true;
+    } catch (e) {
+      print("Error : $e");
+      return false;
+    }
   }
 }

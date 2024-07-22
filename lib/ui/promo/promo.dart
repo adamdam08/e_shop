@@ -7,6 +7,7 @@ import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/home/search_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
@@ -199,19 +200,50 @@ class _PromoState extends State<Promo> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    // Simulate network fetch or database query
+    // await Future.delayed(Duration(seconds: 2));
+    // Update the list of items and refresh the UI
+    setState(() {
+      _isInitLoading = true;
+    });
+
+    print("Before promo ${_isInitLoading}");
+
+    // Get Suggestion
+    _getSuggestionList();
+
+    // Get Promo
+    _getPromo();
+
+    print("After promo ${_isInitLoading}");
+  }
+
+  DateTime? lastPressed;
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    final maxDuration = Duration(seconds: 2);
+
+    if (lastPressed == null || now.difference(lastPressed!) > maxDuration) {
+      lastPressed = now;
+      Fluttertoast.showToast(
+        msg: 'Tekan sekali lagi untuk keluar',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+      );
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     ProductProvider productProvider = Provider.of<ProductProvider>(context);
     return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
       return WillPopScope(
-        onWillPop: () async {
-          print("Searchbar Clicked ${searchBarFocusNode.hasFocus}");
-          searchBarFocusNode.removeListener(() {});
-          if (context.mounted) {
-            setState(() {});
-          }
-          return true;
-        },
+        onWillPop: onWillPop,
         child: Container(
             padding: const EdgeInsets.only(bottom: 10),
             child: Column(
@@ -285,26 +317,29 @@ class _PromoState extends State<Promo> {
                               ],
                             ),
                           )
-                        : ListView.builder(
-                            controller: _scrollController,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount:
-                                productProvider.promoProduct!.data!.length,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 20),
-                            itemBuilder: (context, index) {
-                              return DynamicCardVertical(
-                                data:
-                                    productProvider.promoProduct!.data![index],
-                                isDiscount: productProvider.promoProduct!
-                                            .data![index].diskon !=
-                                        0 &&
-                                    productProvider.promoProduct!.data![index]
-                                            .diskon !=
-                                        null,
-                              );
-                            },
+                        : RefreshIndicator(
+                            onRefresh: _handleRefresh,
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: false,
+                              itemCount:
+                                  productProvider.promoProduct!.data!.length,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 20),
+                              itemBuilder: (context, index) {
+                                return DynamicCardVertical(
+                                  data: productProvider
+                                      .promoProduct!.data![index],
+                                  isDiscount: productProvider.promoProduct!
+                                              .data![index].diskon !=
+                                          0 &&
+                                      productProvider.promoProduct!.data![index]
+                                              .diskon !=
+                                          null,
+                                );
+                              },
+                            ),
                           ),
                   ),
                 ],

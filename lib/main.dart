@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ProductProvider()),
       ],
       child: MaterialApp(
-          title: 'E-Shop',
+          title: 'Toko SM Sales',
           builder: (BuildContext context, Widget? child) {
             return MediaQuery(
               data: MediaQuery.of(context).copyWith(
@@ -92,10 +92,6 @@ class MyApp extends StatelessWidget {
               case '/checkout_summary':
                 return PageTransition(
                     child: CheckoutPage(), type: PageTransitionType.fade);
-              case '/payment_tutorial':
-                return PageTransition(
-                    child: PaymentInformationPage(),
-                    type: PageTransitionType.fade);
               default:
                 return null;
             }
@@ -119,7 +115,6 @@ class _BottomNavigationBarExampleState
     Category(),
     Promo(),
     Customer(),
-    // Cart()
   ];
 
   @override
@@ -186,10 +181,10 @@ class _BottomNavigationBarExampleState
                   margin: const EdgeInsets.only(bottom: 12),
                   height: 10,
                   child: const Icon(
-                    Icons.percent,
+                    SolarIconsBold.tag,
                   ),
                 ),
-                label: 'Diskon',
+                label: 'Promo',
               ),
               BottomNavigationBarItem(
                 icon: Container(
@@ -201,6 +196,16 @@ class _BottomNavigationBarExampleState
                 ),
                 label: 'Pelanggan',
               ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  height: 10,
+                  child: const Icon(
+                    SolarIconsBold.cartLarge,
+                  ),
+                ),
+                label: 'Keranjang',
+              ),
             ],
             currentIndex: pageProvider.currentIndex,
             selectedItemColor: Colors.white,
@@ -210,9 +215,13 @@ class _BottomNavigationBarExampleState
             backgroundColor: Colors.transparent,
             onTap: (index) {
               if (context.mounted) {
-                setState(() {
-                  pageProvider.currentIndex = index;
-                });
+                if (index == 4) {
+                  Navigator.pushNamed(context, '/cart');
+                } else {
+                  setState(() {
+                    pageProvider.currentIndex = index;
+                  });
+                }
               }
             },
           ),

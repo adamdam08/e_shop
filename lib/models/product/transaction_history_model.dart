@@ -42,6 +42,7 @@ class ListTransaksi {
   String? norekeningTransfer;
   int? status;
   String? keteranganStatus;
+  int? pembatalan;
   bool? online;
   List<Produk>? produk;
 
@@ -63,6 +64,7 @@ class ListTransaksi {
       this.norekeningTransfer,
       this.status,
       this.keteranganStatus,
+      this.pembatalan,
       this.online,
       this.produk});
 
@@ -84,6 +86,7 @@ class ListTransaksi {
     norekeningTransfer = json['norekening_transfer'];
     status = json['status'];
     keteranganStatus = json['keterangan_status'];
+    pembatalan = json['pembatalan'];
     online = json['online'];
     if (json['produk'] != null) {
       produk = <Produk>[];
@@ -112,6 +115,7 @@ class ListTransaksi {
     data['norekening_transfer'] = this.norekeningTransfer;
     data['status'] = this.status;
     data['keterangan_status'] = this.keteranganStatus;
+    data['pembatalan'] = this.pembatalan;
     data['online'] = this.online;
     if (this.produk != null) {
       data['produk'] = this.produk!.map((v) => v.toJson()).toList();

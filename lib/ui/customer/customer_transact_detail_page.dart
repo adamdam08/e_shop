@@ -1,13 +1,18 @@
 import 'package:bluetooth_thermal_printer/bluetooth_thermal_printer.dart';
 import 'package:e_shop/models/product/transaction_history_model.dart';
+import 'package:e_shop/provider/auth_provider.dart';
+import 'package:e_shop/provider/customer_provider.dart';
+import 'package:e_shop/provider/settings_provider.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:e_shop/ui/customer/payment_information_page.dart';
-import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
+import 'package:provider/provider.dart';
+import 'package:solar_icons/solar_icons.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class CustomerTransactionDetailPage extends StatefulWidget {
@@ -28,6 +33,28 @@ class _CustomerTransactionDetailPageState
   @override
   void initState() {
     super.initState();
+  }
+
+  void _getPaymentInfo() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+    var data = await authProvider.getLoginData();
+
+    var kode = "${widget.data!.metodePembayaran}${widget.data!.bankTransfer}";
+
+    if (await settingsProvider.getPaymentInfo(
+        token: data!.token.toString(),
+        cabangId: widget.data!.cabangId.toString(),
+        kode: kode)) {
+      print("HTML : ${settingsProvider.paymentInfo?.PaymentData}");
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PaymentInformationPage(
+                  paymentInfo:
+                      "${settingsProvider.paymentInfo?.PaymentData}")));
+    } else {}
   }
 
   Future<void> getBluetooth() async {
@@ -360,7 +387,7 @@ class _CustomerTransactionDetailPageState
                   ),
                 ),
                 Text(
-                  "${data!.bankTransfer}",
+                  "${data.bankTransfer}",
                   style: poppins.copyWith(
                     color: backgroundColor1,
                   ),
@@ -372,11 +399,8 @@ class _CustomerTransactionDetailPageState
               child: Container(
                 width: double.infinity,
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PaymentInformationPage()));
+                  onTap: () async {
+                    _getPaymentInfo();
                   },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -861,6 +885,8 @@ class _CustomerTransactionDetailPageState
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -1002,6 +1028,90 @@ class _CustomerTransactionDetailPageState
                       ),
                     ),
                   ),
+                  if (widget.data?.pembatalan != 1 &&
+                      widget.data?.status == 0) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          bottom: 10, left: 20, right: 20),
+                      child: Center(
+                        child: SizedBox(
+                          height: 50,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    titleTextStyle: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    title: const Text('Transaksi'),
+                                    content: const Text(
+                                        'Yakin membatalkan transaksi?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () async {
+                                          Navigator.of(context).pop();
+                                          // await openAppSettings();
+                                          var token =
+                                              await authProvider.getLoginData();
+                                          if (await settingsProvider
+                                              .updateTransaksi(
+                                                  noinvoice: widget
+                                                      .data!.noInvoice
+                                                      .toString(),
+                                                  status: "5",
+                                                  token: token.toString())) {
+                                            showToast(
+                                                "Pembatalan Transaksi berhasil diajukan");
+                                            Navigator.pop(context);
+                                          } else {
+                                            showToast(
+                                                "Pembatalan Transaksi gagal");
+                                          }
+                                        },
+                                        child: const Text('Iya'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Tidak'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                                shape: const StadiumBorder(
+                                    side: BorderSide(
+                                        width: 1, color: Colors.red)),
+                                backgroundColor: Colors.red),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  SolarIconsBold.trashBin2,
+                                  color: Colors.white,
+                                ),
+                                Text(
+                                  ' Batalkan Transaksi',
+                                  style: poppins.copyWith(
+                                      fontWeight: semiBold,
+                                      color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

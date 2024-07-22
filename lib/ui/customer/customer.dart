@@ -3,6 +3,7 @@ import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/ui/customer/add_customer_page.dart';
 import 'package:e_shop/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
 import 'package:solar_icons/solar_icons.dart';
@@ -71,6 +72,37 @@ class _CustomerState extends State<Customer> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  DateTime? lastPressed;
+  Future<bool> onWillPop() async {
+    final now = DateTime.now();
+    final maxDuration = Duration(seconds: 2);
+
+    if (lastPressed == null || now.difference(lastPressed!) > maxDuration) {
+      lastPressed = now;
+      Fluttertoast.showToast(
+        msg: 'Tekan sekali lagi untuk keluar',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+      );
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+  Future<void> _handleRefresh() async {
+    // Simulate network fetch or database query
+    // await Future.delayed(Duration(seconds: 2));
+    // Update the list of items and refresh the UI
+    setState(() {
+      isLoading = true;
+    });
+
+    // Get Customer List
+    _getCustomer();
   }
 
   @override
@@ -210,120 +242,129 @@ class _CustomerState extends State<Customer> {
       );
     }
 
-    return Container(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: isLoading
-            ? Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.transparent,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      color: backgroundColor1,
-                    ),
-                    Container(
-                      height: 30,
-                    ),
-                    Text(
-                      "Loading Data",
-                      style: poppins.copyWith(
-                        fontWeight: semiBold,
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: Container(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: isLoading
+              ? Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.transparent,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
                         color: backgroundColor1,
-                        fontSize: 15,
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    color: backgroundColor3,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Pelanggan",
-                                style: poppins.copyWith(
-                                    fontSize: 20,
-                                    fontWeight: semiBold,
-                                    color: Colors.white),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    customerProvider.selectedCity = "-";
-                                  });
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const CustomerInformation(
-                                              data: {},
-                                              isEditable: true,
-                                            )),
-                                  ).then((value) => setState(() {
-                                        _getCustomer();
-                                      }));
-                                },
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.05,
-                                  child: const Icon(
-                                    SolarIconsOutline.userPlus,
-                                    color: Colors.white,
+                      Container(
+                        height: 30,
+                      ),
+                      Text(
+                        "Loading Data",
+                        style: poppins.copyWith(
+                          fontWeight: semiBold,
+                          color: backgroundColor1,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      color: backgroundColor3,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Pelanggan",
+                                  style: poppins.copyWith(
+                                      fontSize: 20,
+                                      fontWeight: semiBold,
+                                      color: Colors.white),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      customerProvider.selectedCity = "-";
+                                    });
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const CustomerInformation(
+                                                data: {},
+                                                isEditable: true,
+                                              )),
+                                    ).then((value) => setState(() {
+                                          _getCustomer();
+                                        }));
+                                  },
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.05,
+                                    child: const Icon(
+                                      SolarIconsOutline.userPlus,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        searchbar()
-                      ],
-                    ),
-                  ),
-                  if (customerListFiltered.isEmpty) ...[
-                    Expanded(
-                        child: Center(
-                            child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.account_circle_outlined,
-                          size: 48,
-                        ),
-                        Text(
-                          "Pelanggan tidak ditemukan",
-                          style: poppins.copyWith(
-                              fontWeight: regular, fontSize: 20),
-                        ),
-                      ],
-                    )))
-                  ] else ...[
-                    Expanded(
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 20),
-                        itemCount: customerListFiltered.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return customerDynamicCardVertical(
-                              customerListFiltered[index]);
-                        },
+                          searchbar()
+                        ],
                       ),
                     ),
-                  ]
-                ],
-              ));
+                    if (customerListFiltered.isEmpty) ...[
+                      Expanded(
+                          child: RefreshIndicator(
+                        onRefresh: _handleRefresh,
+                        child: Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.account_circle_outlined,
+                              size: 48,
+                            ),
+                            Text(
+                              "Pelanggan tidak ditemukan",
+                              style: poppins.copyWith(
+                                  fontWeight: regular, fontSize: 20),
+                            ),
+                          ],
+                        )),
+                      ))
+                    ] else ...[
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: _handleRefresh,
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 20),
+                            itemCount: customerListFiltered.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return customerDynamicCardVertical(
+                                  customerListFiltered[index]);
+                            },
+                          ),
+                        ),
+                      ),
+                    ]
+                  ],
+                )),
+    );
   }
 }
