@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:e_shop/models/cart/cart_list_model.dart';
+import 'package:e_shop/models/cart/total_cart_model.dart';
 import 'package:e_shop/models/customer/customer_post_model.dart';
 import 'package:e_shop/models/customer/success_model.dart';
 import 'package:e_shop/models/settings/district_model.dart';
@@ -238,6 +239,33 @@ class SettingsService {
       return storeLocateModel;
     } else {
       throw Exception("Gagal Mendapatkan Promo");
+    }
+  }
+
+  // Add data customer
+  Future<TotalCartModel> getTotalTransaction({
+    required String cabangid,
+    required String token,
+  }) async {
+    var url = Uri.parse("${baseURL}keranjang/total?cabang=$cabangid");
+    var header = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json'
+    };
+
+    var response = await http.get(url, headers: header);
+    // ignore: avoid_print
+    print("Get List Transaction: ${url}");
+    print("Get List Transaction: ${response.body}");
+
+// **success melakukan login
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var data = jsonDecode(response.body);
+      TotalCartModel callbackData = TotalCartModel.fromJson(data);
+      return callbackData;
+    } else {
+      var data = jsonDecode(response.body);
+      throw ErrorDescription('${data['message']}');
     }
   }
 }

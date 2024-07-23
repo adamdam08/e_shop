@@ -1,3 +1,4 @@
+import 'package:e_shop/models/cart/total_cart_model.dart';
 import 'package:e_shop/models/customer/success_model.dart';
 import 'package:e_shop/models/settings/payment_model.dart';
 import 'package:e_shop/models/settings/shipping_model.dart';
@@ -134,6 +135,7 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
+  // Update Transaksi Code
   Future<bool> updateTransaksi({
     required String noinvoice,
     required String status,
@@ -144,6 +146,32 @@ class SettingsProvider with ChangeNotifier {
           .updateTransaksi(noinvoice: noinvoice, status: status, token: token);
       // _paymentInfo = data;
       // print("Store Location :  ${_paymentInfo}");
+      return true;
+    } catch (e) {
+      print("Error : $e");
+      return false;
+    }
+  }
+
+  // Total Cart
+  TotalCartModel? _totalCart;
+
+  TotalCartModel? get totalCart => _totalCart;
+
+  set totalCart(TotalCartModel? totalCart) {
+    _totalCart = totalCart;
+    notifyListeners();
+  }
+
+  Future<bool> getTotalCart({
+    required String token,
+    required String cabangId,
+  }) async {
+    try {
+      TotalCartModel data = await SettingsService()
+          .getTotalTransaction(cabangid: cabangId, token: token);
+      _totalCart = data;
+      print("Store Location :  ${_paymentInfo}");
       return true;
     } catch (e) {
       print("Error : $e");

@@ -17,6 +17,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:solar_icons/solar_icons.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class Home extends StatefulWidget {
@@ -42,6 +43,7 @@ class _HomeState extends State<Home> {
   String _longitude = '';
 
   // Produk Terlaku controller
+  int totalCart = 0;
   int bestSellerIndex = 1;
   bool _isInitLoading = false;
   bool _isLoading = false;
@@ -73,6 +75,9 @@ class _HomeState extends State<Home> {
 
     // List Banner
     _getListBanner();
+
+    // Total Data
+    _getTotalCart();
   }
 
   void _onFocusChange() {
@@ -303,6 +308,29 @@ class _HomeState extends State<Home> {
     }
   }
 
+  // Get total data
+  void _getTotalCart() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+
+    // Get data from SharedPref
+    var data = await authProvider.getLoginData();
+    // Get Category By Tree
+    if (await settingsProvider.getTotalCart(
+        token: data!.token.toString(),
+        cabangId: data.data.cabangId.toString())) {
+      if (context.mounted) {
+        setState(() {
+          totalCart = settingsProvider.totalCart?.totalData!.total ?? 0;
+        });
+      }
+      print("Suggestion Data : ${_myCategory}");
+    } else {
+      print("Suggestion Data Failed : ${_myCategory}");
+    }
+  }
+
   Future<void> _handleRefresh() async {
     // Simulate network fetch or database query
     // await Future.delayed(Duration(seconds: 2));
@@ -407,10 +435,38 @@ class _HomeState extends State<Home> {
                       onTap: () {
                         Navigator.pushNamed(context, '/cart');
                       },
-                      child: Icon(
-                        Icons.shopping_cart,
-                        size: 30,
-                        color: backgroundColor3,
+                      child: Stack(
+                        children: <Widget>[
+                          Icon(
+                            SolarIconsBold.cartLarge,
+                            size: 30,
+                            color: backgroundColor3,
+                          ),
+                          if (totalCart > 0) ...[
+                            Positioned(
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(1),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  "$totalCart",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     const SizedBox(

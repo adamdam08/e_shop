@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:e_shop/models/cart/total_cart_model.dart';
 import 'package:e_shop/models/detail_product_model.dart';
 import 'package:e_shop/models/product/banner_model.dart';
 import 'package:e_shop/models/product/product_category_tree_model.dart';
