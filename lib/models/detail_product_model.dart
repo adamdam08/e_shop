@@ -229,14 +229,14 @@ class Harga {
 class Keranjang {
   String? sId;
   int? jumlah;
-  List<int>? jumlahMultisatuan;
+  List<dynamic>? jumlahMultisatuan;
 
   Keranjang({this.sId, this.jumlah, this.jumlahMultisatuan});
 
   Keranjang.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     jumlah = json['jumlah'];
-    jumlahMultisatuan = json['jumlah_multisatuan'].cast<int>();
+    jumlahMultisatuan = json['jumlah_multisatuan'];
   }
 
   Map<String, dynamic> toJson() {

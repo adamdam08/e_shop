@@ -144,7 +144,7 @@ class ProductProvider with ChangeNotifier {
       _detailProduct?.data?.harga = detailProduct.data?.harga
           ?.where((element) => element.cabang == cabang)
           .toList();
-      print("Get Promo : ${detailProduct}");
+      print("Get Promo : ${detailProduct.data?.keranjang?.jumlah}");
       return true;
     } catch (e) {
       print("Error : $e");
