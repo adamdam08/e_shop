@@ -247,7 +247,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 // borderRadius: BorderRadius.circular(8),
                 child: FadeInImage.memoryNetwork(
                   placeholder: kTransparentImage,
-                  image: data["image_url"],
+                  image: "http://103.127.132.116/uploads/images/${data["image_url"]}",
                   fit: BoxFit.cover,
                   height: 125,
                   width: 125,

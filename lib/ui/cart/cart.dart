@@ -1177,7 +1177,7 @@ class _CartState extends State<Cart> {
                 "id": data.produkId,
                 "nama_produk": data.namaProduk.toString(),
                 "image_url":
-                    "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                    "${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
                 "harga": data.diskon != null ? data.hargaDiskon : data.harga,
                 "jumlah": data.jumlah,
                 "total_harga": totalHarga,
@@ -1190,12 +1190,13 @@ class _CartState extends State<Cart> {
                 "kategori_slug": data.kategoriSlug,
                 "satuan_produk": data.satuanProduk
               };
+              //http://103.127.132.116/uploads/images/
             } else {
               cartProduct.selectedProducts[i] = {
                 "id": data.produkId,
                 "nama_produk": data.namaProduk.toString(),
                 "image_url":
-                    "http://103.127.132.116/uploads/images/${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
+                    "${cartProduct.cartList.listData!.first.cartData![index].imageUrl.toString()}",
                 "harga": data.diskon != null ? data.hargaDiskon : data.harga,
                 "jumlah": data.jumlah,
                 "total_harga": totalHarga,
@@ -1899,8 +1900,7 @@ class _CartState extends State<Cart> {
                             if (cartProduct.cartList.listData!.isNotEmpty &&
                                 customerListFiltered.isNotEmpty &&
                                 cartProduct.selectedProducts.isNotEmpty) {
-                              print(
-                                  "selectedProducts : ${cartProduct.selectedProducts.toString()}");
+                              print("selectedProducts : ${cartProduct.selectedProducts.toString()}");
 
                               Navigator.pushNamed(context, '/checkout_summary');
                             }

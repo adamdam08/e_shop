@@ -215,11 +215,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                             offset: const Offset(0, 0))
                       ]),
                   child: Text(
-                    data.pembatalan == 1
-                        ? "${data.keteranganStatus}"
-                        : data.status == 0
-                            ? "Belum Dibayar"
-                            : "Selesai",
+                    (data.pembatalan == 1 && data.status == 0) ? "${data.keteranganStatus}" : data.status == 0 ? "Belum Dibayar" : data.status == 5 ? "Dibatalkan" :"${data.keteranganStatus}" "",
                     style: poppins.copyWith(
                         fontWeight: regular,
                         color: Colors.white,
@@ -248,8 +244,8 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                   // borderRadius: BorderRadius.circular(8),
                   child: FadeInImage.memoryNetwork(
                     placeholder: kTransparentImage,
-                    image: data.produk!.first.imageUrl.toString().replaceAll(
-                        "https://tokosm.online", "http://103.127.132.116"),
+                    image: "http://103.127.132.116/uploads/images/${data.produk!.first.imageUrl.toString().replaceAll(
+                        "https://tokosm.online", "http://103.127.132.116")}",
                     fit: BoxFit.cover,
                     height: 75,
                     width: 75,
@@ -733,7 +729,7 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                                 color: _indexStatus == "3"
                                     ? backgroundColor1
                                     : backgroundColor3),
-                            child: Text("Selesai",
+                            child: Text("Diterima",
                                 style: poppins.copyWith(color: Colors.white)),
                           ),
                         ),
@@ -752,6 +748,27 @@ class _CustomerTransactPageState extends State<CustomerTransactPage> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(15),
                                 color: _indexStatus == "4"
+                                    ? backgroundColor1
+                                    : backgroundColor3),
+                            child: Text("Selesai",
+                                style: poppins.copyWith(color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _indexStatus = "5";
+                              _getTransactionHistory();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: _indexStatus == "5"
                                     ? backgroundColor1
                                     : backgroundColor3),
                             child: Text("Dibatalkan",

@@ -250,8 +250,8 @@ class _CustomerTransactionDetailPageState
               // borderRadius: BorderRadius.circular(8),
               child: FadeInImage.memoryNetwork(
                 placeholder: kTransparentImage,
-                image: data.imageUrl.toString().replaceAll(
-                    "https://tokosm.online", "http://103.127.132.116"),
+                image: "http://103.127.132.116/uploads/images/${data.imageUrl.toString().replaceAll(
+                    "https://tokosm.online", "http://103.127.132.116")}",
                 fit: BoxFit.cover,
                 height: 125,
                 width: 125,
@@ -372,7 +372,7 @@ class _CustomerTransactionDetailPageState
             ],
           ),
 
-          if ("${data.bankTransfer}" != "") ...[
+          if ("${data.bankTransfer}" != "" && data.metodePembayaran == "transfer") ...[
             const SizedBox(
               height: 10,
             ),
@@ -424,28 +424,6 @@ class _CustomerTransactionDetailPageState
               ),
             ),
           ],
-
-          // const SizedBox(
-          //   height: 10,
-          // ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Text(
-          //       "No Rekening",
-          //       style: poppins.copyWith(
-          //         color: Colors.black,
-          //       ),
-          //     ),
-          //     Text(
-          //       "${data!.norekeningTransfer}",
-          //       style: poppins.copyWith(
-          //         color: backgroundColor1,
-          //       ),
-          //     ),
-          //   ],
-          // ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(
