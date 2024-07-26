@@ -279,7 +279,7 @@ class _CustomerState extends State<Customer> {
                           const SizedBox(
                               height:
                                   10), // Add some spacing between text and buttons
-                          Row(
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               ElevatedButton(
@@ -310,7 +310,7 @@ class _CustomerState extends State<Customer> {
                                       color: Colors.white,
                                     ),
                                     Text(
-                                      ' A - Z',
+                                      ' Terkecil - Terbesar',
                                       style: poppins.copyWith(
                                           fontWeight: semiBold,
                                           color: Colors.white),
@@ -346,7 +346,7 @@ class _CustomerState extends State<Customer> {
                                       color: Colors.white,
                                     ),
                                     Text(
-                                      ' Z - A',
+                                      ' Terbesar - Terkecil',
                                       style: poppins.copyWith(
                                           fontWeight: semiBold,
                                           color: Colors.white),
