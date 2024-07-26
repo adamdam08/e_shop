@@ -38,10 +38,11 @@ class _CustomerSearchState extends State<CustomerSearch> {
     var data = await authProvider.getLoginData();
 
     if (await customerProvider.getListCustomerData(
-        token: data!.token.toString())) {
-      setState(() {
-        
-      });
+      token: data!.token.toString(),
+      order: "",
+      sort: "",
+    )) {
+      setState(() {});
     } else {}
   }
 

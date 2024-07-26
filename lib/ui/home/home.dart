@@ -339,6 +339,8 @@ class _HomeState extends State<Home> {
       _isInitLoading = true;
     });
 
+    _getTotalCart();
+
     _getLocationSettings();
 
     // List Banner

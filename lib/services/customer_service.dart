@@ -117,8 +117,14 @@ class CustomerService {
   }
 
   // Get List Customer
-  Future<CustomerDataModel> getListCustomer({required String token}) async {
-    var url = Uri.parse("${baseURL}customer");
+  Future<CustomerDataModel> getListCustomer(
+      {required String token,
+      required String sort,
+      required String order}) async {
+    print("Filter data at service $order");
+    print("Sort data at service $sort");
+    print("url at service ${"${baseURL}customer?sort=$sort&order=$order"}");
+    var url = Uri.parse("${baseURL}customer?sort=$sort&order=$order");
     var header = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

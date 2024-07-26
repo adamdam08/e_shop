@@ -127,6 +127,7 @@ class ProductService {
 
     var response = await http.get(url, headers: header);
     // ignore: avoid_print
+    print("Detail Product: ${url}");
     print("Detail Product: ${response.body}");
 
     // **success melakukan login

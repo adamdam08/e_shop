@@ -64,10 +64,18 @@ class CustomerProvider with ChangeNotifier {
 
   Future<bool> getListCustomerData({
     required String token,
+    required String sort,
+    required String order,
   }) async {
     try {
-      CustomerDataModel data =
-          await CustomerService().getListCustomer(token: token);
+      print("Filter data at provider $order");
+      print("Sort data at provider $sort");
+
+      CustomerDataModel data = await CustomerService().getListCustomer(
+        token: token,
+        sort: sort,
+        order: order,
+      );
       _myCustomer = data.data!
           .map((e) => {
                 "id": e.id.toString(),

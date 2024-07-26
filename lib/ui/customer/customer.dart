@@ -2,7 +2,10 @@ import 'package:e_shop/provider/auth_provider.dart';
 import 'package:e_shop/provider/customer_provider.dart';
 import 'package:e_shop/ui/customer/add_customer_page.dart';
 import 'package:e_shop/theme/theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_image_with_textbg/rounded_image_with_textbg.dart';
@@ -22,6 +25,8 @@ class _CustomerState extends State<Customer> {
   List<Map<dynamic, dynamic>> customerListFiltered = [];
   TextEditingController searchTextController = TextEditingController();
   bool isLoading = false;
+  String _sortData = "nama";
+  String _filterData = "asc";
 
   @override
   void initState() {
@@ -36,6 +41,9 @@ class _CustomerState extends State<Customer> {
       isLoading = true;
     });
 
+    print("Filter data $_filterData");
+    print("Sort data $_sortData");
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
@@ -44,6 +52,8 @@ class _CustomerState extends State<Customer> {
     if (data?.token != null) {
       if (await customerProvider.getListCustomerData(
         token: data!.token.toString(),
+        sort: _sortData,
+        order: _filterData,
       )) {
         _customerList.clear();
         _customerList = customerProvider.myCustomer;
@@ -242,6 +252,227 @@ class _CustomerState extends State<Customer> {
       );
     }
 
+    Widget filter() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                print("Showdialog : $_sortData");
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: Colors.white,
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const SizedBox(height: 10),
+                          Text(
+                            'Urutkan $_sortData berdasarkan',
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(
+                              height:
+                                  10), // Add some spacing between text and buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () async {
+                                  _filterData = "asc";
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    _handleRefresh();
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: StadiumBorder(
+                                    side: BorderSide(
+                                      width: 1,
+                                      color: backgroundColor3,
+                                    ),
+                                  ),
+                                  backgroundColor: _filterData == "asc"
+                                      ? backgroundColor1
+                                      : backgroundColor3,
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      SolarIconsOutline.sortFromTopToBottom,
+                                      color: Colors.white,
+                                    ),
+                                    Text(
+                                      ' A - Z',
+                                      style: poppins.copyWith(
+                                          fontWeight: semiBold,
+                                          color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  _filterData = "desc";
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    _handleRefresh();
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: StadiumBorder(
+                                    side: BorderSide(
+                                      width: 1,
+                                      color: backgroundColor3,
+                                    ),
+                                  ),
+                                  backgroundColor: _filterData == "desc"
+                                      ? backgroundColor1
+                                      : backgroundColor3,
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      SolarIconsOutline.sortFromBottomToTop,
+                                      color: Colors.white,
+                                    ),
+                                    Text(
+                                      ' Z - A',
+                                      style: poppins.copyWith(
+                                          fontWeight: semiBold,
+                                          color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: backgroundColor3,
+                ),
+                width: MediaQuery.of(context).size.width * 0.1,
+                height: MediaQuery.of(context).size.width * 0.1,
+                child: Icon(
+                  _filterData == "desc"
+                      ? SolarIconsOutline.sortFromBottomToTop
+                      : SolarIconsOutline.sortFromTopToBottom,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.02,
+            ),
+            Container(
+              // padding: const EdgeInsets.all(10),
+              width: MediaQuery.of(context).size.width * 0.78,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          setState(() {
+                            _sortData = "nama";
+                            _handleRefresh();
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          alignment: Alignment.center,
+                          color: _sortData == "nama"
+                              ? backgroundColor1
+                              : backgroundColor3,
+                          child: Text(
+                            "Nama",
+                            style: TextStyle(
+                              fontWeight: semiBold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          setState(() {
+                            _sortData = "transaksi";
+                            _handleRefresh();
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          alignment: Alignment.center,
+                          color: _sortData == "transaksi"
+                              ? backgroundColor1
+                              : backgroundColor3,
+                          child: Text(
+                            "Transaksi",
+                            style: TextStyle(
+                              fontWeight: semiBold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          setState(() {
+                            _sortData = "nominal";
+                            _handleRefresh();
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          alignment: Alignment.center,
+                          color: _sortData == "nominal"
+                              ? backgroundColor1
+                              : backgroundColor3,
+                          child: Text(
+                            "Nominal",
+                            style: TextStyle(
+                              fontWeight: semiBold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return WillPopScope(
       onWillPop: onWillPop,
       child: Container(
@@ -347,6 +578,10 @@ class _CustomerState extends State<Customer> {
                         )),
                       ))
                     ] else ...[
+                      filter(),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       Expanded(
                         child: RefreshIndicator(
                           onRefresh: _handleRefresh,

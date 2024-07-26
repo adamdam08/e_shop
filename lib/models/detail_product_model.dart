@@ -52,6 +52,7 @@ class Data {
   List<Stok>? stok;
   List<Harga>? harga;
   double? rating;
+  Keranjang? keranjang;
 
   Data(
       {this.id,
@@ -85,7 +86,8 @@ class Data {
       this.gambar,
       this.stok,
       this.harga,
-      this.rating});
+      this.rating,
+      this.keranjang});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -130,6 +132,9 @@ class Data {
       });
     }
     rating = json['rating'];
+    keranjang = json['keranjang'] != null
+        ? new Keranjang.fromJson(json['keranjang'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -170,6 +175,9 @@ class Data {
       data['harga'] = this.harga!.map((v) => v.toJson()).toList();
     }
     data['rating'] = this.rating;
+    if (this.keranjang != null) {
+      data['keranjang'] = this.keranjang!.toJson();
+    }
     return data;
   }
 }
@@ -214,6 +222,28 @@ class Harga {
     data['harga'] = this.harga;
     data['harga_diskon'] = this.hargaDiskon;
     data['diskon'] = this.diskon;
+    return data;
+  }
+}
+
+class Keranjang {
+  String? sId;
+  int? jumlah;
+  List<int>? jumlahMultisatuan;
+
+  Keranjang({this.sId, this.jumlah, this.jumlahMultisatuan});
+
+  Keranjang.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    jumlah = json['jumlah'];
+    jumlahMultisatuan = json['jumlah_multisatuan'].cast<int>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = this.sId;
+    data['jumlah'] = this.jumlah;
+    data['jumlah_multisatuan'] = this.jumlahMultisatuan;
     return data;
   }
 }

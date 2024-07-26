@@ -47,7 +47,10 @@ class SplashScreenPageState extends State<SplashScreenPage> {
 
             if (data.token != null) {
               if (await customerProvider.getListCustomerData(
-                  token: data.token.toString())) {
+                token: data.token.toString(),
+                order: "",
+                sort: "",
+              )) {
               } else {}
             }
 
